@@ -8,6 +8,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&family=Noto+Sans+Thai+Looped:wght@400;500;600&display=swap">
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.11/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.11/katex.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.11/contrib/auto-render.min.js"></script>
 <style>
 /* หน้าตาตาม mockup v19 (ระบบจริง/ออกแบบ/mockup):
    หน้านักเรียนและหน้าครูเป็นคอลัมน์มือถือ ปุ่มหลักติดล่างจอ · หน้าผู้ดูแลเป็นจอคอมมีเมนูด้านซ้าย */
@@ -492,6 +495,9 @@ details.more > summary::-webkit-details-marker { display: none; }
 .fs-foot { text-align: center; color: #475467; font-size: .95rem; }
 .fs-closed { display: grid; place-items: center; text-align: center; gap: 10px; font-size: 1.3rem; }
 .toast { position: fixed; left: 50%; bottom: 96px; transform: translateX(-50%); z-index: 40; max-width: min(440px, calc(100% - 32px)); padding: 12px 16px; border-radius: 12px; background: var(--ink); color: var(--bg); font-size: 14px; line-height: 1.5; box-shadow: 0 8px 24px rgba(16,24,40,.2); }
+.katex { font-size: 1.08em; }
+.katex-display { margin: .5em 0; overflow-x: auto; overflow-y: hidden; padding: 2px 0; }
+.mini .q .katex-display { display: inline; margin: 0; }
 #print-area { display: none; }
 @media print {
   body > *:not(#print-area) { display: none !important; }
@@ -543,6 +549,30 @@ const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const esc = (t) => String(t ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const fmtCode = (c) => String(c || '').replace(/^(\d{3})(\d{3})$/, '$1 $2');
+
+/* สมการในโจทย์และตัวเลือก: พิมพ์ในชีตเป็น LaTeX ครอบด้วย $…$ (ในบรรทัด) หรือ $$…$$ (แยกบรรทัด)
+   หน้าเว็บแปลงเป็นสมการด้วย KaTeX ทุกครั้งที่มีเนื้อหาใหม่ขึ้นจอ ถ้าโหลด KaTeX ไม่ได้ จะเห็นเป็นข้อความ LaTeX เดิม
+   ไม่แปลงในช่องกรอก (input/textarea) และกล่องข้อความสำหรับคัดลอกส่ง LINE (.msg) */
+const TEX_OPT = {
+  delimiters: [{ left: '$$', right: '$$', display: true }, { left: '$', right: '$', display: false }, { left: '\\(', right: '\\)', display: false }],
+  ignoredClasses: ['katex', 'msg', 'no-tex'], throwOnError: false, strict: 'ignore'
+};
+/* การแปลงสมการเองก็แก้ DOM ด้วย (เช่น $ ตัวเดียวที่ไม่มีตัวปิด ถูกแยกเป็นข้อความใหม่ทุกครั้ง)
+   จึงทิ้งการเปลี่ยนแปลงที่เกิดจากการแปลงด้วย takeRecords() ไม่ให้วนแปลงซ้ำไม่รู้จบ */
+const texObs = new MutationObserver(ms => {
+  for (const m of ms) {
+    if (m.type === 'characterData') { texIn(m.target.parentElement); continue; }
+    for (const n of m.addedNodes) texIn(n.nodeType === 3 ? n.parentElement : n);
+  }
+});
+function texIn(el) {
+  if (!window.renderMathInElement || !el || el.nodeType !== 1 || el.closest('.katex, .msg, .no-tex')) return;
+  if (!/\$|\\\(/.test(el.textContent)) return;
+  try { renderMathInElement(el, TEX_OPT); } catch (e) {}
+  texObs.takeRecords();
+}
+texObs.observe(document.body, { childList: true, subtree: true, characterData: true });
+document.addEventListener('DOMContentLoaded', () => texIn(document.body));
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
 const pct = (a, b) => b ? Math.min(100, Math.round(a / b * 100)) : 0;
 const store = {
