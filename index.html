@@ -630,10 +630,10 @@ function showLogin(note) {
     <header class="hero"><div class="hero-top"><div class="who"><span>${esc(ME.school || 'ระบบฝึกข้อสอบระดับชาติ')}</span><b>${adminLink() ? 'เข้าสู่ระบบผู้ดูแลระบบ' : 'เข้าสู่ระบบครู'}</b></div></div></header>
     <main class="pad">
       <div class="card" style="padding:16px;display:flex;flex-direction:column;gap:14px">
-        <div class="field"><label for="lg-id">เลขบัตรประชาชน 13 หลัก</label>
+        <div class="field"><label for="lg-id">ID (รหัส 13 หลัก)</label>
           <input id="lg-id" class="input num" inputmode="numeric" autocomplete="username" maxlength="17" placeholder="0000000000000"></div>
         <div class="field"><label for="lg-pw">รหัสผ่าน</label>
-          <input id="lg-pw" class="input" type="password" autocomplete="current-password" placeholder="รหัสผ่านที่ผู้ดูแลระบบให้"></div>
+          <input id="lg-pw" class="input" type="password" autocomplete="current-password" placeholder="รหัสผ่านที่ผู้ดูแลระบบตั้งให้"></div>
         <label style="display:flex;gap:10px;align-items:center;font-size:14px;color:var(--ink-2)"><input type="checkbox" id="lg-remember" style="width:20px;height:20px"> จำการเข้าสู่ระบบในเครื่องนี้ (ไม่ติ๊กถ้าใช้คอมร่วมกัน)</label>
         <span class="err" id="lg-err" role="alert">${esc(note || '')}</span>
       </div>
@@ -652,7 +652,7 @@ function showLogin(note) {
 async function doLogin() {
   const id = $('#lg-id').value.replace(/\D/g, ''), pw = $('#lg-pw').value;
   const err = $('#lg-err');
-  if (id.length !== 13) { err.textContent = 'เลขบัตรประชาชนต้องมี 13 หลัก'; return; }
+  if (id.length !== 13) { err.textContent = 'ID ต้องเป็นตัวเลข 13 หลัก'; return; }
   if (!pw) { err.textContent = 'กรอกรหัสผ่าน'; return; }
   const b = $('#lg-go'); b.disabled = true; b.textContent = 'กำลังเข้าสู่ระบบ…'; err.textContent = '';
   try {
