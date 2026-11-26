@@ -1054,7 +1054,7 @@ function tShow(page, key) { T.page = page; T.key = key || T.key; T.arm = false; 
 
 /* ----- สถานะของห้อง: ข้อความสั้น สี และปุ่มหลัก ----- */
 function roomStatus(r) {
-  if (r.state === 'idle') return { cls: r.today ? 'wait' : 'mute', text: 'ยังไม่เลือกข้อ' };
+  if (r.state === 'idle') return { cls: 'wait', text: 'ยังไม่เลือกข้อ' };
   if (r.state === 'planned') return r.item.missing ? { cls: 'bad', text: 'ไม่พบข้อที่เลือกไว้ในคลัง' } : { cls: 'info', text: 'เลือกข้อแล้ว รอเปิดรับ' };
   if (r.state === 'open') return { cls: 'ok', text: `เปิดรับอยู่ · ตอบแล้ว ${r.sent || 0}/${r.size || '?'}` };
   if (!r.report) return { cls: 'bad', text: (r.state === 'paper' ? 'แบบกระดาษ' : 'ปิดรับแล้ว') + ' · ยังไม่ส่งรายงาน' };
@@ -1073,12 +1073,9 @@ function pickFocus(D) {
   const by = f => rooms.find(f);
   const keep = T.focus && roomOf(T.focus);
   return keep
-    || by(r => r.now && !(isDone(r) && r.report))
     || by(r => r.state === 'open')
-    || by(r => r.today && isDone(r) && !r.report)
-    || by(r => r.today && (r.state === 'idle' || r.state === 'planned'))
     || by(r => isDone(r) && !r.report)
-    || by(r => r.today)
+    || by(r => r.state === 'planned')
     || rooms[0] || null;
 }
 
@@ -1100,7 +1097,7 @@ function miniItem(it) {
 function focusCard(r) {
   const st = roomStatus(r);
   let body = '';
-  if (r.state === 'idle') body = `<div class="mini"><span style="font-size:14px;color:var(--ink-2)">ยังไม่ได้เลือกข้อสำหรับคาบนี้</span>
+  if (r.state === 'idle') body = `<div class="mini"><span style="font-size:14px;color:var(--ink-2)">ยังไม่ได้เลือกข้อ</span>
       <span class="note">${r.usedCount ? `ห้องนี้ทำไปแล้ว ${r.usedCount} ข้อ ข้อที่ยังไม่เคยทำจะขึ้นก่อน` : 'ห้องนี้ยังไม่เคยทำข้อประจำคาบ'}</span></div>`;
   if (r.state === 'planned') body = miniItem(r.item) + `<div class="links"><button class="link" type="button" data-f="pick">เปลี่ยนข้อ</button><button class="link" type="button" data-f="more">ตัวเลือกอื่น</button></div>`;
   if (r.state === 'open') body = miniItem(r.item) + `<div class="count"><div class="r"><span>ตอบแล้ว</span><span><b class="num">${r.sent || 0}</b> / ${r.size || '?'} คน</span></div>
@@ -1112,16 +1109,16 @@ function focusCard(r) {
     body = miniItem(r.item) + `<div class="count"><div class="r"><span>${r.state === 'paper' ? 'แบบกระดาษ · ' : ''}ตอบถูก</span><span><b class="num">${res.pct ?? '—'}${res.pct !== null && res.pct !== undefined ? '%' : ''}</b> จาก ${res.n || 0} คน</span></div></div>
       ${r.report ? `<div class="links"><button class="link" type="button" data-f="result">ดูผลและรายงานที่ส่ง</button></div>` : ''}`;
   }
-  const when = r.extra ? `รอบ${r.day ? ' ' + r.day : 'ก่อนหน้า'}` : r.when;
+  const when = r.extra ? `รอบ${r.day ? ' ' + r.day : 'ก่อนหน้า'}` : '';
   return `<section class="card focus" aria-label="ห้องที่ต้องทำต่อ">
-    <div class="focus-head"><div class="t"><span><b>${esc(r.room)}</b>${r.now ? '<span class="now-tag">คาบนี้</span>' : r.extra ? '<span class="now-tag warn">ค้างรายงาน</span>' : ''}</span>
+    <div class="focus-head"><div class="t"><span><b>${esc(r.room)}</b>${r.extra ? '<span class="now-tag warn">ค้างรายงาน</span>' : ''}</span>
       <span class="sub">${esc(r.subject)}${when ? ' · ' + esc(when) : ''}</span></div><span class="st ${st.cls}">${esc(st.text.split(' · ')[0])}</span></div>
     ${body}${stepsHtml(r)}</section>`;
 }
 
 function roomRow(r) {
   const st = roomStatus(r);
-  const when = r.extra ? (r.day ? `ปิดรับ${r.day}` : '') : r.when;
+  const when = r.extra && r.day ? `ปิดรับ${r.day}` : '';
   return `<button class="row" type="button" data-row="${esc(r.key)}"><span class="t"><b>${esc(r.room)} <small>${esc(r.subject)}</small></b>
       <span class="${st.cls}">${esc(st.text)}${when ? `<span class="muted"> · ${esc(when)}</span>` : ''}</span></span>${IC.chev}</button>`;
 }
@@ -1142,20 +1139,18 @@ function renderHome() {
   const f = pickFocus(D);
   T.focus = f ? f.key : '';
   const rest = allRooms().filter(r => r !== f);
-  const rank = r => r.now ? 0 : r.state === 'open' ? 1 : (isDone(r) && !r.report) ? 2 : r.today ? 3 : 4;
-  rest.sort((a, b) => rank(a) - rank(b) || (a.first ?? 9999) - (b.first ?? 9999) || a.room.localeCompare(b.room, 'th', { numeric: true }));
-  const todayRows = rest.filter(r => r.today || r.state === 'open' || (isDone(r) && !r.report));
-  const otherRows = rest.filter(r => todayRows.indexOf(r) < 0);
+  // ไม่ผูกเวลา: ห้องที่ต้องทำต่อขึ้นก่อน (เปิดรับอยู่ › ค้างรายงาน › เลือกข้อไว้แล้ว) ที่เหลือเรียงตามชื่อห้อง
+  const rank = r => r.state === 'open' ? 0 : (isDone(r) && !r.report) ? 1 : r.state === 'planned' ? 2 : 3;
+  rest.sort((a, b) => rank(a) - rank(b) || a.room.localeCompare(b.room, 'th', { numeric: true }));
   const act = f ? mainAction(f) : null;
   el.innerHTML = `
     <header class="hero"><div class="hero-top"><div class="who"><span>${esc(D.teacher.name)}${subjects ? ' · ' + esc(subjects) : ''}</span><b>${esc(D.today)}</b></div>
         <div class="side">${D.week ? `<span>สัปดาห์ที่ ${D.week}</span>` : '<span>นอกสัปดาห์ที่นับ</span>'}<button type="button" id="t-menu">เมนู</button></div></div>
-      <div class="stats" role="group" aria-label="สรุปวันนี้"><div><span>คาบวันนี้</span><b>${D.todayCount}</b></div><div><span>ยังไม่เลือกข้อ</span><b>${D.todayUnpicked}</b></div><div><span>รายงานค้าง</span><b>${D.owe}</b></div></div></header>
+      <div class="stats" role="group" aria-label="สรุปห้องที่สอน"><div><span>ห้องที่สอน</span><b>${D.roomCount}</b></div><div><span>ยังไม่เลือกข้อ</span><b>${D.unpicked}</b></div><div><span>รายงานค้าง</span><b>${D.owe}</b></div></div></header>
     <main class="pad">
-      ${!D.rooms.length && !(D.extra || []).length ? `<div class="card empty">ยังไม่พบห้องที่คุณสอนในชีตตารางสอน<br>แจ้งผู้ดูแลระบบให้เพิ่มแถวที่มีรหัสครู ${esc(D.teacher.tid)}</div>` : ''}
+      ${!D.rooms.length && !(D.extra || []).length ? `<div class="card empty">ยังไม่พบห้องที่คุณสอนในชีตครูผู้สอน<br>แจ้งผู้ดูแลระบบให้เพิ่มแถวที่มีรหัสครู ${esc(D.teacher.tid)}</div>` : ''}
       ${f ? focusCard(f) : ''}
-      ${todayRows.length ? `<h2 class="sec-label">วันนี้</h2><div class="card rows">${todayRows.map(roomRow).join('')}</div>` : ''}
-      ${otherRows.length ? `<h2 class="sec-label">ห้องอื่นที่สอน · เลือกข้อล่วงหน้าได้</h2><div class="card rows">${otherRows.map(roomRow).join('')}</div>` : ''}
+      ${rest.length ? `<h2 class="sec-label">ห้องอื่นที่สอน</h2><div class="card rows">${rest.map(roomRow).join('')}</div>` : ''}
       ${(D.homeroom || []).length ? `<h2 class="sec-label">ห้องที่คุณเป็นครูประจำชั้น</h2>${D.homeroom.map(homeroomCard).join('')}` : ''}
     </main>
     ${act ? `<div class="dock"><button class="btn-p" type="button" id="t-main">${esc(act.label)}</button></div>` : ''}`;
@@ -1174,7 +1169,7 @@ function renderHome() {
 
 function teacherMenu() {
   openSheet(sheetHead(T.data.teacher.name, [T.data.teacher.role, ME.school].filter(Boolean).join(' · ')) +
-    `<div class="list"><button type="button" id="m-reload">โหลดข้อมูลใหม่<small>ดึงตารางสอนและยอดคำตอบล่าสุด</small></button>
+    `<div class="list"><button type="button" id="m-reload">โหลดข้อมูลใหม่<small>ดึงห้องที่สอนและยอดคำตอบล่าสุด</small></button>
       ${ME.canDash ? '<button type="button" id="m-admin">หน้าผู้ดูแล<small>ภาพรวมข้อมูล แบบประเมินรวม รายงานการใช้</small></button>' : ''}
       <button type="button" id="m-out" class="red">ออกจากระบบ</button></div>`, () => {
     $('#m-reload').onclick = () => { closeSheet(); tLoad(); };
@@ -1196,8 +1191,7 @@ async function startIn(r, btn) {
 function moreSheet(r, itemId) {
   const fromPicker = !!itemId;
   openSheet(sheetHead('ตัวเลือกอื่น', `${r.room} · ${r.subject}`) + `<div class="list">
-      ${fromPicker ? (r.now ? '<button type="button" data-m="keep">เลือกข้อนี้ไว้ก่อน<small>ยังไม่เปิดรับ กดเปิดรับจากหน้าห้องเรียนเมื่อพร้อม</small></button>'
-        : '<button type="button" data-m="now">เปิดรับในคาบตอนนี้เลย<small>ใช้เมื่อสอนนอกเวลาที่อยู่ในตารางสอน</small></button>') : ''}
+      ${fromPicker ? '<button type="button" data-m="keep">เลือกข้อนี้ไว้ก่อน<small>ยังไม่เปิดรับ กดเปิดรับจากหน้าห้องเรียนเมื่อพร้อม</small></button>' : ''}
       <button type="button" data-m="out">ทำนอกคาบ<small>ส่งลิงก์เข้ากลุ่ม LINE ห้อง ระบบปิดรับเองตามกำหนด</small></button>
       <button type="button" data-m="paper">บันทึกแบบกระดาษ<small>อินเทอร์เน็ตใช้ไม่ได้ เขียนข้อบนกระดาน แล้วนับจำนวนที่ตอบถูก</small></button>
       ${!fromPicker && r.state === 'planned' ? '<button type="button" data-m="cancel" class="red">ยกเลิกข้อที่เลือกไว้</button>' : ''}</div>`, () => {
@@ -1295,7 +1289,7 @@ async function openPicker(r) {
 
 function pickBar(r) {
   return `<header class="bar"><button class="ibtn" type="button" id="pk-back" aria-label="กลับหน้าห้องเรียน">${IC.back}</button>
-    <div class="t"><b>เลือกข้อสอบ</b><span>${esc(r.room)} · ${esc(r.subject)}${r.when && !r.extra ? ' · ' + esc(r.when) : ''}</span></div></header>`;
+    <div class="t"><b>เลือกข้อสอบ</b><span>${esc(r.room)} · ${esc(r.subject)}</span></div></header>`;
 }
 
 function renderPicker() {
@@ -1307,7 +1301,6 @@ function renderPicker() {
   const list = inSub.filter(i => !P.topic || i.topic === P.topic).sort((a, b) => (a.used ? 1 : 0) - (b.used ? 1 : 0));
   const subs = subjectsOf(P.exam);
   const sel = d.items.find(i => i.id === P.sel);
-  const now = !!r.now;
   el.innerHTML = pickBar(r) + `
     <div class="filters">
       <div class="fgroup"><span class="lab" id="lab-exam">1 · ประเภทข้อสอบ</span>
@@ -1328,8 +1321,8 @@ function renderPicker() {
       ${list.length ? `<div class="qlist" role="radiogroup" aria-labelledby="lab-list">${list.map(pickItemHtml).join('')}</div>` : '<div class="card empty">ยังไม่มีข้อในหมวดนี้</div>'}
     </main>
     <div class="dock">
-      <button class="btn-p" type="button" id="pk-go" ${sel ? '' : 'disabled'}>${now ? 'ใช้ข้อนี้ แล้วเปิดรับคำตอบ' : 'เลือกข้อนี้ไว้ก่อน'}</button>
-      <span class="cap">${now ? 'คาบนี้กำลังสอนอยู่ ระบบเปิดรับและขึ้น QR ทันที' : 'ยังไม่ถึงคาบ ระบบเก็บข้อไว้ กดเปิดรับตอนเข้าคาบ'} · <button class="link" type="button" id="pk-more" ${sel ? '' : 'disabled'} style="font-size:12px">ตัวเลือกอื่น</button></span>
+      <button class="btn-p" type="button" id="pk-go" ${sel ? '' : 'disabled'}>ใช้ข้อนี้ แล้วเปิดรับคำตอบ</button>
+      <span class="cap">ระบบเปิดรับและขึ้น QR ทันที · <button class="link" type="button" id="pk-more" ${sel ? '' : 'disabled'} style="font-size:12px">ตัวเลือกอื่น</button></span>
       <span class="err" id="pk-err" role="alert" style="text-align:center"></span></div>`;
   $('#pk-back').onclick = () => tShow('home');
   $$('[data-exam]', el).forEach(b => b.onclick = () => {
@@ -1339,7 +1332,7 @@ function renderPicker() {
   $$('[data-sub]', el).forEach(b => b.onclick = () => { P.subject = b.dataset.sub; P.topic = ''; P.sel = ''; renderPicker(); });
   const tp = $('#pk-topic'); if (tp) tp.onchange = () => { P.topic = tp.value; P.sel = ''; renderPicker(); };
   $$('[data-item]', el).forEach(b => b.onclick = () => { P.sel = P.sel === b.dataset.item ? '' : b.dataset.item; renderPicker(); const x = $(`[data-item="${CSS.escape(b.dataset.item)}"]`); x && x.focus(); });
-  $('#pk-go').onclick = e => now ? pickStart(r, P.sel, 'in', '', e.currentTarget) : pickOnly(r, P.sel, e.currentTarget);
+  $('#pk-go').onclick = e => pickStart(r, P.sel, 'in', '', e.currentTarget);
   $('#pk-more').onclick = () => moreSheet(r, P.sel);
   window.scrollTo(0, keepY);
 }
@@ -1547,7 +1540,7 @@ function adNav() {
   $('#ad-nav').innerHTML = item('overview', 'ภาพรวมข้อมูล') + item('assess', 'แบบประเมินรายระดับชั้น') + item('usage', 'รายงานการใช้ในคาบ') +
     (ME.canTeach ? '<button type="button" data-nav="teacher">ห้องเรียนของฉัน</button>' : '') +
     (sh ? `<span class="grp">ข้อมูลใน Google Sheets</span>
-      <a class="ext" href="${esc(sh.bank)}" target="_blank" rel="noopener">คลังข้อสอบ</a><a class="ext" href="${esc(sh.timetable)}" target="_blank" rel="noopener">ตารางสอน</a>
+      <a class="ext" href="${esc(sh.bank)}" target="_blank" rel="noopener">คลังข้อสอบ</a><a class="ext" href="${esc(sh.timetable)}" target="_blank" rel="noopener">ครูผู้สอน</a>
       <a class="ext" href="${esc(sh.rooms)}" target="_blank" rel="noopener">ห้องเรียน</a><a class="ext" href="${esc(sh.students)}" target="_blank" rel="noopener">นักเรียน (รหัส–ห้อง)</a>
       <a class="ext" href="${esc(sh.weeks)}" target="_blank" rel="noopener">ปฏิทินสัปดาห์</a><a class="ext" href="${esc(sh.teachers)}" target="_blank" rel="noopener">ครูและสิทธิ์</a>
       <a class="ext" href="${esc(sh.settings)}" target="_blank" rel="noopener">ตั้งค่า</a>` : '');
@@ -1606,7 +1599,7 @@ function ovRender() {
       <section class="sec wide" aria-labelledby="h-bank"><div class="sec-h"><div class="t"><h2 id="h-bank">คลังข้อสอบรายวิชา</h2>
           <span class="s">เป้า ${o.target} ข้อต่อวิชาต่อระดับ · รวม ${o.bankTotal.toLocaleString('en-US')} ข้อ</span></div></div>
         <div class="tw"><table class="tb"><thead><tr><th>วิชา</th><th>ระดับ</th><th>ผู้รับผิดชอบ</th><th class="r">ใช้ในคาบแล้ว</th><th>ข้อในคลัง</th><th>สถานะ</th></tr></thead>
-          <tbody>${o.bank.length ? o.bank.map(x => `<tr><td class="b">${esc(x.subject)}${x.taught ? '' : ' <span class="m" style="font-weight:400;font-size:12px">(ไม่มีในตารางสอน)</span>'}</td><td class="nw">${esc(x.level)}</td><td class="m nw">${esc(x.owner || '—')}</td>
+          <tbody>${o.bank.length ? o.bank.map(x => `<tr><td class="b">${esc(x.subject)}${x.taught ? '' : ' <span class="m" style="font-weight:400;font-size:12px">(ยังไม่มีครูผู้สอน)</span>'}</td><td class="nw">${esc(x.level)}</td><td class="m nw">${esc(x.owner || '—')}</td>
             <td class="r num">${x.used}</td><td>${bar(x.items, o.target, x.state === 'bad')}</td><td><span class="st ${x.state}">${esc(x.status)}</span></td></tr>`).join('')
             : '<tr><td colspan="6" class="m">คลังข้อสอบยังว่าง</td></tr>'}</tbody></table></div></section>
       <div class="narrow">
@@ -1940,7 +1933,7 @@ function dbRender() {
       <div class="strip"><span><span class="cell ok">≥${D.useMin}%</span> นับเป็นการใช้</span><span><span class="cell no">—</span> ยังไม่ใช้หรือไม่ถึงเกณฑ์</span><span><span class="cell pp">กระดาษ</span> แบบกระดาษ</span><span><span class="cell off">รอ</span> สัปดาห์นี้ยังไม่จบ</span><span><span class="cell off">หยุด</span> ไม่นับโควตา</span></div>
       <div class="tw"><table class="tb">${rows.length ? `<thead><tr><th>ห้อง–วิชา</th><th>ครู</th>${D.weeks.map(w => `<th class="c">${esc(w)}</th>`).join('')}<th class="c">ต่อเนื่อง</th></tr></thead>
         <tbody>${rows.map(r => { const c = cont(r); return `<tr><td class="b">${esc(r.r)} ${esc(r.s)}</td><td class="m nw">${esc(r.t)}</td>${r.w.map(v => `<td class="c">${cell(v)}</td>`).join('')}<td class="c">${c === null ? '<span class="cell off">—</span>' : `<span class="cell ${c >= D.contMin ? 'ok' : 'no'}">${c}%</span>`}</td></tr>`; }).join('')}</tbody>`
-        : '<tbody><tr><td class="m">ยังไม่มีห้อง–วิชาของระดับชั้นนี้ในชีตตารางสอน</td></tr></tbody>'}</table></div></section>
+        : '<tbody><tr><td class="m">ยังไม่มีห้อง–วิชาของระดับชั้นนี้ในชีตครูผู้สอน</td></tr></tbody>'}</table></div></section>
     <div class="cols">
       <section class="sec half" aria-labelledby="h-weak"><div class="sec-h"><div class="t"><h2 id="h-weak">ตัวชี้วัดที่ยังอ่อน</h2><span class="s">ร้อยละตอบถูกจากคำตอบในคาบ เรียงจากน้อยไปมาก</span></div></div>
         <div class="sec-pad" style="padding-top:0">${weak.length ? weak.map(x => `<div class="meter" style="display:grid;grid-template-columns:minmax(0,1fr) 120px 44px;gap:10px;align-items:center;font-size:14px">
