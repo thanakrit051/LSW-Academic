@@ -314,6 +314,20 @@ textarea.memo { font-family: var(--font-read); font-size: 15px; line-height: 1.6
 .opt .k { font-size: 15px; color: var(--muted); width: 18px; flex: none; }
 .opt .v { font-family: var(--font-read); font-size: 18px; line-height: 1.5; font-variant-numeric: tabular-nums; }
 .opts.long .opt { gap: 12px; } .opts.long .opt .v { font-size: 15px; }
+/* เลือกหลายคำตอบ (ช่องสี่เหลี่ยม) · เรียงลำดับ (เลขลำดับในวง) · ใช่/ไม่ใช่ */
+.opt .dot.sq { border-radius: 6px; }
+.opt[aria-checked="true"] .dot.sq::after { border-radius: 3px; }
+.opt[aria-pressed="true"] { border: 2px solid var(--brand); margin: 0; width: 100%; background: var(--brand-soft); }
+.opt.ord .dot { font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.opt.ord[aria-pressed="true"] .dot { border: 0; background: var(--brand); color: #fff; }
+.ahint { margin: 0 0 -2px; font-size: 14px; }
+.yn { display: flex; flex-direction: column; gap: 10px; }
+.yn-r { display: flex; flex-direction: column; gap: 10px; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line-strong); background: var(--surface); }
+.yn-r .v { font-family: var(--font-read); font-size: 17px; line-height: 1.5; }
+.yn-b { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.yn-b button { min-height: 46px; border-radius: 10px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); font-size: 16px; margin: 1px; }
+.yn-b button[aria-checked="true"] { border: 2px solid var(--brand); margin: 0; background: var(--brand-soft); font-weight: 600; }
+.ans .kc { color: var(--good); }
 .qtags { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 12px; }
 .qtags .sj { color: var(--ink-2); font-weight: 600; }
 .qtags .sep { color: var(--faint); }
@@ -602,7 +616,86 @@ function drawQr(el, text, size) {
 }
 
 const OPT_L = ['ก', 'ข', 'ค', 'ง', 'จ'];
-const C_TXT = { C1: 'จำ', C2: 'เข้าใจ', C3: 'ประยุกต์ใช้', C4: 'วิเคราะห์', C5: 'ประเมินค่า', C6: 'สร้างสรรค์' };
+
+/* ----- ชนิดคำตอบ: choice เลือกตอบ · number เติมตัวเลข · multi เลือกหลายคำตอบ · yesno ใช่/ไม่ใช่ · order เรียงลำดับ ----- */
+// คำตอบเก็บเป็นข้อความ: multi "2,4" · order "3,1,2" · yesno "1,2,1" (1 = ใช่ 2 = ไม่ใช่ ช่องว่าง = ยังไม่ตอบ)
+const aParts = v => (v === null || v === undefined ? '' : String(v)).split(',').filter(Boolean);
+const YN_TXT = { 1: 'ใช่', 2: 'ไม่ใช่' };
+// ตอบครบพอจะส่งได้หรือยัง
+function ansReady(it, v) {
+  if (v === null || v === undefined || v === '') return false;
+  if (it.type === 'yesno') { const a = String(v).split(','); return it.opts.every((o, j) => a[j] === '1' || a[j] === '2'); }
+  if ((it.type === 'multi' || it.type === 'order') && it.need) return aParts(v).length === it.need;
+  return true;
+}
+function ansRight(it, v, key) {
+  if (!ansReady(it, v)) return false;
+  if (it.type === 'number') return Number(String(v).replace(/,/g, '')) === Number(String(key).replace(/,/g, ''));
+  if (it.type === 'multi') return aParts(v).sort().join(',') === String(key);
+  return String(v) === String(key);
+}
+const isKey = (it, j) => it.type === 'multi' ? aParts(it.ans).includes(String(j + 1)) : String(j + 1) === String(it.ans);
+// แสดงคำตอบเป็นข้อความ (full = ใส่ข้อความตัวเลือกด้วย)
+function ansText(it, v, full) {
+  if (v === null || v === undefined || v === '') return 'ไม่ได้ตอบ';
+  const opt = k => `${OPT_L[k - 1] || k}${full && it.opts[k - 1] ? ' ' + it.opts[k - 1] : ''}`;
+  if (it.type === 'number') return String(v);
+  if (it.type === 'choice') return opt(Number(v));
+  if (it.type === 'multi') return aParts(v).map(k => opt(Number(k))).join(' และ ');
+  if (it.type === 'order') return aParts(v).map(k => opt(Number(k))).join(' → ');
+  if (it.type === 'yesno') return String(v).split(',').map((x, j) => `${j + 1}) ${YN_TXT[x] || '—'}`).join(' · ');
+  return String(v);
+}
+// ช่องตอบตามชนิดข้อ · ord = ลำดับตัวเลือกที่แสดง (แบบประเมินสลับตัวเลือกได้) · ปุ่มคำตอบมี data-k หรือ data-yn
+function ansBox(it, pick, ord) {
+  const order = ord && ord.length ? ord : it.opts.map((o, j) => j), long = it.opts.some(o => o.length > 40) ? ' long' : '';
+  if (it.type === 'number') return `<div class="field"><label for="q-num">คำตอบ (ตัวเลข)</label><input id="q-num" class="input id-in" inputmode="decimal" autocomplete="off" maxlength="20" value="${esc(pick ?? '')}" placeholder="พิมพ์ตัวเลข"></div>`;
+  if (it.type === 'yesno') {
+    const a = String(pick ?? '').split(',');
+    return `<p class="note ahint">ตอบ ใช่ หรือ ไม่ใช่ ทุกข้อความ</p><div class="yn" role="group" aria-labelledby="q-stem">${it.opts.map((o, j) => `<div class="yn-r"><span class="v">${j + 1}) ${esc(o)}</span>
+      <div class="yn-b" role="radiogroup" aria-label="ข้อความที่ ${j + 1}">${['1', '2'].map(x => `<button type="button" role="radio" aria-checked="${a[j] === x}" data-yn="${j}" data-v="${x}">${YN_TXT[x]}</button>`).join('')}</div></div>`).join('')}</div>`;
+  }
+  if (it.type === 'multi') {
+    const s = aParts(pick);
+    return `<p class="note ahint">เลือก ${it.need ? it.need + ' คำตอบ' : 'ทุกคำตอบที่ถูก'} (แตะอีกครั้งเพื่อยกเลิก)</p><div class="opts${long}" role="group" aria-labelledby="q-stem">${order.map((j, p) => `<button type="button" class="opt" role="checkbox" aria-checked="${s.includes(String(j + 1))}" data-k="${j + 1}"><span class="dot sq"></span><span class="k">${OPT_L[p]}</span><span class="v">${esc(it.opts[j])}</span></button>`).join('')}</div>`;
+  }
+  if (it.type === 'order') {
+    const s = aParts(pick);
+    return `<p class="note ahint">แตะเรียงตามลำดับ${it.need ? ' ' + it.need + ' รายการ' : ''} (แตะอีกครั้งเพื่อเอาออก)${s.length ? ` · ตอบแล้ว ${s.map(k => OPT_L[order.indexOf(Number(k) - 1)]).join(' → ')}` : ''}</p>
+      <div class="opts${long}" role="group" aria-labelledby="q-stem">${order.map((j, p) => { const at = s.indexOf(String(j + 1));
+        return `<button type="button" class="opt ord" aria-pressed="${at >= 0}" aria-label="${OPT_L[p]} ${esc(it.opts[j])}${at >= 0 ? ' ลำดับที่ ' + (at + 1) : ''}" data-k="${j + 1}"><span class="dot">${at >= 0 ? at + 1 : ''}</span><span class="k">${OPT_L[p]}</span><span class="v">${esc(it.opts[j])}</span></button>`; }).join('')}</div>`;
+  }
+  return `<div class="opts${long}" role="radiogroup" aria-labelledby="q-stem">${order.map((j, p) => `<button type="button" class="opt" role="radio" aria-checked="${String(pick) === String(j + 1)}" data-k="${j + 1}"><span class="dot"></span><span class="k">${OPT_L[p]}</span><span class="v">${esc(it.opts[j])}</span></button>`).join('')}</div>`;
+}
+// คำตอบใหม่หลังแตะปุ่ม b
+function ansTap(it, pick, b) {
+  const k = b.dataset.k;
+  if (it.type === 'yesno') { const a = it.opts.map((o, j) => String(pick ?? '').split(',')[j] || ''); a[+b.dataset.yn] = b.dataset.v; return a.join(','); }
+  if (it.type === 'multi') {
+    let s = aParts(pick);
+    s = s.includes(k) ? s.filter(x => x !== k) : (it.need && s.length >= it.need ? s : [...s, k]);   // ครบแล้วต้องแตะออกก่อน
+    return s.sort().join(',') || null;
+  }
+  if (it.type === 'order') {
+    let s = aParts(pick);
+    s = s.includes(k) ? s.filter(x => x !== k) : (it.need && s.length >= it.need ? s : [...s, k]);
+    return s.join(',') || null;
+  }
+  return k;
+}
+const ansSel = b => b.dataset.yn !== undefined ? `[data-yn="${b.dataset.yn}"][data-v="${b.dataset.v}"]` : `[data-k="${b.dataset.k}"]`;
+// เฉลยแบบรายการสำหรับหน้าครู
+function keyHtml(it) {
+  if (it.type === 'number') return `<span class="ans one"><span class="key">คำตอบแบบตัวเลข · เฉลย ${esc(it.ans)}</span></span>`;
+  if (it.type === 'yesno') { const a = String(it.ans).split(',');
+    return `<span class="ans one">${it.opts.map((x, j) => `<span>${j + 1}) ${esc(x)} · <b class="kc">${YN_TXT[a[j]] || 'ไม่มีเฉลย'}</b></span>`).join('')}</span>`; }
+  const wide = it.opts.some(x => x.length > 28) || it.type === 'order' ? ' one' : '';
+  return `<span class="ans${wide}">${it.opts.map((x, j) => `<span class="${isKey(it, j) ? 'key' : ''}">${OPT_L[j]} ${esc(x)}${isKey(it, j) ? ' · เฉลย' : ''}</span>`).join('')}</span>`
+    + (it.type === 'order' ? `<span class="ans one"><span class="key">เฉลยลำดับ: ${esc(ansText(it, it.ans))}</span></span>` : '');
+}
+const TYPE_TXT = { multi: 'เลือกหลายคำตอบ', yesno: 'ใช่/ไม่ใช่', order: 'เรียงลำดับ', number: 'เติมตัวเลข' };
+
+const C_TXT ={ C1: 'จำ', C2: 'เข้าใจ', C3: 'ประยุกต์ใช้', C4: 'วิเคราะห์', C5: 'ประเมินค่า', C6: 'สร้างสรรค์' };
 const cTag = (c, cls) => c ? `<span class="ctag${cls ? ' ' + cls : ''}">${esc(c)} ${esc(C_TXT[c] || '')}</span>` : '';
 const DIFF_DOT = { 'ง่าย': 'var(--good)', 'ปานกลาง': 'var(--warn)', 'ยาก': 'var(--bad)' };
 const diffTag = d => d ? `<span class="diff" style="--dot:${DIFF_DOT[d] || 'var(--faint)'}">${esc(d)}</span>` : '';
@@ -877,12 +970,8 @@ function stuRender() {
     return;
   }
   if (STU.step === 'quiz' || STU.step === 'confirm') {
-    const has = STU.pick !== null && STU.pick !== '';
-    const body = it.type === 'number'
-      ? `<div class="field"><label for="q-num">คำตอบ (ตัวเลข)</label><input id="q-num" class="input id-in" inputmode="decimal" autocomplete="off" maxlength="20" value="${esc(STU.pick ?? '')}" placeholder="พิมพ์ตัวเลข"></div>`
-      : `<div class="opts${it.opts.some(o => o.length > 40) ? ' long' : ''}" role="radiogroup" aria-labelledby="q-stem">
-          ${it.opts.map((o, j) => `<button type="button" class="opt" role="radio" aria-checked="${String(STU.pick) === String(j + 1)}" data-k="${j + 1}"><span class="dot"></span><span class="k">${OPT_L[j]}</span><span class="v">${esc(o)}</span></button>`).join('')}
-        </div>`;
+    const has = ansReady(it, STU.pick);
+    const body = ansBox(it, STU.pick);
     el.innerHTML = stuBar(`ห้อง ${I.room} · รหัสนักเรียน ${STU.no}`) + `
       <main class="stu">
         <div class="meta"><span>${esc(it.exam)}${it.topic ? ' · ' + esc(it.topic) : ''}</span><button class="link" type="button" id="stu-fix">แก้ไขรหัส</button></div>
@@ -891,11 +980,11 @@ function stuRender() {
         ${body}
       </main>
       <div class="dock">${STU.step === 'confirm'
-        ? `<span class="cap strong" role="alert">ยืนยันคำตอบ ${it.type === 'number' ? esc(STU.pick) : OPT_L[Number(STU.pick) - 1]} ของรหัส ${esc(STU.no)} (ส่งแล้วแก้ไขไม่ได้)</span>
+        ? `<span class="cap strong" role="alert">ยืนยันคำตอบ ${esc(ansText(it, STU.pick))} ของรหัส ${esc(STU.no)} (ส่งแล้วแก้ไขไม่ได้)</span>
            <div class="two"><button class="btn-s" type="button" id="c-no">แก้ไข</button><button class="btn-p" type="button" id="c-yes">ยืนยัน</button></div>`
         : `<span class="cap">ส่งได้ครั้งเดียว</span>
            <button class="btn-p" type="button" id="q-send" ${has ? '' : 'disabled'}>ส่งคำตอบ</button>`}</div>`;
-    $$('.opt', el).forEach(b => b.onclick = () => { STU.pick = b.dataset.k; STU.step = 'quiz'; stuSave(); stuRender(); $(`.opt[data-k="${b.dataset.k}"]`).focus(); });
+    $$('main [data-k], main [data-yn]', el).forEach(b => b.onclick = () => { const s = ansSel(b); STU.pick = ansTap(it, STU.pick, b); STU.step = 'quiz'; stuSave(); stuRender(); const f = $('main ' + s, el); f && f.focus(); });
     $('#stu-fix').onclick = () => { STU.step = 'id'; STU.err = ''; stuRender(); };
     const numIn = $('#q-num');
     if (numIn) numIn.oninput = () => { STU.pick = numIn.value.trim() || null; stuSave(); $('#q-send') && ($('#q-send').disabled = !STU.pick); };
@@ -912,7 +1001,7 @@ function stuRender() {
     const r = STU.result || {};
     el.innerHTML = stuBar(`ห้อง ${I.room} · รหัสนักเรียน ${STU.no}`) + `
       <main class="stu">
-        <div class="done-big"><span class="ic">${IC.check}</span><b>ส่งคำตอบแล้ว</b><span class="muted">คำตอบ: ${it.type === 'number' ? esc(STU.pick ?? '—') : (STU.pick ? OPT_L[Number(STU.pick) - 1] + ' ' + esc(it.opts[Number(STU.pick) - 1] ?? '') : 'ไม่ได้ตอบ')}</span></div>
+        <div class="done-big"><span class="ic">${IC.check}</span><b>ส่งคำตอบแล้ว</b><span class="muted">คำตอบ: ${esc(ansText(it, STU.pick, it.type === 'choice'))}</span></div>
         ${r.dup ? `<div class="notice wait" role="status">รหัส ${esc(STU.no)} ส่งคำตอบข้อนี้ไปแล้ว ระบบนับเฉพาะครั้งแรก</div>` : ''}
         <div id="stu-review"><div class="notice">เฉลยจะแสดงที่หน้านี้เมื่อครูปิดรับคำตอบ</div></div>
         ${I.open ? '<div class="foot-links"><button type="button" id="stu-next">ส่งคำตอบของนักเรียนคนถัดไปด้วยเครื่องนี้</button></div>' : ''}
@@ -950,17 +1039,17 @@ async function stuLoadReview() {
   if (!rv) { STU.reviewTimer = setTimeout(stuLoadReview, 20000); return; }
   const nx = $('#stu-next'); if (nx) nx.parentElement.remove();
   const x = rv[0], mine = STU.pick;
-  const ok = mine !== null && mine !== '' && (x.type === 'number' ? Number(String(mine).replace(/,/g, '')) === Number(String(x.ans).replace(/,/g, '')) : String(mine) === String(x.ans));
-  const show = a => x.type === 'number' ? esc(a) : `${OPT_L[Number(a) - 1] || esc(a)} ${esc(x.opts[Number(a) - 1] ?? '')}`;
+  const ok = ansRight(x, mine, x.ans);
   box.innerHTML = `<div class="rv"><div class="h"><span>เฉลย</span><span class="${ok ? 'yes' : 'no'}">${ok ? 'ถูกต้อง' : 'ไม่ถูกต้อง'}</span></div>
-    <span>คำตอบที่ถูก: <b>${show(x.ans)}</b></span>
+    <span>คำตอบที่ถูก: <b>${esc(ansText(x, x.ans, x.type === 'choice' || x.type === 'multi'))}</b></span>
     ${x.why ? `<span class="read muted">${esc(x.why)}</span>` : ''}
-    ${!ok && x.wrong && x.wrong[mine] ? `<span class="read muted">ตัวเลือกที่ตอบ: ${esc(x.wrong[mine])}</span>` : ''}</div>`;
+    ${!ok && x.type === 'choice' && x.wrong && x.wrong[mine] ? `<span class="read muted">ตัวเลือกที่ตอบ: ${esc(x.wrong[mine])}</span>` : ''}</div>`;
 }
 
 /* ===================== นักเรียน: แบบประเมินรวม ===================== */
 const AS = { info: null, step: 'loading', no: '', room: '', i: 0, order: [], optOrder: [], answers: [], result: null, err: '' };
 const blank = v => v === null || v === undefined || v === '';
+const asLeft = k => !ansReady(AS.info.items[k], AS.answers[k]);   // ข้อ k (ตำแหน่งในชุด) ยังตอบไม่ครบ
 
 async function asInit() {
   AS.step = 'loading'; asRender();
@@ -1039,12 +1128,10 @@ function asRender() {
   const n = I.items ? I.items.length : 0;
   if (AS.step === 'quiz') {
     const k = AS.order[AS.i], it = I.items[k], pick = AS.answers[k], last = AS.i === n - 1;
-    const answered = AS.answers.filter(a => !blank(a)).length;
-    const skipped = AS.order.slice(0, AS.i).filter(x => blank(AS.answers[x])).length;
+    const answered = AS.answers.filter((a, x) => !asLeft(x)).length;
+    const skipped = AS.order.slice(0, AS.i).filter(asLeft).length;
     const nx = !last ? I.items[AS.order[AS.i + 1]] : null;
-    const body = it.type === 'number'
-      ? `<div class="field"><label for="q-num">คำตอบ (ตัวเลข)</label><input id="q-num" class="input id-in" inputmode="decimal" autocomplete="off" maxlength="20" value="${esc(pick ?? '')}" placeholder="พิมพ์ตัวเลข"></div>`
-      : `<div class="opts${it.opts.some(o => o.length > 40) ? ' long' : ''}" role="radiogroup" aria-labelledby="q-stem">${AS.optOrder[k].map((j, p) => `<button type="button" class="opt" role="radio" aria-checked="${String(pick) === String(j + 1)}" data-k="${j + 1}"><span class="dot"></span><span class="k">${OPT_L[p]}</span><span class="v">${esc(it.opts[j])}</span></button>`).join('')}</div>`;
+    const body = ansBox(it, pick, AS.optOrder[k]);
     el.innerHTML = `<header class="bar"><div class="t"><b>${esc(I.title)}</b><span>รหัส ${esc(AS.no)} · ห้อง ${esc(AS.room)}</span></div></header>
       <main class="stu">
         <div class="prog"><div class="h" style="display:flex;justify-content:space-between;align-items:baseline">
@@ -1060,7 +1147,7 @@ function asRender() {
       <div class="dock"><span class="cap left">${last ? 'ข้อสุดท้าย' : `ข้อถัดไป: ${esc(nx && nx.subject ? nx.subject : 'ข้อ ' + (AS.i + 2))}`}</span>
         <div class="two"><button class="btn-s" type="button" id="q-prev" ${AS.i === 0 ? 'disabled' : ''}>ก่อนหน้า</button>
           <button class="btn-p" type="button" id="q-next">${last ? 'ตรวจและส่ง' : 'ข้อถัดไป'}</button></div></div>`;
-    $$('.opt', el).forEach(b => b.onclick = () => { AS.answers[k] = b.dataset.k; asSave(); asRender(); $(`.opt[data-k="${b.dataset.k}"]`).focus(); });
+    $$('main [data-k], main [data-yn]', el).forEach(b => b.onclick = () => { const s = ansSel(b); AS.answers[k] = ansTap(it, AS.answers[k], b); asSave(); asRender(); const f = $('main ' + s, el); f && f.focus(); });
     const numIn = $('#q-num'); if (numIn) numIn.oninput = () => { AS.answers[k] = numIn.value.trim() || null; asSave(); };
     $('#q-prev').onclick = () => { AS.i--; asSave(); asRender(); };
     $('#q-next').onclick = () => { if (last) asConfirm(); else { AS.i++; asSave(); asRender(); } };
@@ -1082,18 +1169,18 @@ function asRender() {
       ${r.dup ? '<div class="notice wait" role="status">รหัสนี้ส่งแบบประเมินไปแล้ว ระบบนับเฉพาะครั้งแรก</div>' : ''}
       ${r.review && I && I.items ? `<h2 style="font-size:16px;padding:4px 4px 0">เฉลย</h2>${r.review.map((x, k) => {
         const mine = AS.answers[k];
-        const ok = !blank(mine) && (x.type === 'number' ? Number(String(mine).replace(/,/g, '')) === Number(String(x.ans).replace(/,/g, '')) : String(mine) === String(x.ans));
+        const ok = ansRight(x, mine, x.ans);
         return `<div class="rv"><div class="h"><span>ข้อ ${AS.order.indexOf(k) + 1}</span><span class="${ok ? 'yes' : 'no'}">${ok ? 'ถูก' : 'ผิด'}</span></div>
-          <span>คำตอบที่ถูก: ${x.type === 'number' ? esc(x.ans) : esc(x.opts[Number(x.ans) - 1] ?? '')}</span>${x.why ? `<span class="read muted">${esc(x.why)}</span>` : ''}</div>`; }).join('')}` : ''}
+          <span>คำตอบที่ถูก: ${x.type === 'choice' ? esc(x.opts[Number(x.ans) - 1] ?? '') : esc(ansText(x, x.ans, x.type === 'multi'))}</span>${x.why ? `<span class="read muted">${esc(x.why)}</span>` : ''}</div>`; }).join('')}` : ''}
       </main>`;
   }
 }
 
 function asGrid(onlyLeft) {
   const I = AS.info, n = I.items.length;
-  const pos = [...Array(n).keys()].filter(p => !onlyLeft || blank(AS.answers[AS.order[p]]));
+  const pos = [...Array(n).keys()].filter(p => !onlyLeft || asLeft(AS.order[p]));
   openSheet(sheetHead(onlyLeft ? `ยังไม่ได้ตอบ ${pos.length} ข้อ` : 'ทุกข้อ', 'ข้อที่มีสีคือข้อที่ตอบแล้ว') +
-    `<div class="grid-jump">${pos.map(p => `<button type="button" data-p="${p}" class="${blank(AS.answers[AS.order[p]]) ? '' : 'on'}${p === AS.i ? ' cur' : ''}">${p + 1}</button>`).join('')}</div>
+    `<div class="grid-jump">${pos.map(p => `<button type="button" data-p="${p}" class="${asLeft(AS.order[p]) ? '' : 'on'}${p === AS.i ? ' cur' : ''}">${p + 1}</button>`).join('')}</div>
     ${onlyLeft ? '' : '<button class="btn-p" type="button" id="g-send">ไปหน้าส่งคำตอบ</button>'}`, () => {
     $$('#sheet [data-p]').forEach(b => b.onclick = () => { AS.i = +b.dataset.p; closeSheet(); asSave(); asRender(); });
     const s = $('#g-send'); if (s) s.onclick = () => { closeSheet(); asConfirm(); };
@@ -1101,10 +1188,10 @@ function asGrid(onlyLeft) {
 }
 
 function asConfirm() {
-  const n = AS.info.items.length, left = AS.answers.filter(blank).length;
+  const n = AS.info.items.length, left = AS.answers.filter((a, k) => asLeft(k)).length;
   openSheet(sheetHead('ยืนยันการส่งแบบประเมิน', 'ส่งแล้วแก้ไขไม่ได้') +
     `<div class="notice ${left ? 'wait' : 'ok'}"><span>${left ? `ยังไม่ได้ตอบ <b>${left}</b> ข้อ จาก ${n} ข้อ` : `ตอบครบ ${n} ข้อแล้ว`}</span></div>
-    ${left ? `<div class="grid-jump">${[...Array(n).keys()].filter(p => blank(AS.answers[AS.order[p]])).slice(0, 40).map(p => `<button type="button" data-p="${p}">${p + 1}</button>`).join('')}</div>` : ''}
+    ${left ? `<div class="grid-jump">${[...Array(n).keys()].filter(p => asLeft(AS.order[p])).slice(0, 40).map(p => `<button type="button" data-p="${p}">${p + 1}</button>`).join('')}</div>` : ''}
     <div class="dock" style="position:static;padding:0;border:0;background:none"><div class="two"><button class="btn-s" type="button" data-x>กลับไปแก้ไข</button><button class="btn-p" type="button" id="c-yes">ยืนยัน</button></div></div>`, () => {
     $$('#sheet [data-p]').forEach(b => b.onclick = () => { AS.i = +b.dataset.p; closeSheet(); asSave(); asRender(); });
     $('#c-yes').onclick = () => { closeSheet(); asSubmit(); };
@@ -1477,9 +1564,8 @@ function pickItemHtml(it) {
     <span class="h">${cTag(it.c, on ? 'on-white' : '')}${diffTag(it.diff)}${it.used ? `<span class="foot"><span class="wait">ห้องนี้ทำแล้ว ${esc(it.used)}</span></span>` : ''}<span class="radio"></span></span>
     ${on && it.img ? `<img src="${esc(it.img)}" alt="รูปโจทย์" referrerpolicy="no-referrer">` : ''}
     <span class="stem"${on ? '' : ' style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden"'}>${it.q ? esc(it.q) : 'โจทย์เป็นรูปภาพ'}</span>
-    ${on ? (it.type === 'number' ? `<span class="ans one"><span class="key">คำตอบแบบตัวเลข · เฉลย ${esc(it.ans)}</span></span>`
-      : `<span class="ans${it.opts.some(x => x.length > 28) ? ' one' : ''}">${it.opts.map((x, j) => `<span class="${String(j + 1) === String(it.ans) ? 'key' : ''}">${OPT_L[j]} ${esc(x)}${String(j + 1) === String(it.ans) ? ' · เฉลย' : ''}</span>`).join('')}</span>`) : ''}
-    <span class="foot">${esc(it.ind || it.topic)}${it.src ? ' · ' + esc(it.src) : ''} · ${others}</span>
+    ${on ? keyHtml(it) : ''}
+    <span class="foot">${TYPE_TXT[it.type] && it.type !== 'number' ? `<b>${TYPE_TXT[it.type]}</b> · ` : ''}${esc(it.ind || it.topic)}${it.src ? ' · ' + esc(it.src) : ''} · ${others}</span>
     ${on && it.why ? `<span class="foot read">${esc(it.why)}</span>` : ''}
   </button>`;
 }
@@ -1555,10 +1641,20 @@ function renderResult(r) {
     if (res.dist) {
       const hot = res.top && res.top.pct >= 15 && res.top.n >= 3 ? res.top.k : 0;
       stats += `<div class="dist" aria-label="จำนวนที่เลือกแต่ละตัวเลือก">${res.dist.map((v, j) => {
-        const key = String(j + 1) === String(it.ans), cls = key ? 'key' : (j + 1 === hot ? 'hot' : '');
+        const key = isKey(it, j), cls = key ? 'key' : (j + 1 === hot ? 'hot' : '');
         return `<div class="r"><span class="l${key ? ' key' : ''}" title="${esc(it.opts[j])}">${OPT_L[j]} ${esc(short(it.opts[j], 10))}${key ? ' ✓' : ''}</span>
           <span class="b"><span class="${cls}" style="width:${pct(v, res.n)}%"></span></span><span class="n">${v} คน</span></div>`; }).join('')}</div>`;
       if (hot) stats += `<p class="warnline">${res.top.n} คนเลือก ${OPT_L[hot - 1]} (${esc(short(it.opts[hot - 1], 24))})${res.top.why ? ' ซึ่ง' + esc(res.top.why) : ''} ควรอธิบายเพิ่มเติม</p>`;
+      if (it.type === 'multi') stats += `<p class="note">ต้องเลือกให้ครบ ${esc(ansText(it, it.ans))} จึงนับว่าถูก</p>`;
+    } else if (res.parts) {
+      stats += `<div class="dist" aria-label="ร้อยละที่ตอบถูกแต่ละข้อความ">${res.parts.map((v, j) => {
+        const p = pct(v, res.n);
+        return `<div class="r"><span class="l" title="${esc(it.opts[j])}">${j + 1}) ${esc(short(it.opts[j], 9))}</span>
+          <span class="b"><span class="${p >= 50 ? 'key' : 'hot'}" style="width:${p}%"></span></span><span class="n">ถูก ${p}%</span></div>`; }).join('')}</div>
+        <p class="note">เฉลย: ${esc(ansText(it, it.ans))} · นับว่าถูกเมื่อตอบถูกทุกข้อความ</p>`;
+    } else if (it.type === 'order') {
+      stats += `<p class="note">ลำดับที่ถูก: <b>${esc(ansText(it, it.ans))}</b>${res.blank ? ` · ไม่ตอบ ${res.blank} คน` : ''}</p>`;
+      if (res.seq && res.seq.n >= 3) stats += `<p class="warnline">${res.seq.n} คนเรียงเป็น ${esc(ansText(it, res.seq.ans))} ควรอธิบายเพิ่มเติม</p>`;
     } else if (it.type === 'number') stats += `<p class="note">คำตอบที่ถูก: <b>${esc(it.ans)}</b>${res.blank ? ` · ไม่ตอบ ${res.blank} คน` : ''}</p>`;
     if (res.pct < 50 && !(res.top && res.top.pct >= 15 && res.top.n >= 3)) stats += '<p class="warnline">ตอบถูกต่ำกว่าร้อยละ 50 ควรอธิบายเพิ่มเติม</p>';
   }
@@ -2019,8 +2115,7 @@ function asmPreview() {
       <div class="stu" style="padding:0">
         ${A.cfg.tags ? `<div class="qtags"><span class="ctag solid">${esc(it.exam)}</span><span class="sj">${esc(it.subject)}</span>${it.c ? '<span class="sep">·</span>' + cTag(it.c) : ''}</div>` : ''}
         ${it.q ? `<h1 class="sm">${esc(it.q)}</h1>` : ''}${it.img ? `<figure><img src="${esc(it.img)}" alt="รูปโจทย์" referrerpolicy="no-referrer"></figure>` : ''}
-        ${it.type === 'number' ? '<div class="field"><label>คำตอบ (ตัวเลข)</label><input class="input" disabled placeholder="พิมพ์ตัวเลข"></div>'
-          : `<div class="opts">${it.opts.map((o, j) => `<div class="opt"><span class="dot"></span><span class="k">${OPT_L[j]}</span><span class="v">${esc(o)}</span></div>`).join('')}</div>`}</div>
+        <div inert>${ansBox(it, null)}</div></div>
       <div class="two" style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><button class="btn-s" type="button" id="pv-prev" ${i ? '' : 'disabled'}>ก่อนหน้า</button><button class="btn-p" type="button" id="pv-next" ${i < items.length - 1 ? '' : 'disabled'}>ข้อถัดไป</button></div>`, () => {
       $('#pv-prev').onclick = () => { i--; draw(); };
       $('#pv-next').onclick = () => { i++; draw(); };
