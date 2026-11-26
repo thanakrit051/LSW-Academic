@@ -537,7 +537,7 @@ async function run(fn, ...a) {
   return j.data;
 }
 const userMsg = (e) => { const m = String((e && e.message) || e || '').match(/E:([\s\S]*)$/); return m ? m[1].trim() : null; };
-const NET_MSG = 'เชื่อมต่อระบบไม่ได้ ตรวจอินเทอร์เน็ตแล้วลองใหม่';
+const NET_MSG = 'ไม่สามารถเชื่อมต่อระบบได้ กรุณาตรวจสอบอินเทอร์เน็ตแล้วลองอีกครั้ง';
 const wait = (ms) => new Promise(r => setTimeout(r, ms));
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
@@ -558,17 +558,17 @@ function toast(msg) {
 function failMsg(e) { const m = userMsg(e); return m ? m.replace(/^LOGIN:/, '') : NET_MSG; }
 async function copyText(text, okMsg) {
   try { await navigator.clipboard.writeText(text); toast(okMsg || 'คัดลอกแล้ว'); }
-  catch (e) { prompt('คัดลอกข้อความนี้', text); }
+  catch (e) { prompt('คัดลอกข้อความด้านล่าง', text); }
 }
 const lineShare = (msg) => 'https://line.me/R/share?text=' + encodeURIComponent(msg);
 // ไลบรารี QR โหลดแบบ defer (ไม่ขวางหน้าแรกของนักเรียน) ถ้ายังโหลดไม่เสร็จ รอจนเสร็จแล้ววาด
 function drawQr(el, text, size) {
   if (typeof QRCode === 'undefined') {
     if (document.readyState !== 'complete') { window.addEventListener('load', () => document.contains(el) && drawQr(el, text, size), { once: true }); return true; }
-    el.textContent = 'สร้าง QR Code ไม่ได้ ใช้รหัสห้องหรือลิงก์แทน'; return false;
+    el.textContent = 'ไม่สามารถสร้าง QR Code ได้ กรุณาใช้รหัสห้องหรือลิงก์แทน'; return false;
   }
   try { new QRCode(el, { text, width: size || 720, height: size || 720, colorDark: '#000000', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M }); return true; }
-  catch (e) { el.textContent = 'สร้าง QR Code ไม่ได้ ใช้รหัสห้องหรือลิงก์แทน'; return false; }
+  catch (e) { el.textContent = 'ไม่สามารถสร้าง QR Code ได้ กรุณาใช้รหัสห้องหรือลิงก์แทน'; return false; }
 }
 
 const OPT_L = ['ก', 'ข', 'ค', 'ง', 'จ'];
@@ -700,11 +700,11 @@ function showLogin(note) {
         <div class="field"><label for="lg-pw">รหัสผ่าน</label>
           <div class="pw-wrap"><input id="lg-pw" class="input" type="password" autocomplete="current-password" placeholder="รหัสผ่านที่ผู้ดูแลระบบตั้งให้">
             <button type="button" class="pw-eye" id="lg-eye" aria-pressed="false" aria-controls="lg-pw">แสดง</button></div></div>
-        <label class="remember"><input type="checkbox" id="lg-remember" ${adminLink() ? '' : 'checked'}> <span>จำการเข้าสู่ระบบในเครื่องนี้ 30 วัน<small>เอาติ๊กออกถ้าใช้คอมหรือโทรศัพท์ร่วมกับคนอื่น</small></span></label>
+        <label class="remember"><input type="checkbox" id="lg-remember" ${adminLink() ? '' : 'checked'}> <span>จดจำการเข้าสู่ระบบบนอุปกรณ์นี้ 30 วัน<small>ไม่ควรเลือกหากใช้อุปกรณ์ร่วมกับผู้อื่น</small></span></label>
         <span class="err" id="lg-err" role="alert">${esc(note || '')}</span>
       </div>
-      <p class="note" style="padding:0 4px">ลืมรหัสผ่าน แจ้งผู้ดูแลระบบให้ตั้งใหม่ ระบบไม่ส่งรหัสทางอีเมล</p>
-      ${adminLink() ? '' : '<div class="foot-links"><button type="button" id="lg-student">นักเรียน: กรอกรหัสห้องเพื่อตอบข้อประจำคาบ</button></div>'}
+      <p class="note" style="padding:0 4px">หากลืมรหัสผ่าน กรุณาติดต่อผู้ดูแลระบบ</p>
+      ${adminLink() ? '' : '<div class="foot-links"><button type="button" id="lg-student">สำหรับนักเรียน: กรอกรหัสห้อง</button></div>'}
     </main>
     <div class="dock"><button class="btn-p" type="button" id="lg-go">เข้าสู่ระบบ</button></div>`;
   go('login');
@@ -724,7 +724,7 @@ async function doLogin() {
   const id = $('#lg-id').value.replace(/\D/g, ''), pw = $('#lg-pw').value;
   const err = $('#lg-err');
   if (id.length !== 13) { err.textContent = 'ID ต้องเป็นตัวเลข 13 หลัก'; return; }
-  if (!pw) { err.textContent = 'กรอกรหัสผ่าน'; return; }
+  if (!pw) { err.textContent = 'กรุณากรอกรหัสผ่าน'; return; }
   const b = $('#lg-go'); b.disabled = true; b.textContent = 'กำลังเข้าสู่ระบบ…'; err.textContent = '';
   try {
     const remember = $('#lg-remember').checked;
@@ -736,7 +736,7 @@ async function doLogin() {
 }
 
 async function doLogout() {
-  if (!confirm('ออกจากระบบในเครื่องนี้? ครั้งหน้าต้องกรอก ID และรหัสผ่านใหม่')) return;
+  if (!confirm('ยืนยันการออกจากระบบ')) return;
   const t = TK.get(); TK.clear();
   T.data = null; A.ov = null; A.d = null; DB.d = null;
   try { await run('logout', t); } catch (e) {}
@@ -785,8 +785,8 @@ function stuRender() {
   clearTimeout(STU.reviewTimer);
   if (STU.step === 'loading') { el.innerHTML = stuBar('กำลังเปิดข้อสอบ') + '<main><div class="loading">กำลังโหลด…</div></main>'; return; }
   if (STU.step === 'error') {
-    el.innerHTML = stuBar('เปิดข้อสอบไม่ได้') + `<main class="stu"><div class="notice wait" role="alert">${esc(STU.err)}</div></main>
-      <div class="dock"><button class="btn-p" type="button" id="stu-retry">ลองใหม่</button></div>`;
+    el.innerHTML = stuBar('เปิดข้อสอบไม่สำเร็จ') + `<main class="stu"><div class="notice wait" role="alert">${esc(STU.err)}</div></main>
+      <div class="dock"><button class="btn-p" type="button" id="stu-retry">ลองอีกครั้ง</button></div>`;
     $('#stu-retry').onclick = () => (STU.retry ? STU.retry() : stuInit());
     return;
   }
@@ -795,16 +795,16 @@ function stuRender() {
       <main class="stu">
         <div class="field"><label for="stu-code" style="font-size:15px;color:var(--ink-2);font-weight:600">รหัสห้อง 6 หลัก</label>
           <input id="stu-code" class="input code-in" inputmode="numeric" autocomplete="off" maxlength="7" value="${esc(STU.code)}" placeholder="000 000" aria-describedby="stu-code-hint">
-          <span class="note" id="stu-code-hint">ดูรหัสที่ครูฉายบนจอ หรือสแกน QR Code แทนได้</span>
+          <span class="note" id="stu-code-hint">ดูรหัสห้องได้จากจอหน้าห้องเรียน</span>
           ${STU.err ? `<span class="err" role="alert">${esc(STU.err)}</span>` : ''}</div>
-        ${lastDone() ? '<div class="foot-links"><button type="button" id="stu-last">ดูเฉลยของข้อที่ทำล่าสุด</button></div>' : ''}
+        ${lastDone() ? '<div class="foot-links"><button type="button" id="stu-last">ดูเฉลยข้อล่าสุด</button></div>' : ''}
       </main>
-      <div class="dock"><button class="btn-p" id="stu-go" type="button">ไปที่ข้อสอบ</button></div>`;
+      <div class="dock"><button class="btn-p" id="stu-go" type="button">เข้าสู่ข้อสอบ</button></div>`;
     const lb = $('#stu-last'); if (lb) lb.onclick = () => stuLoad({ r: lastDone() });
     $('#stu-go').onclick = () => {
       const v = $('#stu-code').value.replace(/\D/g, '');
       STU.code = $('#stu-code').value;
-      if (v.length !== 6) { STU.err = 'รหัสห้องมี 6 หลัก'; return stuRender(); }
+      if (v.length !== 6) { STU.err = 'รหัสห้องต้องมี 6 หลัก'; return stuRender(); }
       stuLoad({ code: v });
     };
     $('#stu-code').addEventListener('keydown', e => { if (e.key === 'Enter') $('#stu-go').click(); });
@@ -813,22 +813,21 @@ function stuRender() {
   }
   const it = I.items[0];
   if (STU.step === 'closed') {
-    el.innerHTML = stuBar('ห้อง ' + I.room) + `<main class="stu"><div class="notice">ครูปิดรับคำตอบของข้อนี้แล้ว ถ้ายังไม่ได้ทำ แจ้งครูผู้สอน</div></main>`;
+    el.innerHTML = stuBar('ห้อง ' + I.room) + `<main class="stu"><div class="notice">ข้อนี้ปิดรับคำตอบแล้ว หากยังไม่ได้ตอบ กรุณาแจ้งครูผู้สอน</div></main>`;
     return;
   }
   if (STU.step === 'id') {
     el.innerHTML = stuBar('ห้อง ' + I.room) + `
       <main class="stu">
         <div class="field"><label for="stu-no" style="font-size:15px;color:var(--ink-2);font-weight:600">รหัสนักเรียน</label>
-          <input id="stu-no" class="input id-in" inputmode="numeric" autocomplete="off" maxlength="6" value="${esc(STU.no)}" placeholder="เช่น 31245" aria-describedby="stu-no-hint">
-          <span class="note" id="stu-no-hint">ระบบรู้ห้องจาก QR Code แล้ว ไม่ต้องกรอกชื่อหรืออีเมล</span>
+          <input id="stu-no" class="input id-in" inputmode="numeric" autocomplete="off" maxlength="6" value="${esc(STU.no)}" placeholder="เช่น 31245">
           ${STU.err ? `<span class="err" role="alert">${esc(STU.err)}</span>` : ''}</div>
       </main>
       <div class="dock"><button class="btn-p" id="stu-start" type="button">เริ่มทำข้อสอบ</button></div>`;
     $('#stu-start').onclick = async () => {
       const v = $('#stu-no').value.trim();
-      if (!/^\d{4,6}$/.test(v)) { STU.err = 'กรอกรหัสนักเรียนเป็นตัวเลข 4–6 หลัก'; STU.no = v; return stuRender(); }
-      const b = $('#stu-start'); b.disabled = true; b.textContent = 'กำลังตรวจรหัส…';
+      if (!/^\d{4,6}$/.test(v)) { STU.err = 'รหัสนักเรียนต้องเป็นตัวเลข 4–6 หลัก'; STU.no = v; return stuRender(); }
+      const b = $('#stu-start'); b.disabled = true; b.textContent = 'กำลังตรวจสอบรหัส…';
       // เตือนแบบนุ่มถ้ารหัสไม่อยู่ในรายชื่อห้อง (เน็ตช้าหรือตรวจไม่ได้ ข้ามไปทำได้เลย ไม่ให้นักเรียนติด)
       let chk = null;
       try { chk = await Promise.race([run('studentCheck', { r: STU.roundId, studentId: v }), wait(4000).then(() => null)]); } catch (e) { chk = null; }
@@ -840,8 +839,8 @@ function stuRender() {
   }
   if (STU.step === 'idcheck') {
     el.innerHTML = stuBar('ห้อง ' + I.room) + `
-      <main class="stu"><div class="notice wait" role="alert"><span>ไม่พบรหัส <b>${esc(STU.no)}</b> ในรายชื่อห้อง ${esc(I.room)} ตรวจว่าพิมพ์ถูกไหม ถ้ารหัสนี้ถูกแล้ว ทำต่อได้เลย</span></div></main>
-      <div class="dock"><div class="two"><button class="btn-s" type="button" id="ic-fix">แก้รหัส</button><button class="btn-p" type="button" id="ic-ok">รหัสถูกแล้ว ทำต่อ</button></div></div>`;
+      <main class="stu"><div class="notice wait" role="alert"><span>ไม่พบรหัส <b>${esc(STU.no)}</b> ในรายชื่อนักเรียนห้อง ${esc(I.room)} กรุณาตรวจสอบรหัสอีกครั้ง</span></div></main>
+      <div class="dock"><div class="two"><button class="btn-s" type="button" id="ic-fix">แก้รหัส</button><button class="btn-p" type="button" id="ic-ok">ยืนยันรหัสนี้</button></div></div>`;
     $('#ic-fix').onclick = () => { STU.step = 'id'; store.del('draft-' + STU.roundId); stuRender(); };
     $('#ic-ok').onclick = () => { STU.step = 'quiz'; stuSave(); stuRender(); };
     $('#ic-fix').focus();
@@ -856,15 +855,15 @@ function stuRender() {
         </div>`;
     el.innerHTML = stuBar(`ห้อง ${I.room} · รหัสนักเรียน ${STU.no}`) + `
       <main class="stu">
-        <div class="meta"><span>แนว ${esc(it.exam)}${it.topic ? ' · ' + esc(it.topic) : ''}</span><button class="link" type="button" id="stu-fix">แก้รหัส ${esc(STU.no)}</button></div>
+        <div class="meta"><span>${esc(it.exam)}${it.topic ? ' · ' + esc(it.topic) : ''}</span><button class="link" type="button" id="stu-fix">แก้ไขรหัส</button></div>
         ${it.q ? `<h1 id="q-stem">${esc(it.q)}</h1>` : '<h1 id="q-stem" class="sr">โจทย์</h1>'}
         ${it.img ? `<figure><img src="${esc(it.img)}" alt="รูปโจทย์" referrerpolicy="no-referrer"></figure>` : ''}
         ${body}
       </main>
       <div class="dock">${STU.step === 'confirm'
-        ? `<span class="cap strong" role="alert">รหัส ${esc(STU.no)} ตอบ ${it.type === 'number' ? esc(STU.pick) : OPT_L[Number(STU.pick) - 1]} ใช่ไหม ส่งแล้วแก้ไม่ได้</span>
-           <div class="two"><button class="btn-s" type="button" id="c-no">กลับ</button><button class="btn-p" type="button" id="c-yes">ยืนยันส่ง</button></div>`
-        : `<span class="cap">ส่งได้ครั้งเดียว · ครูจะเฉลยหน้าห้องหลังปิดรับ</span>
+        ? `<span class="cap strong" role="alert">ยืนยันคำตอบ ${it.type === 'number' ? esc(STU.pick) : OPT_L[Number(STU.pick) - 1]} ของรหัส ${esc(STU.no)} (ส่งแล้วแก้ไขไม่ได้)</span>
+           <div class="two"><button class="btn-s" type="button" id="c-no">แก้ไข</button><button class="btn-p" type="button" id="c-yes">ยืนยัน</button></div>`
+        : `<span class="cap">ส่งได้ครั้งเดียว</span>
            <button class="btn-p" type="button" id="q-send" ${has ? '' : 'disabled'}>ส่งคำตอบ</button>`}</div>`;
     $$('.opt', el).forEach(b => b.onclick = () => { STU.pick = b.dataset.k; STU.step = 'quiz'; stuSave(); stuRender(); $(`.opt[data-k="${b.dataset.k}"]`).focus(); });
     $('#stu-fix').onclick = () => { STU.step = 'id'; STU.err = ''; stuRender(); };
@@ -875,18 +874,18 @@ function stuRender() {
     return;
   }
   if (STU.step === 'sending') {
-    el.innerHTML = stuBar(`ห้อง ${I.room} · รหัสนักเรียน ${STU.no}`) + `<main class="stu"><div class="loading" role="status">${STU.tries ? `ยังส่งไม่สำเร็จ ระบบกำลังลองส่งอีกครั้ง (ครั้งที่ ${STU.tries + 1})` : 'กำลังส่งคำตอบ…'}</div>
-      <div class="notice">บันทึกคำตอบไว้ในเครื่องแล้ว ถ้าอินเทอร์เน็ตช้า ระบบจะส่งซ้ำเองจนสำเร็จ ไม่ต้องทำใหม่ และไม่ต้องปิดหน้านี้</div></main>`;
+    el.innerHTML = stuBar(`ห้อง ${I.room} · รหัสนักเรียน ${STU.no}`) + `<main class="stu"><div class="loading" role="status">กำลังส่งคำตอบ…</div>
+      <div class="notice">คำตอบบันทึกไว้ในเครื่องแล้ว ระบบจะส่งให้อัตโนมัติ กรุณาอย่าปิดหน้านี้</div></main>`;
     return;
   }
   if (STU.step === 'done') {
     const r = STU.result || {};
     el.innerHTML = stuBar(`ห้อง ${I.room} · รหัสนักเรียน ${STU.no}`) + `
       <main class="stu">
-        <div class="done-big"><span class="ic">${IC.check}</span><b>ส่งคำตอบแล้ว</b><span class="muted">คุณตอบ ${it.type === 'number' ? esc(STU.pick ?? '—') : (STU.pick ? OPT_L[Number(STU.pick) - 1] + ' ' + esc(it.opts[Number(STU.pick) - 1] ?? '') : 'ไม่ได้ตอบ')}</span></div>
-        ${r.dup ? `<div class="notice wait" role="status">รหัส ${esc(STU.no)} เคยตอบข้อนี้แล้ว ระบบนับเฉพาะครั้งแรก ถ้ากรอกรหัสผิด แจ้งครูผู้สอน</div>` : ''}
-        <div id="stu-review"><div class="notice">เฉลยและคำอธิบายจะขึ้นที่หน้านี้หลังครูปิดรับคำตอบ</div></div>
-        ${I.open ? '<div class="foot-links"><button type="button" id="stu-next">ให้เพื่อนที่ไม่มีโทรศัพท์ใช้เครื่องนี้ตอบต่อ</button></div>' : ''}
+        <div class="done-big"><span class="ic">${IC.check}</span><b>ส่งคำตอบแล้ว</b><span class="muted">คำตอบ: ${it.type === 'number' ? esc(STU.pick ?? '—') : (STU.pick ? OPT_L[Number(STU.pick) - 1] + ' ' + esc(it.opts[Number(STU.pick) - 1] ?? '') : 'ไม่ได้ตอบ')}</span></div>
+        ${r.dup ? `<div class="notice wait" role="status">รหัส ${esc(STU.no)} ส่งคำตอบข้อนี้ไปแล้ว ระบบนับเฉพาะครั้งแรก</div>` : ''}
+        <div id="stu-review"><div class="notice">เฉลยจะแสดงที่หน้านี้เมื่อครูปิดรับคำตอบ</div></div>
+        ${I.open ? '<div class="foot-links"><button type="button" id="stu-next">ส่งคำตอบของนักเรียนคนถัดไปด้วยเครื่องนี้</button></div>' : ''}
       </main>`;
     const nx = $('#stu-next');
     if (nx) nx.onclick = () => { Object.assign(STU, { step: 'id', no: '', pick: null, result: null, err: '' }); stuRender(); };
@@ -923,10 +922,10 @@ async function stuLoadReview() {
   const x = rv[0], mine = STU.pick;
   const ok = mine !== null && mine !== '' && (x.type === 'number' ? Number(String(mine).replace(/,/g, '')) === Number(String(x.ans).replace(/,/g, '')) : String(mine) === String(x.ans));
   const show = a => x.type === 'number' ? esc(a) : `${OPT_L[Number(a) - 1] || esc(a)} ${esc(x.opts[Number(a) - 1] ?? '')}`;
-  box.innerHTML = `<div class="rv"><div class="h"><span>เฉลย</span><span class="${ok ? 'yes' : 'no'}">${ok ? 'คุณตอบถูก' : 'คุณตอบยังไม่ถูก'}</span></div>
+  box.innerHTML = `<div class="rv"><div class="h"><span>เฉลย</span><span class="${ok ? 'yes' : 'no'}">${ok ? 'ถูกต้อง' : 'ไม่ถูกต้อง'}</span></div>
     <span>คำตอบที่ถูก: <b>${show(x.ans)}</b></span>
     ${x.why ? `<span class="read muted">${esc(x.why)}</span>` : ''}
-    ${!ok && x.wrong && x.wrong[mine] ? `<span class="read muted">ตัวที่คุณเลือก: ${esc(x.wrong[mine])}</span>` : ''}</div>`;
+    ${!ok && x.wrong && x.wrong[mine] ? `<span class="read muted">ตัวเลือกที่ตอบ: ${esc(x.wrong[mine])}</span>` : ''}</div>`;
 }
 
 /* ===================== นักเรียน: แบบประเมินรวม ===================== */
@@ -955,12 +954,12 @@ function asSave() { if (AS.step === 'quiz') store.set('draft-as-' + AS.info.id, 
 function asHero() {
   const I = AS.info;
   return `<header class="as-start"><span>นอกเวลาเรียน${I.year ? ' · ปีการศึกษา ' + esc(I.year) : ''} · ${esc(I.level)}</span><b>${esc(I.title)}</b>
-    ${I.closeText ? `<span class="d">ทำได้ถึง ${esc(I.closeText)}</span>` : ''}</header>`;
+    ${I.closeText ? `<span class="d">ปิดรับ ${esc(I.closeText)}</span>` : ''}</header>`;
 }
 function asMix() {
   const I = AS.info;
-  return `<div class="card mix"><div class="top"><div class="h"><b>${I.n} ข้อ คละในชุดเดียว</b><span class="muted" style="font-size:14px">ราว ${I.minutes} นาที</span></div>
-      <span class="note">ทำต่อเนื่องจนจบแล้วส่งครั้งเดียว ปิดหน้าไปก่อนได้ ระบบจำคำตอบไว้ในเครื่องนี้</span></div>
+  return `<div class="card mix"><div class="top"><div class="h"><b>${I.n} ข้อ</b><span class="muted" style="font-size:14px">ประมาณ ${I.minutes} นาที</span></div>
+      <span class="note">ส่งได้ครั้งเดียว คำตอบบันทึกไว้ในเครื่อง ปิดหน้าแล้วกลับมาทำต่อได้</span></div>
     ${(I.mix || []).map(m => `<div><div class="h"><span class="etag">${esc(m.exam)}</span><b>${m.n} ข้อ</b></div><span class="s">${esc(m.subjects)}</span></div>`).join('')}</div>`;
 }
 
@@ -969,43 +968,42 @@ function asRender() {
   if (AS.step === 'loading') { el.innerHTML = '<main><div class="loading">กำลังโหลดแบบประเมิน…</div></main>'; return; }
   if (AS.step === 'error') {
     el.innerHTML = `${I ? asHero() : '<header class="bar"><div class="t"><b>แบบประเมินรวม</b></div></header>'}<main class="pad"><div class="notice wait" role="alert">${esc(AS.err)}</div></main>
-      <div class="dock"><button class="btn-p" type="button" id="as-retry">ลองใหม่</button></div>`;
+      <div class="dock"><button class="btn-p" type="button" id="as-retry">ลองอีกครั้ง</button></div>`;
     $('#as-retry').onclick = asInit; return;
   }
-  if (AS.step === 'scheduled') { el.innerHTML = asHero() + `<main class="pad">${asMix()}<div class="notice"><span>แบบประเมินนี้เปิดให้ทำ <b>${esc(I.openText)}</b> กลับมาเปิดลิงก์นี้อีกครั้งตอนนั้น</span></div></main>`; return; }
-  if (AS.step === 'closed') { el.innerHTML = asHero() + '<main class="pad"><div class="notice">แบบประเมินนี้ปิดรับแล้ว ถ้ายังไม่ได้ทำ แจ้งครูประจำชั้น</div></main>'; return; }
+  if (AS.step === 'scheduled') { el.innerHTML = asHero() + `<main class="pad">${asMix()}<div class="notice"><span>แบบประเมินนี้เปิดให้ทำ <b>${esc(I.openText)}</b></span></div></main>`; return; }
+  if (AS.step === 'closed') { el.innerHTML = asHero() + '<main class="pad"><div class="notice">แบบประเมินนี้ปิดรับแล้ว หากยังไม่ได้ทำ กรุณาแจ้งครูประจำชั้น</div></main>'; return; }
   if (AS.step === 'id') {
     el.innerHTML = asHero() + `<main class="pad">
         ${asMix()}
         <div class="card idcard"><label for="as-no" style="font-size:14px;font-weight:600;color:var(--ink-2)">รหัสนักเรียน</label>
-          <input id="as-no" class="input id-in" inputmode="numeric" autocomplete="off" maxlength="6" value="${esc(AS.no)}" placeholder="เช่น 31245" aria-describedby="as-no-hint">
-          <span class="note" id="as-no-hint">ใช้รหัสประจำตัวของโรงเรียน ไม่ต้องกรอกชื่อ ส่งได้ครั้งเดียวต่อรหัส</span>
+          <input id="as-no" class="input id-in" inputmode="numeric" autocomplete="off" maxlength="6" value="${esc(AS.no)}" placeholder="เช่น 31245">
           ${AS.err ? `<span class="err" role="alert">${esc(AS.err)}</span>` : ''}</div>
-        <p class="note" style="padding:0 4px">ทำที่บ้านได้ ถ้าไม่มีอุปกรณ์ ใช้ห้องคอมของโรงเรียนช่วงพักกลางวัน</p>
+        <p class="note" style="padding:0 4px">นักเรียนที่ไม่มีอุปกรณ์ ใช้ห้องคอมพิวเตอร์ของโรงเรียนได้ในช่วงพักกลางวัน</p>
       </main>
       <div class="dock"><button class="btn-p" id="as-start" type="button">เริ่มทำแบบประเมิน</button></div>`;
     $('#as-start').onclick = async () => {
       const v = $('#as-no').value.trim(); AS.no = v;
-      if (!/^\d{4,6}$/.test(v)) { AS.err = 'กรอกรหัสนักเรียนเป็นตัวเลข 4–6 หลัก'; return asRender(); }
-      $('#as-start').disabled = true; $('#as-start').textContent = 'กำลังตรวจรหัส…';
+      if (!/^\d{4,6}$/.test(v)) { AS.err = 'รหัสนักเรียนต้องเป็นตัวเลข 4–6 หลัก'; return asRender(); }
+      $('#as-start').disabled = true; $('#as-start').textContent = 'กำลังตรวจสอบรหัส…';
       let w;
       try { w = await run('assessWho', { a: PARAMS.a, studentId: v }); }
       catch (e) { AS.err = failMsg(e); return asRender(); }
       AS.err = '';
-      if (w.done) { AS.err = 'รหัสนี้ส่งแบบประเมินแล้ว ถ้าไม่ใช่รหัสของคุณ ตรวจรหัสอีกครั้ง หรือแจ้งครูประจำชั้น'; return asRender(); }
+      if (w.done) { AS.err = 'รหัสนี้ส่งแบบประเมินแล้ว หากรหัสไม่ถูกต้อง กรุณาแจ้งครูประจำชั้น'; return asRender(); }
       AS.room = w.room; AS.step = w.room ? 'quiz' : 'room'; AS.i = 0; asSave(); asRender();
     };
     $('#as-no').addEventListener('keydown', e => { if (e.key === 'Enter') $('#as-start').click(); });
     return;
   }
   if (AS.step === 'room') {
-    el.innerHTML = asHero() + `<main class="pad"><div class="card idcard"><label for="as-room" style="font-size:14px;font-weight:600;color:var(--ink-2)">ห้องของคุณ</label>
+    el.innerHTML = asHero() + `<main class="pad"><div class="card idcard"><label for="as-room" style="font-size:14px;font-weight:600;color:var(--ink-2)">ห้องเรียน</label>
         <select id="as-room" class="input"><option value="">เลือกห้อง</option>${I.rooms.map(r => `<option ${r === AS.room ? 'selected' : ''}>${esc(r)}</option>`).join('')}</select>
-        <span class="note">ไม่พบรหัส ${esc(AS.no)} ในรายชื่อของโรงเรียน เลือกห้องเพื่อให้ครูประจำชั้นนับยอดได้</span>
+        <span class="note">ไม่พบรหัส ${esc(AS.no)} ในรายชื่อนักเรียน กรุณาเลือกห้องเรียน</span>
         ${AS.err ? `<span class="err" role="alert">${esc(AS.err)}</span>` : ''}</div></main>
       <div class="dock"><div class="two"><button class="btn-s" type="button" id="as-back">แก้รหัส</button><button class="btn-p" type="button" id="as-go">เริ่มทำ</button></div></div>`;
     $('#as-back').onclick = () => { AS.step = 'id'; AS.err = ''; asRender(); };
-    $('#as-go').onclick = () => { const r = $('#as-room').value; if (!r) { AS.err = 'เลือกห้องก่อน'; return asRender(); } AS.room = r; AS.err = ''; AS.step = 'quiz'; asSave(); asRender(); };
+    $('#as-go').onclick = () => { const r = $('#as-room').value; if (!r) { AS.err = 'กรุณาเลือกห้องเรียน'; return asRender(); } AS.room = r; AS.err = ''; AS.step = 'quiz'; asSave(); asRender(); };
     return;
   }
   const n = I.items ? I.items.length : 0;
@@ -1023,13 +1021,13 @@ function asRender() {
             <b class="num" style="font-size:20px">ข้อ ${AS.i + 1} <span style="font-size:15px;color:var(--muted);font-weight:500">/ ${n}</span></b>
             <button class="link" type="button" id="q-all">ดูทุกข้อ</button></div>
           <div class="bar4" aria-hidden="true"><span style="width:${pct(answered, n)}%"></span></div>
-          <div class="r"><span>ตอบแล้ว ${answered} · ข้าม ${skipped}</span><span>บันทึกในเครื่องแล้ว</span></div></div>
+          <div class="r"><span>ตอบแล้ว ${answered} · ข้าม ${skipped}</span></div></div>
         ${I.flags.tags && (it.exam || it.subject || it.c) ? `<div class="qtags">${it.exam ? `<span class="ctag solid">${esc(it.exam)}</span>` : ''}${it.subject ? `<span class="sj">${esc(it.subject)}</span>` : ''}${it.c ? '<span class="sep">·</span>' + cTag(it.c) : ''}</div>` : ''}
         ${it.q ? `<h1 class="sm" id="q-stem">${esc(it.q)}</h1>` : '<h1 class="sr" id="q-stem">โจทย์</h1>'}
         ${it.img ? `<figure><img src="${esc(it.img)}" alt="รูปโจทย์ข้อ ${AS.i + 1}" referrerpolicy="no-referrer"></figure>` : ''}
         ${body}
       </main>
-      <div class="dock"><span class="cap left">${last ? 'ข้อสุดท้าย · ตรวจแล้วกดส่ง' : `ข้อถัดไป: ${esc(nx && nx.subject ? nx.subject : 'ข้อ ' + (AS.i + 2))}`}</span>
+      <div class="dock"><span class="cap left">${last ? 'ข้อสุดท้าย' : `ข้อถัดไป: ${esc(nx && nx.subject ? nx.subject : 'ข้อ ' + (AS.i + 2))}`}</span>
         <div class="two"><button class="btn-s" type="button" id="q-prev" ${AS.i === 0 ? 'disabled' : ''}>ก่อนหน้า</button>
           <button class="btn-p" type="button" id="q-next">${last ? 'ตรวจและส่ง' : 'ข้อถัดไป'}</button></div></div>`;
     $$('.opt', el).forEach(b => b.onclick = () => { AS.answers[k] = b.dataset.k; asSave(); asRender(); $(`.opt[data-k="${b.dataset.k}"]`).focus(); });
@@ -1041,7 +1039,7 @@ function asRender() {
   }
   if (AS.step === 'sending') {
     el.innerHTML = asHero() + `<main class="pad"><div class="loading" role="status">กำลังส่งแบบประเมิน…</div>
-      <div class="notice">บันทึกคำตอบไว้ในเครื่องแล้ว ถ้าอินเทอร์เน็ตช้า ระบบจะส่งซ้ำเองจนสำเร็จ ไม่ต้องทำใหม่</div></main>`;
+      <div class="notice">คำตอบบันทึกไว้ในเครื่องแล้ว ระบบจะส่งให้อัตโนมัติ กรุณาอย่าปิดหน้านี้</div></main>`;
     return;
   }
   if (AS.step === 'done') {
@@ -1049,9 +1047,9 @@ function asRender() {
     const hasScore = r.score !== null && r.score !== undefined;
     el.innerHTML = asHero() + `<main class="pad">
       <div class="card done-big" style="padding:22px 16px"><span class="ic">${IC.check}</span><b>ส่งแบบประเมินแล้ว</b>
-        ${hasScore ? `<span class="score">${r.score}<span style="font-size:22px;color:var(--muted);font-weight:500"> / ${r.total}</span></span><span class="muted">คะแนนของคุณ</span>` : '<span class="muted">ขอบคุณที่ตั้งใจทำ</span>'}
+        ${hasScore ? `<span class="score">${r.score}<span style="font-size:22px;color:var(--muted);font-weight:500"> / ${r.total}</span></span><span class="muted">คะแนน</span>` : ''}
         <span class="note">รหัส ${esc(AS.no)}${AS.room ? ' · ห้อง ' + esc(AS.room) : ''}</span></div>
-      ${r.dup ? '<div class="notice wait" role="status">รหัสนี้เคยส่งแล้ว ระบบนับเฉพาะครั้งแรก ถ้ากรอกรหัสผิด แจ้งครูประจำชั้น</div>' : ''}
+      ${r.dup ? '<div class="notice wait" role="status">รหัสนี้ส่งแบบประเมินไปแล้ว ระบบนับเฉพาะครั้งแรก</div>' : ''}
       ${r.review && I && I.items ? `<h2 style="font-size:16px;padding:4px 4px 0">เฉลย</h2>${r.review.map((x, k) => {
         const mine = AS.answers[k];
         const ok = !blank(mine) && (x.type === 'number' ? Number(String(mine).replace(/,/g, '')) === Number(String(x.ans).replace(/,/g, '')) : String(mine) === String(x.ans));
@@ -1064,7 +1062,7 @@ function asRender() {
 function asGrid(onlyLeft) {
   const I = AS.info, n = I.items.length;
   const pos = [...Array(n).keys()].filter(p => !onlyLeft || blank(AS.answers[AS.order[p]]));
-  openSheet(sheetHead(onlyLeft ? `ยังไม่ได้ตอบ ${pos.length} ข้อ` : 'ทุกข้อ', 'แตะเลขข้อเพื่อไปที่ข้อนั้น · สีฟ้าคือตอบแล้ว') +
+  openSheet(sheetHead(onlyLeft ? `ยังไม่ได้ตอบ ${pos.length} ข้อ` : 'ทุกข้อ', 'ข้อที่มีสีคือข้อที่ตอบแล้ว') +
     `<div class="grid-jump">${pos.map(p => `<button type="button" data-p="${p}" class="${blank(AS.answers[AS.order[p]]) ? '' : 'on'}${p === AS.i ? ' cur' : ''}">${p + 1}</button>`).join('')}</div>
     ${onlyLeft ? '' : '<button class="btn-p" type="button" id="g-send">ไปหน้าส่งคำตอบ</button>'}`, () => {
     $$('#sheet [data-p]').forEach(b => b.onclick = () => { AS.i = +b.dataset.p; closeSheet(); asSave(); asRender(); });
@@ -1074,10 +1072,10 @@ function asGrid(onlyLeft) {
 
 function asConfirm() {
   const n = AS.info.items.length, left = AS.answers.filter(blank).length;
-  openSheet(sheetHead('ส่งแบบประเมิน?', 'ส่งได้ครั้งเดียว ส่งแล้วแก้ไม่ได้') +
+  openSheet(sheetHead('ยืนยันการส่งแบบประเมิน', 'ส่งแล้วแก้ไขไม่ได้') +
     `<div class="notice ${left ? 'wait' : 'ok'}"><span>${left ? `ยังไม่ได้ตอบ <b>${left}</b> ข้อ จาก ${n} ข้อ` : `ตอบครบ ${n} ข้อแล้ว`}</span></div>
     ${left ? `<div class="grid-jump">${[...Array(n).keys()].filter(p => blank(AS.answers[AS.order[p]])).slice(0, 40).map(p => `<button type="button" data-p="${p}">${p + 1}</button>`).join('')}</div>` : ''}
-    <div class="dock" style="position:static;padding:0;border:0;background:none"><div class="two"><button class="btn-s" type="button" data-x>ทำต่อ</button><button class="btn-p" type="button" id="c-yes">ยืนยันส่ง</button></div></div>`, () => {
+    <div class="dock" style="position:static;padding:0;border:0;background:none"><div class="two"><button class="btn-s" type="button" data-x>กลับไปแก้ไข</button><button class="btn-p" type="button" id="c-yes">ยืนยัน</button></div></div>`, () => {
     $$('#sheet [data-p]').forEach(b => b.onclick = () => { AS.i = +b.dataset.p; closeSheet(); asSave(); asRender(); });
     $('#c-yes').onclick = () => { closeSheet(); asSubmit(); };
   });
@@ -1103,7 +1101,7 @@ async function asSubmit(payload) {
 
 /* ===================== หน้าครู: ห้องเรียนวันนี้ → เลือกข้อ → QR รับคำตอบ → ผลและรายงาน ===================== */
 const T = { data: null, timer: null, page: 'home', key: '', focus: '', bank: {}, rep: {}, arm: false };
-const REPORT_CHIPS = ['เฉลยหน้าห้องแล้ว', 'อธิบายตัวลวงซ้ำ', 'เน็ตมีปัญหา', 'ใช้กระดาษบางส่วน'];
+const REPORT_CHIPS = ['เฉลยหน้าห้องแล้ว', 'อธิบายตัวลวงซ้ำ', 'อินเทอร์เน็ตขัดข้อง', 'ใช้กระดาษบางส่วน'];
 
 const allRooms = () => T.data ? T.data.rooms.concat(T.data.extra || []) : [];
 const roomOf = key => allRooms().find(x => x.key === key) || null;
@@ -1122,7 +1120,7 @@ async function tLoad(keepPage) {
   catch (e) {
     if (/^LOGIN:/.test(userMsg(e) || '')) return;
     $('#view-teacher').innerHTML = `<main class="pad"><div class="notice wait" role="alert">${esc(failMsg(e))}</div></main>
-      <div class="dock"><button class="btn-p" type="button" id="t-retry">ลองใหม่</button></div>`;
+      <div class="dock"><button class="btn-p" type="button" id="t-retry">ลองอีกครั้ง</button></div>`;
     $('#t-retry').onclick = () => tLoad(keepPage);
     return;
   }
@@ -1172,12 +1170,12 @@ function stepsHtml(r) {
   const s1 = st === 'idle' ? 'now' : 'done';
   const s2 = st === 'idle' ? '' : st === 'planned' || st === 'open' ? 'now' : 'done';
   const s3 = isDone(r) ? (r.report ? 'done' : 'now') : '';
-  return `<ol class="steps" aria-label="ขั้นตอน"><li class="${s1}">1 เลือกข้อสอบ</li><li class="${s2}">2 ขึ้น QR รับคำตอบ</li><li class="${s3}">3 ปิดรับ ส่งรายงาน</li></ol>`;
+  return `<ol class="steps" aria-label="ขั้นตอน"><li class="${s1}">1 เลือกข้อสอบ</li><li class="${s2}">2 เปิดรับคำตอบ</li><li class="${s3}">3 ปิดรับและส่งรายงาน</li></ol>`;
 }
 
 function miniItem(it) {
   if (!it) return '';
-  if (it.missing) return `<div class="mini"><span class="err">ไม่พบข้อ ${esc(it.id)} ในคลังข้อสอบแล้ว เลือกข้อใหม่</span></div>`;
+  if (it.missing) return `<div class="mini"><span class="err">ไม่พบข้อ ${esc(it.id)} ในคลังข้อสอบ กรุณาเลือกข้อใหม่</span></div>`;
   return `<div class="mini"><div class="tags"><span class="ctag solid">${esc(it.exam)}</span>${cTag(it.c, 'on-white')}${diffTag(it.diff)}</div>
     <div class="q">${it.q ? esc(it.q) : 'โจทย์เป็นรูปภาพ'}</div>${it.ind || it.topic ? `<span class="note">${esc(it.ind || it.topic)}</span>` : ''}</div>`;
 }
@@ -1186,27 +1184,27 @@ function miniItem(it) {
 function weekLine(r) {
   const W = (T.data && T.data.weekInfo) || {}, w = r.week;
   if (!w || !r.size) return '';
-  if (w.counted) return `<div class="wk ok"><b>สัปดาห์ที่ ${W.n} นับเป็นการใช้แล้ว</b><span>${w.paper ? 'แบบกระดาษ · ' : ''}ตอบ ${w.sent} จาก ${r.size} คน (เกณฑ์ ${w.need} คน)</span></div>`;
+  if (w.counted) return `<div class="wk ok"><b>สัปดาห์ที่ ${W.n} ผ่านเกณฑ์การใช้แล้ว</b><span>${w.paper ? 'แบบกระดาษ · ' : ''}ตอบ ${w.sent} จาก ${r.size} คน (เกณฑ์ ${w.need} คน)</span></div>`;
   return `<div class="wk"><b>สัปดาห์ที่ ${W.n}: ตอบแล้ว ${w.sent} จาก ${r.size} คน</b>
-    <span>ต้องถึง ${w.need} คน (ร้อยละ ${W.useMin} ของห้อง) จึงนับเป็นการใช้ของสัปดาห์นี้${w.out ? ` · รหัสที่ไม่อยู่ในรายชื่อห้อง ${w.out} คน ไม่นับ` : ''}</span></div>`;
+    <span>เกณฑ์ ${w.need} คน (ร้อยละ ${W.useMin} ของห้อง)${w.out ? ` · ไม่นับรหัสนอกรายชื่อห้อง ${w.out} คน` : ''}</span></div>`;
 }
 function weekBadge(W) {
   if (!W) return '';
   if (W.n) return W.quota ? `สัปดาห์ที่ ${W.n}` : `สัปดาห์ที่ ${W.n} · ไม่นับ`;
   if (W.before) return `เริ่มนับ ${W.before}`;
-  return W.after ? 'จบช่วงนับแล้ว' : 'นอกช่วงนับ';
+  return W.after ? 'สิ้นสุดช่วงนับแล้ว' : 'นอกช่วงนับ';
 }
 
 function focusCard(r) {
   const st = roomStatus(r);
   let body = '';
   if (r.state === 'idle') body = `<div class="mini"><span style="font-size:14px;color:var(--ink-2)">ยังไม่ได้เลือกข้อ</span>
-      <span class="note">${r.usedCount ? `ห้องนี้ทำไปแล้ว ${r.usedCount} ข้อ ข้อที่ยังไม่เคยทำจะขึ้นก่อน` : 'ห้องนี้ยังไม่เคยทำข้อประจำคาบ'}</span></div>`;
+      <span class="note">${r.usedCount ? `ห้องนี้ทำแล้ว ${r.usedCount} ข้อ` : 'ห้องนี้ยังไม่เคยทำข้อประจำคาบ'}</span></div>`;
   if (r.state === 'planned') body = miniItem(r.item) + `<div class="links"><button class="link" type="button" data-f="pick">เปลี่ยนข้อ</button><button class="link" type="button" data-f="more">ตัวเลือกอื่น</button></div>`;
   if (r.state === 'open') body = miniItem(r.item) + `<div class="count"><div class="r"><span>ตอบแล้ว</span><span><b class="num">${r.sent || 0}</b> / ${r.size || '?'} คน</span></div>
       <div class="track"><span style="width:${pct(r.sent || 0, r.size)}%"></span></div>
-      <span class="note">รหัสห้อง <b class="num">${fmtCode(r.code)}</b> · ${r.mode === 'นอกคาบ' ? 'ทำนอกคาบ ' : ''}ปิดรับเอง ${esc(r.mode === 'นอกคาบ' ? r.deadline : r.deadlineHm + ' น.')}</span></div>
-      <div class="links"><button class="link" type="button" data-f="fs">ฉายเต็มจอ</button><button class="link mute" type="button" data-f="paper">เน็ตล่ม บันทึกแบบกระดาษ</button></div>`;
+      <span class="note">รหัสห้อง <b class="num">${fmtCode(r.code)}</b> · ${r.mode === 'นอกคาบ' ? 'ทำนอกคาบ ' : ''}ปิดรับอัตโนมัติ ${esc(r.mode === 'นอกคาบ' ? r.deadline : r.deadlineHm + ' น.')}</span></div>
+      <div class="links"><button class="link" type="button" data-f="fs">ฉายเต็มจอ</button><button class="link mute" type="button" data-f="paper">บันทึกแบบกระดาษ</button></div>`;
   if (isDone(r)) {
     const res = r.result || {};
     body = miniItem(r.item) + `<div class="count"><div class="r"><span>${r.state === 'paper' ? 'แบบกระดาษ · ' : ''}ตอบถูก</span><span><b class="num">${res.pct ?? '—'}${res.pct !== null && res.pct !== undefined ? '%' : ''}</b> จาก ${res.n || 0} คน</span></div></div>
@@ -1223,13 +1221,13 @@ function roomRow(r) {
   const st = roomStatus(r);
   const when = r.extra && r.day ? `ปิดรับ${r.day}` : '';
   return `<button class="row" type="button" data-row="${esc(r.key)}"><span class="t"><b>${esc(r.room)} <small>${esc(r.subject)}</small></b>
-      <span class="${st.cls}">${esc(st.text)}${when ? `<span class="muted"> · ${esc(when)}</span>` : ''}${r.week && r.week.counted && !r.extra ? '<span class="muted"> · สัปดาห์นี้นับแล้ว</span>' : ''}</span></span>${IC.chev}</button>`;
+      <span class="${st.cls}">${esc(st.text)}${when ? `<span class="muted"> · ${esc(when)}</span>` : ''}${r.week && r.week.counted && !r.extra ? '<span class="muted"> · ผ่านเกณฑ์สัปดาห์นี้</span>' : ''}</span></span>${IC.chev}</button>`;
 }
 
 function homeroomCard(h) {
   return `<article class="bubble"><div class="body"><span class="k">แบบประเมินรวม · ครูประจำชั้น ${esc(h.room)}</span>
       <span class="h">${esc(h.title)}</span>
-      <span class="d">${h.n} ข้อ ราว ${h.minutes} นาที · ${h.phase === 'live' ? (h.closeShort ? 'ปิดรับ ' + esc(h.closeShort) : 'เปิดรับอยู่') : 'เปิดให้ทำ ' + esc(h.openText)}</span>
+      <span class="d">${h.n} ข้อ ประมาณ ${h.minutes} นาที · ${h.phase === 'live' ? (h.closeShort ? 'ปิดรับ ' + esc(h.closeShort) : 'เปิดรับอยู่') : 'เปิดให้ทำ ' + esc(h.openText)}</span>
       <span class="n">ทำแล้ว <b>${h.done}</b> / ${h.size || '?'} คน</span><div class="track"><span style="width:${pct(h.done, h.size)}%"></span></div></div>
     <a class="ba" href="${esc(lineShare(h.share))}" target="_blank" rel="noopener">ส่งต่อเข้ากลุ่ม LINE ห้อง</a>
     ${h.phase === 'live' ? `<a class="ba sub" href="${esc(lineShare(h.remind))}" target="_blank" rel="noopener">ส่งข้อความเตือนพร้อมยอดห้อง</a>` : ''}
@@ -1251,10 +1249,10 @@ function renderHome() {
         <div class="side"><span>${esc(weekBadge(D.weekInfo) || (D.week ? 'สัปดาห์ที่ ' + D.week : ''))}</span><button type="button" id="t-menu" aria-haspopup="dialog">เมนู</button></div></div>
       <div class="stats" role="group" aria-label="สรุปห้องที่สอน"><div><span>ห้องที่สอน</span><b>${D.roomCount}</b></div><div><span>รอเลือกข้อ</span><b>${D.unpicked}</b></div><div><span>รอส่งรายงาน</span><b>${D.owe}</b></div></div></header>
     <main class="pad">
-      ${!D.rooms.length && !(D.extra || []).length ? `<div class="card empty">ยังไม่พบห้องที่คุณสอนในชีตครูผู้สอน<br>แจ้งผู้ดูแลระบบให้เพิ่มแถวที่มีรหัสครู ${esc(D.teacher.tid)}</div>` : ''}
+      ${!D.rooms.length && !(D.extra || []).length ? `<div class="card empty">ไม่พบห้องที่สอนในชีตครูผู้สอน<br>กรุณาแจ้งผู้ดูแลระบบ (รหัสครู ${esc(D.teacher.tid)})</div>` : ''}
       ${f ? focusCard(f) : ''}
       ${rest.length ? `<h2 class="sec-label">ห้องอื่นที่สอน</h2><div class="card rows">${rest.map(roomRow).join('')}</div>` : ''}
-      ${(D.homeroom || []).length ? `<h2 class="sec-label">ห้องที่คุณเป็นครูประจำชั้น</h2>${D.homeroom.map(homeroomCard).join('')}` : ''}
+      ${(D.homeroom || []).length ? `<h2 class="sec-label">ห้องที่เป็นครูประจำชั้น</h2>${D.homeroom.map(homeroomCard).join('')}` : ''}
     </main>
     ${act ? `<div class="dock"><button class="btn-p" type="button" id="t-main">${esc(act.label)}</button></div>` : ''}`;
   $('#t-menu').onclick = teacherMenu;
@@ -1273,8 +1271,8 @@ function renderHome() {
 
 function teacherMenu() {
   openSheet(sheetHead(T.data.teacher.name, [T.data.teacher.role, ME.school].filter(Boolean).join(' · ')) +
-    `<div class="list"><button type="button" id="m-reload">โหลดข้อมูลใหม่<small>ดึงห้องที่สอนและยอดคำตอบล่าสุด</small></button>
-      ${ME.canDash ? '<button type="button" id="m-admin">หน้าผู้ดูแล<small>ภาพรวมข้อมูล แบบประเมินรวม รายงานการใช้</small></button>' : ''}
+    `<div class="list"><button type="button" id="m-reload">โหลดข้อมูลใหม่</button>
+      ${ME.canDash ? '<button type="button" id="m-admin">หน้าผู้ดูแลระบบ</button>' : ''}
       <button type="button" id="m-out" class="red">ออกจากระบบ</button></div>`, () => {
     $('#m-reload').onclick = () => { closeSheet(); tLoad(); };
     const a = $('#m-admin'); if (a) a.onclick = () => { closeSheet(); startAdmin(); };
@@ -1295,9 +1293,9 @@ async function startIn(r, btn) {
 function moreSheet(r, itemId) {
   const fromPicker = !!itemId;
   openSheet(sheetHead('ตัวเลือกอื่น', `${r.room} · ${r.subject}`) + `<div class="list">
-      ${fromPicker ? '<button type="button" data-m="keep">เลือกข้อนี้ไว้ก่อน<small>ยังไม่เปิดรับ กดเปิดรับจากหน้าห้องเรียนเมื่อพร้อม</small></button>' : ''}
-      <button type="button" data-m="out">ทำนอกคาบ<small>ส่งลิงก์เข้ากลุ่ม LINE ห้อง ระบบปิดรับเองตามกำหนด</small></button>
-      <button type="button" data-m="paper">บันทึกแบบกระดาษ<small>อินเทอร์เน็ตใช้ไม่ได้ เขียนข้อบนกระดาน แล้วนับจำนวนที่ตอบถูก</small></button>
+      ${fromPicker ? '<button type="button" data-m="keep">บันทึกข้อนี้ไว้ก่อน<small>เปิดรับภายหลังจากหน้าห้องเรียน</small></button>' : ''}
+      <button type="button" data-m="out">ทำนอกคาบ<small>ส่งลิงก์ให้นักเรียนทำนอกเวลาเรียน</small></button>
+      <button type="button" data-m="paper">บันทึกแบบกระดาษ<small>ใช้เมื่ออินเทอร์เน็ตขัดข้อง</small></button>
       ${!fromPicker && r.state === 'planned' ? '<button type="button" data-m="cancel" class="red">ยกเลิกข้อที่เลือกไว้</button>' : ''}</div>`, () => {
     $$('#sheet [data-m]').forEach(b => b.onclick = () => {
       const m = b.dataset.m;
@@ -1312,7 +1310,6 @@ function moreSheet(r, itemId) {
 
 function outSheet(r, itemId) {
   openSheet(sheetHead('ทำนอกคาบ', `${r.room} · ${r.subject}`) + `
-    <p class="note">ระบบสร้างลิงก์ให้ส่งเข้ากลุ่ม LINE ห้องเรียน นักเรียนเข้าทำด้วยรหัสนักเรียน และปิดรับเองเมื่อครบกำหนด</p>
     <div class="field"><label for="dl">ปิดรับอัตโนมัติ</label>
       <select id="dl" class="input"><option value="fri">วันศุกร์ 16:30 น.</option><option value="thu">วันพฤหัสบดี 16:30 น.</option><option value="sun">วันอาทิตย์ 20:00 น.</option></select></div>
     <span class="err" id="go-err" role="alert"></span>
@@ -1330,16 +1327,16 @@ function outSheet(r, itemId) {
 }
 
 function paperSheet(r, itemId) {
-  openSheet(sheetHead('บันทึกแบบกระดาษ', `${r.room} · ${r.subject} · ใช้เมื่ออินเทอร์เน็ตใช้ไม่ได้`) + `
-    <p class="note">เขียนข้อบนกระดาน ให้นักเรียนตอบในสมุด แล้วนับจำนวน${r.state === 'open' ? ' · ระบบจะปิดรับออนไลน์ของรอบนี้ และใช้ตัวเลขจากกระดาษแทน' : ''}</p>
-    <div class="field"><label for="p-n">จำนวนนักเรียนที่ทำ</label><input id="p-n" class="input num" inputmode="numeric" placeholder="จาก ${r.size || '?'} คน"></div>
+  openSheet(sheetHead('บันทึกแบบกระดาษ', `${r.room} · ${r.subject}`) + `
+    ${r.state === 'open' ? '<p class="note">ระบบจะปิดรับคำตอบออนไลน์ของรอบนี้ และใช้จำนวนจากกระดาษแทน</p>' : ''}
+    <div class="field"><label for="p-n">จำนวนนักเรียนที่ตอบ</label><input id="p-n" class="input num" inputmode="numeric" placeholder="จาก ${r.size || '?'} คน"></div>
     <div class="field"><label for="p-k">จำนวนที่ตอบถูก</label><input id="p-k" class="input num" inputmode="numeric" placeholder="เช่น 21"></div>
     <span class="err" id="p-err" role="alert"></span>
-    <p class="note">นับเป็นการใช้ของสัปดาห์เมื่อจำนวนนักเรียนที่ทำถึงร้อยละ ${esc((T.data && T.data.weekInfo && T.data.weekInfo.useMin) || 50)} ของห้อง เหมือนแบบออนไลน์ · รายงานติดป้าย "แบบกระดาษ" และหัวหน้ากลุ่มสาระสุ่มตรวจ</p>
+    <p class="note">นับเป็นการใช้เมื่อจำนวนนักเรียนที่ตอบถึงร้อยละ ${esc((T.data && T.data.weekInfo && T.data.weekInfo.useMin) || 50)} ของห้อง</p>
     <button class="btn-p" type="button" id="go">บันทึก</button>`, () => {
     $('#go').onclick = async () => {
       const n = +$('#p-n').value, k = +$('#p-k').value;
-      if (!Number.isInteger(n) || n < 1 || (r.size && n > r.size)) return $('#p-err').textContent = `จำนวนนักเรียนต้องเป็น 1–${r.size || 'จำนวนในห้อง'}`;
+      if (!Number.isInteger(n) || n < 1 || (r.size && n > r.size)) return $('#p-err').textContent = `จำนวนนักเรียนต้องอยู่ระหว่าง 1–${r.size || 'จำนวนในห้อง'}`;
       if ($('#p-k').value.trim() === '' || !Number.isInteger(k) || k < 0 || k > n) return $('#p-err').textContent = `จำนวนที่ตอบถูกต้องอยู่ระหว่าง 0–${n}`;
       const b = $('#go'); b.disabled = true;
       try {
@@ -1353,9 +1350,9 @@ function paperSheet(r, itemId) {
 }
 
 function cancelSheet(r) {
-  openSheet(sheetHead('ยกเลิกข้อที่เลือกไว้?', `${r.room} · ${r.subject}`) + miniItem(r.item) + `
+  openSheet(sheetHead('ยืนยันการยกเลิกข้อที่เลือกไว้', `${r.room} · ${r.subject}`) + miniItem(r.item) + `
     <span class="err" id="go-err" role="alert"></span>
-    <div class="dock" style="position:static;padding:0;border:0;background:none"><div class="two"><button class="btn-s" type="button" data-x>ไม่ยกเลิก</button><button class="btn-p arm" type="button" id="go">ยกเลิกข้อนี้</button></div></div>`, () => {
+    <div class="dock" style="position:static;padding:0;border:0;background:none"><div class="two"><button class="btn-s" type="button" data-x>กลับ</button><button class="btn-p arm" type="button" id="go">ยกเลิกข้อนี้</button></div></div>`, () => {
     $('#go').onclick = async () => {
       $('#go').disabled = true;
       try { await api('cancelPick', r.roundId); } catch (e) { $('#go-err').textContent = failMsg(e); $('#go').disabled = false; return; }
@@ -1413,22 +1410,22 @@ function renderPicker() {
         <div class="exams" role="radiogroup" aria-labelledby="lab-exam">${ALL_EXAMS.map(x => {
           const ok = d.exams.indexOf(x) >= 0;
           return `<button type="button" role="radio" data-exam="${x}" aria-checked="${P.exam === x}"${ok ? '' : ' aria-disabled="true"'}>${x}</button>`; }).join('')}</div>
-        ${d.exams.length < ALL_EXAMS.length ? `<span class="hint">${esc(d.level)} ใช้ O-NET · A-Level TGAT TPAT ใช้ได้เฉพาะ ม.6</span>` : ''}</div>
+        ${d.exams.length < ALL_EXAMS.length ? '<span class="hint">A-Level, TGAT และ TPAT ใช้ได้เฉพาะ ม.6</span>' : ''}</div>
       <div class="fgroup"><span class="lab" id="lab-sub">2 · วิชา</span>
         ${subs.length ? `<div class="chips scroll" role="radiogroup" aria-labelledby="lab-sub">${subs.map(s => `<button type="button" class="chip" role="radio" data-sub="${esc(s)}" aria-checked="${P.subject === s}">${esc(s)}</button>`).join('')}</div>`
-          : '<span class="hint">คลังยังไม่มีข้อสอบประเภทนี้ของระดับชั้นนี้</span>'}</div>
+          : '<span class="hint">ไม่มีข้อสอบประเภทนี้สำหรับระดับชั้นนี้</span>'}</div>
       ${inSub.length ? `<div class="fgroup"><label class="lab" for="pk-topic">3 · เรื่อง</label>
         <div class="selectbox"><span class="v">${esc(P.topic || 'ทุกเรื่อง')}</span><span class="n">${(P.topic ? inSub.filter(i => i.topic === P.topic) : inSub).length} ข้อ</span>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
           <select id="pk-topic"><option value="">ทุกเรื่อง (${inSub.length} ข้อ)</option>${topics.map(t => `<option value="${esc(t)}" ${P.topic === t ? 'selected' : ''}>${esc(t)} (${inSub.filter(i => i.topic === t).length} ข้อ)</option>`).join('')}</select></div></div>` : ''}
     </div>
     <main class="pad">
-      <span class="sec-label" id="lab-list">4 · แตะเลือกข้อ <span style="font-weight:400;color:var(--muted)">· ข้อที่ห้องนี้ยังไม่เคยทำขึ้นก่อน</span></span>
-      ${list.length ? `<div class="qlist" role="radiogroup" aria-labelledby="lab-list">${list.map(pickItemHtml).join('')}</div>` : '<div class="card empty">ยังไม่มีข้อในหมวดนี้</div>'}
+      <span class="sec-label" id="lab-list">4 · เลือกข้อ</span>
+      ${list.length ? `<div class="qlist" role="radiogroup" aria-labelledby="lab-list">${list.map(pickItemHtml).join('')}</div>` : '<div class="card empty">ไม่มีข้อสอบในหมวดนี้</div>'}
     </main>
     <div class="dock">
-      <button class="btn-p" type="button" id="pk-go" ${sel ? '' : 'disabled'}>ใช้ข้อนี้ แล้วเปิดรับคำตอบ</button>
-      <span class="cap">ระบบเปิดรับและขึ้น QR ทันที · <button class="link" type="button" id="pk-more" ${sel ? '' : 'disabled'} style="font-size:12px">ตัวเลือกอื่น</button></span>
+      <button class="btn-p" type="button" id="pk-go" ${sel ? '' : 'disabled'}>ใช้ข้อนี้และเปิดรับคำตอบ</button>
+      <span class="cap"><button class="link" type="button" id="pk-more" ${sel ? '' : 'disabled'} style="font-size:14px">ตัวเลือกอื่น</button></span>
       <span class="err" id="pk-err" role="alert" style="text-align:center"></span></div>`;
   $('#pk-back').onclick = () => tShow('home');
   $$('[data-exam]', el).forEach(b => b.onclick = () => {
@@ -1450,7 +1447,7 @@ function pickItemHtml(it) {
     <span class="h">${cTag(it.c, on ? 'on-white' : '')}${diffTag(it.diff)}${it.used ? `<span class="foot"><span class="wait">ห้องนี้ทำแล้ว ${esc(it.used)}</span></span>` : ''}<span class="radio"></span></span>
     ${on && it.img ? `<img src="${esc(it.img)}" alt="รูปโจทย์" referrerpolicy="no-referrer">` : ''}
     <span class="stem"${on ? '' : ' style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden"'}>${it.q ? esc(it.q) : 'โจทย์เป็นรูปภาพ'}</span>
-    ${on ? (it.type === 'number' ? `<span class="ans one"><span class="key">เติมคำตอบเป็นตัวเลข · เฉลย ${esc(it.ans)}</span></span>`
+    ${on ? (it.type === 'number' ? `<span class="ans one"><span class="key">คำตอบแบบตัวเลข · เฉลย ${esc(it.ans)}</span></span>`
       : `<span class="ans${it.opts.some(x => x.length > 28) ? ' one' : ''}">${it.opts.map((x, j) => `<span class="${String(j + 1) === String(it.ans) ? 'key' : ''}">${OPT_L[j]} ${esc(x)}${String(j + 1) === String(it.ans) ? ' · เฉลย' : ''}</span>`).join('')}</span>`) : ''}
     <span class="foot">${esc(it.ind || it.topic)}${it.src ? ' · ' + esc(it.src) : ''} · ${others}</span>
     ${on && it.why ? `<span class="foot read">${esc(it.why)}</span>` : ''}
@@ -1463,7 +1460,7 @@ async function pickOnly(r, itemId, btn) {
   try { await api('pickItem', r.room, r.subject, itemId); }
   catch (e) { btn.disabled = false; btn.textContent = t0; ($('#pk-err') || {}).textContent = failMsg(e); if (!$('#pk-err')) toast(failMsg(e)); return; }
   closeSheet(); delete T.bank[r.key];
-  toast(`เก็บข้อไว้แล้ว เข้าคาบแล้วกด "เปิดรับคำตอบ ${r.room}"`);
+  toast('บันทึกข้อที่เลือกแล้ว');
   T.focus = r.key; await tLoad();
 }
 
@@ -1479,24 +1476,23 @@ async function pickStart(r, itemId, mode, dl, btn) {
 /* ----- หน้า QR รับคำตอบ ----- */
 function renderLive(r) {
   const el = $('#view-teacher'), it = r.item || {};
-  const msg = `${r.subject} ห้อง ${r.room} · ข้อประจำคาบ\nกดลิงก์เพื่อตอบ: ${r.link}\nหรือกรอกรหัสห้อง ${fmtCode(r.code)}`;
-  const scr = `หน้าฉาย QR ห้อง ${r.room} (เปิดบนคอมห้องเรียน ไม่ต้องล็อกอิน)\n${r.screenLink}`;
+  const msg = `${r.subject} ห้อง ${r.room} · ข้อประจำคาบ\nลิงก์สำหรับตอบ: ${r.link}\nหรือกรอกรหัสห้อง ${fmtCode(r.code)}`;
+  const scr = `ลิงก์หน้าฉาย QR ห้อง ${r.room}\n${r.screenLink}`;
   el.innerHTML = `<header class="bar"><button class="ibtn" type="button" id="lv-back" aria-label="กลับหน้าห้องเรียน">${IC.back}</button>
       <div class="t"><b>${esc(r.room)} · ${esc(r.subject)}</b><span>${r.mode === 'นอกคาบ' ? 'ทำนอกคาบ' : 'ข้อประจำคาบ'}${it.c ? ' · ' + esc(it.c) + ' ' + esc(C_TXT[it.c] || '') : ''}</span></div>
       <span class="end st ok">เปิดรับคำตอบ</span></header>
     <main class="live">
       <div class="qrbox" id="lv-qr" aria-label="QR Code สำหรับนักเรียนสแกน"></div>
-      <div class="code"><span>หรือพิมพ์รหัสห้อง</span><b>${fmtCode(r.code)}</b></div>
+      <div class="code"><span>รหัสห้อง</span><b>${fmtCode(r.code)}</b></div>
       <div class="answered"><div class="r" aria-live="polite" aria-atomic="true"><span>ตอบแล้ว</span><span><b class="num" id="lv-n">${r.sent || 0}</b><small> / ${r.size || '?'} คน</small></span></div>
         <div class="track"><span id="lv-bar" style="width:${pct(r.sent || 0, r.size)}%"></span></div></div>
       <div class="acts3"><button type="button" id="lv-fs">${IC.expand}ฉายเต็มจอ</button>
-        <a href="${esc(lineShare(msg))}" target="_blank" rel="noopener">${IC.chat}ส่งกลุ่ม LINE</a>
+        <a href="${esc(lineShare(msg))}" target="_blank" rel="noopener">${IC.chat}ส่งเข้ากลุ่ม LINE</a>
         <a href="${esc(lineShare(scr))}" target="_blank" rel="noopener">${IC.screen}ส่งลิงก์ฉายจอ</a></div>
-      <p class="note" style="text-align:center">"ส่งลิงก์ฉายจอ" ส่งเข้า LINE ตัวเอง แล้วเปิดบนคอมห้องเรียน หน้าฉายใช้ได้จนกว่าจะปิดรับ</p>
-      <div class="foot-links"><button type="button" id="lv-paper">เน็ตล่ม บันทึกแบบกระดาษแทน</button></div>
+      <div class="foot-links"><button type="button" id="lv-paper">บันทึกแบบกระดาษแทน</button></div>
     </main>
-    <div class="dock"><button class="btn-p${T.arm ? ' arm' : ''}" type="button" id="lv-close">${T.arm ? 'แตะอีกครั้งเพื่อปิดรับ' : 'ปิดรับคำตอบ'}</button>
-      <span class="cap" aria-live="polite">${T.arm ? 'ปิดแล้วนักเรียนที่ยังไม่ตอบจะส่งไม่ได้ และทุกคนเห็นเฉลยในเครื่อง' : `ลืมกดปิด ระบบปิดให้เอง ${esc(r.mode === 'นอกคาบ' ? r.deadline : r.deadlineHm + ' น.')}`}</span>
+    <div class="dock"><button class="btn-p${T.arm ? ' arm' : ''}" type="button" id="lv-close">${T.arm ? 'กดอีกครั้งเพื่อยืนยัน' : 'ปิดรับคำตอบ'}</button>
+      <span class="cap" aria-live="polite">${T.arm ? 'เมื่อปิดรับแล้ว นักเรียนจะส่งคำตอบไม่ได้และจะเห็นเฉลย' : `ปิดรับอัตโนมัติ ${esc(r.mode === 'นอกคาบ' ? r.deadline : r.deadlineHm + ' น.')}`}</span>
       <span class="err" id="lv-err" role="alert" style="text-align:center"></span></div>`;
   drawQr($('#lv-qr'), r.link, 600);
   $('#lv-back').onclick = () => tShow('home');
@@ -1532,31 +1528,30 @@ function renderResult(r) {
         const key = String(j + 1) === String(it.ans), cls = key ? 'key' : (j + 1 === hot ? 'hot' : '');
         return `<div class="r"><span class="l${key ? ' key' : ''}" title="${esc(it.opts[j])}">${OPT_L[j]} ${esc(short(it.opts[j], 10))}${key ? ' ✓' : ''}</span>
           <span class="b"><span class="${cls}" style="width:${pct(v, res.n)}%"></span></span><span class="n">${v} คน</span></div>`; }).join('')}</div>`;
-      if (hot) stats += `<p class="warnline">${res.top.n} คนเลือก ${OPT_L[hot - 1]} (${esc(short(it.opts[hot - 1], 24))})${res.top.why ? ' ซึ่ง' + esc(res.top.why) : ''} ควรอธิบายซ้ำ</p>`;
+      if (hot) stats += `<p class="warnline">${res.top.n} คนเลือก ${OPT_L[hot - 1]} (${esc(short(it.opts[hot - 1], 24))})${res.top.why ? ' ซึ่ง' + esc(res.top.why) : ''} ควรอธิบายเพิ่มเติม</p>`;
     } else if (it.type === 'number') stats += `<p class="note">คำตอบที่ถูก: <b>${esc(it.ans)}</b>${res.blank ? ` · ไม่ตอบ ${res.blank} คน` : ''}</p>`;
-    if (res.pct < 50 && !(res.top && res.top.pct >= 15 && res.top.n >= 3)) stats += '<p class="warnline">ตอบถูกต่ำกว่าร้อยละ 50 ควรอธิบายซ้ำก่อนจบคาบ</p>';
+    if (res.pct < 50 && !(res.top && res.top.pct >= 15 && res.top.n >= 3)) stats += '<p class="warnline">ตอบถูกต่ำกว่าร้อยละ 50 ควรอธิบายเพิ่มเติม</p>';
   }
   const repHtml = !rp.editing && r.report ? `
     <div class="sent-box"><div class="h"><span class="st ok">ส่งรายงานแล้ว${r.report.at ? ' · ' + esc(r.report.at) : ''}</span><button class="link" type="button" id="rp-edit">แก้ไข</button></div>
       <div class="mini" style="background:none;padding:0;gap:6px"><div class="tags">${cTag(r.report.c, 'on-white')}${r.report.chips ? r.report.chips.split(' · ').map(c => `<span class="note">· ${esc(c)}</span>`).join('') : ''}</div></div>
       ${r.report.note ? `<p>${esc(r.report.note)}</p>` : ''}</div>`
     : `<div class="lv-head"><span id="lab-lv">ระดับที่ใช้สอน</span><b>${rp.c ? esc(rp.c + ' ' + C_TXT[rp.c]) : 'เลือก 1 ระดับ'}</b></div>
-      ${it.c && C_TXT[it.c] ? `<p class="note" style="margin:-4px 0 0">ข้อนี้ในคลังเป็น ${esc(it.c)} เลือกตามที่สอนจริงในคาบ</p>` : ''}
+      ${it.c && C_TXT[it.c] ? `<p class="note" style="margin:-4px 0 0">ระดับในคลังข้อสอบ: ${esc(it.c)}</p>` : ''}
       <div class="levels" role="radiogroup" aria-labelledby="lab-lv">${Object.keys(C_TXT).map(c => `<button type="button" role="radio" aria-checked="${rp.c === c}" data-c="${c}" title="${C_TXT[c]}">${c}</button>`).join('')}</div>
       <div class="chips" role="group" aria-label="ตัวเลือกด่วน">${REPORT_CHIPS.map(c => `<button type="button" class="chip" aria-pressed="${rp.chips.has(c)}" data-chip="${esc(c)}">${esc(c)}</button>`).join('')}</div>
-      <textarea class="memo" id="rp-note" rows="1" maxlength="300" aria-label="บันทึกเพิ่มเติม" placeholder="พิมพ์เพิ่มได้ (ไม่บังคับ)">${esc(rp.note)}</textarea>
+      <textarea class="memo" id="rp-note" rows="1" maxlength="300" aria-label="บันทึกเพิ่มเติม" placeholder="บันทึกเพิ่มเติม (ถ้ามี)">${esc(rp.note)}</textarea>
       <span class="err" id="rp-err" role="alert"></span>`;
   el.innerHTML = `<header class="bar"><button class="ibtn" type="button" id="rs-back" aria-label="กลับหน้าห้องเรียน">${IC.back}</button>
       <div class="t"><b>${esc(r.room)} · ผลคาบ</b><span>${esc(r.subject)}${r.day ? ' · ' + esc(r.day) : ''}</span></div>
-      <span class="end st mute">${r.state === 'paper' ? 'แบบกระดาษ' : r.auto ? 'ระบบปิดรับให้' : 'ปิดรับแล้ว'}</span></header>
+      <span class="end st mute">${r.state === 'paper' ? 'แบบกระดาษ' : r.auto ? 'ปิดรับอัตโนมัติ' : 'ปิดรับแล้ว'}</span></header>
     <main class="result">
       <section style="display:flex;flex-direction:column;gap:12px">
         <div class="meta">${cTag(it.c, 'solid')}<span>${[it.exam, it.ind || it.topic, it.diff].filter(Boolean).map(esc).join(' · ')}</span></div>
-        ${it.missing ? `<span class="err">ไม่พบข้อ ${esc(it.id)} ในคลังแล้ว</span>` : ''}
+        ${it.missing ? `<span class="err">ไม่พบข้อ ${esc(it.id)} ในคลังข้อสอบ</span>` : ''}
         ${it.q ? `<p class="stem">${esc(it.q)}</p>` : ''}${it.img ? `<img class="stem-img" src="${esc(it.img)}" alt="รูปโจทย์" referrerpolicy="no-referrer">` : ''}
       </section>
       <section style="display:flex;flex-direction:column;gap:14px">${stats}
-        ${r.state === 'closed' ? '<p class="note">นักเรียนเห็นเฉลยและคำอธิบายในเครื่องของตนเองแล้ว</p>' : ''}
         ${it.why ? `<p class="note read">คำอธิบาย: ${esc(it.why)}</p>` : ''}</section>
       <section class="report"><h2>รายงานคาบ</h2>${repHtml}</section>
     </main>
@@ -1570,7 +1565,7 @@ function renderResult(r) {
   if (note) { const fit = () => { note.style.height = 'auto'; note.style.height = note.scrollHeight + 2 + 'px'; }; note.oninput = () => { rp.note = note.value; fit(); }; fit(); }
   const send = $('#rp-send');
   if (send) send.onclick = async () => {
-    if (!rp.c) { $('#rp-err').textContent = 'เลือกระดับที่ใช้สอน C1–C6 ก่อนส่ง'; return; }
+    if (!rp.c) { $('#rp-err').textContent = 'กรุณาเลือกระดับที่ใช้สอน'; return; }
     send.disabled = true; send.textContent = 'กำลังส่ง…';
     try { await api('saveReport', r.roundId, rp.c, [...rp.chips], rp.note.trim()); }
     catch (e) { send.disabled = false; send.textContent = 'ส่งรายงาน'; $('#rp-err').textContent = failMsg(e); return; }
@@ -1606,12 +1601,12 @@ function openFs(r) {
   closeSheet();
   fs.dataset.key = r.key;
   fs.innerHTML = `
-    <div class="fs-top"><h2>${esc(r.subject)} · ข้อประจำคาบ</h2><button class="btn" type="button" id="fs-x">ปิดหน้าจอนี้ (Esc)</button></div>
+    <div class="fs-top"><h2>${esc(r.subject)} · ข้อประจำคาบ</h2><button class="btn" type="button" id="fs-x">ปิด (Esc)</button></div>
     <div class="fs-main">${r.item && r.item.q ? `<p class="fs-q">${esc(r.item.q)}</p>` : ''}<div class="fs-qr" id="fs-qr"></div>
       <div class="fs-side"><span class="fs-room">ห้อง ${esc(r.room)}</span>
-        <span>สแกน QR Code หรือพิมพ์รหัสห้อง</span><span class="fs-code">${fmtCode(r.code)}</span>
+        <span>สแกน QR Code หรือกรอกรหัสห้อง</span><span class="fs-code">${fmtCode(r.code)}</span>
         <span class="fs-count">ตอบแล้ว <b id="fs-count">${r.sent || 0}</b> จาก ${r.size || '?'} คน</span></div></div>
-    <p class="fs-foot">ใช้ได้เฉพาะห้อง ${esc(r.room)} ขณะเปิดรับคำตอบ · กรอกแค่รหัสนักเรียน</p>`;
+    <p class="fs-foot">ใช้ได้เฉพาะห้อง ${esc(r.room)}</p>`;
   fs.hidden = false;
   drawQr($('#fs-qr'), r.link);
   $('#fs-x').onclick = closeFs; $('#fs-x').focus();
@@ -1630,8 +1625,8 @@ const PHASE = { draft: ['mute', 'ร่าง'], scheduled: ['info', 'ตั้�
 const phaseSt = ph => { const p = PHASE[ph] || PHASE.none; return `<span class="st ${p[0]}">${p[1]}</span>`; };
 const SRC_DESC = {
   'ข้อใหม่ ตัวชี้วัดเดียวกับที่ฝึกในคาบ': 'วัดตัวชี้วัดที่ครูใช้สอนแล้ว แต่ไม่ซ้ำข้อที่นักเรียนเคยเห็น (แนะนำ)',
-  'ข้อใหม่ที่ยังไม่เคยใช้ในคาบ': 'ทุกตัวชี้วัดในคลัง ใช้เมื่อคลังของตัวชี้วัดที่ฝึกแล้วมีไม่พอ',
-  'ข้อที่ฝึกในคาบแล้ว': 'ดูว่านักเรียนจำและเข้าใจข้อที่ทำในคาบได้แค่ไหน'
+  'ข้อใหม่ที่ยังไม่เคยใช้ในคาบ': 'ทุกตัวชี้วัดในคลัง ใช้เมื่อข้อของตัวชี้วัดที่ฝึกแล้วมีไม่เพียงพอ',
+  'ข้อที่ฝึกในคาบแล้ว': 'วัดความเข้าใจข้อที่ฝึกในคาบแล้ว'
 };
 
 function startAdmin(page) {
@@ -1656,7 +1651,7 @@ function adNav() {
   $('#ad-foot').innerHTML = `<button type="button" id="ad-out">ออกจากระบบ</button>`;
   $$('#ad-nav [data-nav]').forEach(b => b.onclick = () => {
     if (b.dataset.nav === 'teacher') return startTeacher();
-    if (A.dirty && !confirm('มีการแก้ไขแบบประเมินที่ยังไม่บันทึก ออกจากหน้านี้?')) return;
+    if (A.dirty && !confirm('มีการแก้ไขที่ยังไม่บันทึก ต้องการออกจากหน้านี้หรือไม่')) return;
     A.dirty = false; adShow(b.dataset.nav);
   });
   $('#ad-out').onclick = doLogout;
@@ -1673,7 +1668,7 @@ function adShow(page, level) {
 
 const adMain = () => $('#ad-main');
 const adErr = (e, retry) => {
-  adMain().innerHTML = `<div class="notice wait" role="alert">${esc(failMsg(e))}</div><button class="btn" type="button" id="ad-retry" style="align-self:flex-start">ลองใหม่</button>`;
+  adMain().innerHTML = `<div class="notice wait" role="alert">${esc(failMsg(e))}</div><button class="btn" type="button" id="ad-retry" style="align-self:flex-start">ลองอีกครั้ง</button>`;
   $('#ad-retry').onclick = retry;
 };
 
@@ -1688,16 +1683,15 @@ function ovRender() {
   const o = A.ov;
   const bar = (a, b, low) => `<div class="meter"><div class="track${low ? ' low' : ''}"><span style="width:${pct(a, b)}%"></span></div><span class="v">${a} / ${b}</span></div>`;
   adMain().innerHTML = `
-    <div class="pg-head"><div class="t"><h1>ภาพรวมข้อมูล</h1><p>${o.year ? 'ปีการศึกษา ' + esc(o.year) + ' · ' : ''}${o.week ? 'สัปดาห์ที่ ' + o.week : 'นอกสัปดาห์ที่นับโควตา'} · อ่านจาก Google Sheets ของโรงเรียน</p></div>
+    <div class="pg-head"><div class="t"><h1>ภาพรวมข้อมูล</h1><p>${o.year ? 'ปีการศึกษา ' + esc(o.year) + ' · ' : ''}${o.week ? 'สัปดาห์ที่ ' + o.week : 'นอกสัปดาห์ที่นับโควตา'}</p></div>
       <div class="acts"><button class="btn" type="button" id="ov-reload">โหลดใหม่</button></div></div>
 
     <section class="sec" aria-labelledby="h-ready"><div class="sec-h line"><h2 id="h-ready">${esc(o.readyTitle)}</h2>
         <span class="s">${o.ready.filter(x => x.ok).length} จาก ${o.ready.length} รายการพร้อม</span></div>
-      <div class="kpis ready">${o.ready.map(x => `<div><span class="lab" style="display:flex;justify-content:space-between;gap:8px">${esc(x.label)}<span class="st ${x.ok ? 'ok' : 'wait'}">${x.ok ? 'พร้อม' : 'ต้องดู'}</span></span>
+      <div class="kpis ready">${o.ready.map(x => `<div><span class="lab" style="display:flex;justify-content:space-between;gap:8px">${esc(x.label)}<span class="st ${x.ok ? 'ok' : 'wait'}">${x.ok ? 'พร้อม' : 'ต้องตรวจสอบ'}</span></span>
         <b>${esc(x.value)}</b><span>${esc(x.sub)}</span></div>`).join('')}</div></section>
 
-    <section class="sec" aria-labelledby="h-asm"><div class="sec-h"><div class="t"><h2 id="h-asm">แบบประเมินรวมรายระดับชั้น</h2>
-        <span class="s">ผู้ดูแลระบบกำหนดสัดส่วน สุ่มข้อจากคลัง แล้วประกาศให้นักเรียนทำนอกเวลาเรียน</span></div></div>
+    <section class="sec" aria-labelledby="h-asm"><div class="sec-h"><div class="t"><h2 id="h-asm">แบบประเมินรวมรายระดับชั้น</h2></div></div>
       <div class="tw"><table class="tb"><thead><tr><th>ระดับชั้น</th><th>ประเภทข้อสอบ</th><th class="r">นักเรียน</th><th>ข้อที่รวมได้</th><th>ยังขาด</th><th>สถานะ</th><th></th></tr></thead>
         <tbody>${o.asm.map(x => `<tr><td class="b">${esc(x.level)}</td><td class="m">${esc(x.types)}</td><td class="r num">${x.students.toLocaleString('en-US')}</td>
           <td>${x.need ? bar(x.have, x.need, x.have < x.need) : '<span class="m">—</span>'}</td><td class="m" style="min-width:140px">${esc(x.gap || (x.need ? 'ครบแล้ว' : '—'))}</td>
@@ -1715,8 +1709,7 @@ function ovRender() {
         <section class="sec" aria-labelledby="h-iss"><div class="sec-h"><h2 id="h-iss">ต้องจัดการ</h2></div>
           <div class="issues">${o.issues.map(x => `<div class="${x.tone === 'ok' ? 'ok' : x.tone === 'bad' ? 'bad' : x.tone === 'wait' ? 'wait' : 'mute'}"><span class="dot"></span><span class="t"><b>${esc(x.title)}</b><span>${esc(x.detail)}</span></span></div>`).join('')}</div></section>
         <section class="sec" aria-labelledby="h-role"><div class="sec-h"><h2 id="h-role">ผู้ใช้และสิทธิ์</h2></div>
-          <div class="roles">${o.roles.map(x => `<div><span class="t"><b>${esc(x.role)}</b><span>${esc(x.can)}</span></span><b>${x.n}</b></div>`).join('')}</div>
-          <p class="note" style="padding:10px 20px 16px">นักเรียนไม่มีบัญชี เข้าทำด้วยรหัสนักเรียนอย่างเดียว ระบบไม่เก็บชื่อนักเรียน</p></section>
+          <div class="roles">${o.roles.map(x => `<div><span class="t"><b>${esc(x.role)}</b><span>${esc(x.can)}</span></span><b>${x.n}</b></div>`).join('')}</div></section>
       </div>
     </div>
 
@@ -1725,8 +1718,7 @@ function ovRender() {
       <div class="tw"><table class="tb"><thead><tr><th>ห้อง–วิชา</th><th>ครู</th><th>ข้อที่ใช้</th><th class="r">ตอบถูก</th><th>บันทึกจากครู</th><th>สถานะ</th></tr></thead>
         <tbody>${o.reports.length ? o.reports.map(x => `<tr class="top"><td class="b">${esc(x.room)}</td><td class="nw">${esc(x.teacher)}</td><td class="m" style="min-width:160px">${esc(x.item || '—')}</td>
           <td class="r num">${esc(x.sent)}</td><td class="read${x.done ? '' : ' m'}">${esc(x.note)}</td><td><span class="st ${x.done ? 'ok' : 'wait'}">${esc(x.status)}</span></td></tr>`).join('')
-          : '<tr><td colspan="6" class="m">สัปดาห์นี้ยังไม่มีคาบที่ปิดรับ</td></tr>'}</tbody></table></div></section>
-    <p class="note">ตัวเลขทั้งหมดคำนวณจากชีตในขณะที่เปิดหน้านี้ · ระบบเก็บเฉพาะรหัสนักเรียน ไม่เก็บชื่อ (PDPA) · ${o.canAdmin ? 'แก้ข้อมูลหลักได้จากลิงก์ "ข้อมูลใน Google Sheets" ที่เมนูด้านซ้าย' : 'แก้ข้อมูลหลักได้เฉพาะผู้ดูแลระบบ'}</p>`;
+          : '<tr><td colspan="6" class="m">สัปดาห์นี้ยังไม่มีคาบที่ปิดรับ</td></tr>'}</tbody></table></div></section>`;
   $('#ov-reload').onclick = ovLoad;
   $('#ov-usage').onclick = () => adShow('usage');
   $$('[data-lv]', adMain()).forEach(b => b.onclick = () => adShow('assess', b.dataset.lv));
@@ -1760,9 +1752,9 @@ function asmRender() {
     <div class="pg-head"><div class="t"><div><h1>${esc(c.title || 'แบบประเมินรวม ' + d.level)}</h1>${phaseSt(phase)}</div>
         <p>${esc(d.level)} · นักเรียน ${d.students.toLocaleString('en-US')} คน ${d.roomCount} ห้อง · ครูประจำชั้นที่ส่งลิงก์ต่อได้ ${d.homeroomCount} จาก ${d.roomCount} ห้อง</p></div>
       <div class="acts">${asmActs(d, phase)}</div></div>${tabs}
-    ${edit ? '' : '<div class="notice">คุณดูได้อย่างเดียว ผู้ดูแลระบบเป็นผู้แก้ไขและประกาศแบบประเมิน</div>'}
+    ${edit ? '' : '<div class="notice">สิทธิ์ดูอย่างเดียว ผู้ดูแลระบบเป็นผู้แก้ไขและประกาศแบบประเมิน</div>'}
     ${(d.uncovered || []).length ? `<div class="notice wait" role="note"><span><b>${d.uncovered.length} ห้องไม่มีครูประจำชั้นที่ส่งลิงก์ต่อได้:</b> ${d.uncovered.map(x => `${esc(x.room)} (${esc(x.why)})`).join(' · ')}
-      <br>ลิงก์จะไม่ถึงนักเรียนห้องเหล่านี้เอง แก้ในชีตห้องเรียน/ชีตครู หรือหลังประกาศ กด "คัดลอกข้อความส่งต่อ" ในตารางความคืบหน้าแล้วส่งเอง</span></div>` : ''}
+      <br>กรุณาแก้ไขในชีตห้องเรียนหรือชีตครู หรือส่งข้อความให้ห้องเหล่านี้จากตารางความคืบหน้า</span></div>` : ''}
     <span class="err" id="as-err" role="alert"></span>`;
   adMain().innerHTML = head + (draftView ? asmDraft(d, c, edit) : asmLive(d, c, s, edit)) +
     (A.dirty && edit ? `<div class="savebar" role="region" aria-label="การแก้ไขที่ยังไม่บันทึก"><span>มีการแก้ไขที่ยังไม่บันทึก</span>
@@ -1777,7 +1769,7 @@ function asmActs(d, phase) {
   if (phase === 'draft') return `<button class="btn" type="button" data-a="preview">ดูแบบที่นักเรียนเห็น</button><button class="btn pri" type="button" data-a="publish">ประกาศให้นักเรียนทำ</button>`;
   if (phase === 'closed') return `<button class="btn" type="button" data-a="reopen">เปิดรับอีกครั้ง</button><button class="btn pri" type="button" data-a="newround">เริ่มรอบใหม่</button>`;
   return `${d.answered ? '' : '<button class="btn" type="button" data-a="todraft">กลับเป็นร่าง</button>'}<button class="btn" type="button" data-a="extend">ขยายเวลา</button>
-    <button class="btn red" type="button" data-a="close">${A.armClose ? 'แตะอีกครั้งเพื่อปิดรับ' : 'ปิดรับก่อนกำหนด'}</button>`;
+    <button class="btn red" type="button" data-a="close">${A.armClose ? 'กดอีกครั้งเพื่อยืนยัน' : 'ปิดรับก่อนกำหนด'}</button>`;
 }
 
 function asmDraft(d, c, edit) {
@@ -1790,38 +1782,36 @@ function asmDraft(d, c, edit) {
     const have = pool[q.exam + '|' + q.subject] || 0, n = Number(q.n) || 0, short = n > have;
     return `<tr class="${n ? '' : 'zero'}"><td><span class="etag">${esc(q.exam)}</span></td><td class="b">${esc(q.subject)}</td>
       <td>${lock ? `<b class="num">${n}</b>` : `<span class="stepper"><button type="button" data-q="${i}" data-d="-1" aria-label="ลด ${esc(q.subject)}">−</button><span aria-live="polite">${n}</span><button type="button" data-q="${i}" data-d="1" aria-label="เพิ่ม ${esc(q.subject)}">+</button></span>`}</td>
-      <td class="num">${have} ข้อ${short ? ` <span class="bad" style="font-weight:600">ไม่พอ ขาด ${n - have}</span>` : ''}</td>
-      <td class="r">${lock ? '' : `<button class="link mute" type="button" data-qdel="${i}" aria-label="เอา ${esc(q.subject)} ออก">เอาออก</button>`}</td></tr>`;
+      <td class="num">${have} ข้อ${short ? ` <span class="bad" style="font-weight:600">ขาด ${n - have}</span>` : ''}</td>
+      <td class="r">${lock ? '' : `<button class="link mute" type="button" data-qdel="${i}" aria-label="นำ ${esc(q.subject)} ออก">นำออก</button>`}</td></tr>`;
   }).join('');
   const items = d.items || [];
   const itemRows = items.map(it => `<tr class="top"><td class="num m">${it.pos}</td>
       <td class="read">${it.missing ? `<span class="err">ไม่พบข้อ ${esc(it.id)} ในคลัง</span>` : `<div class="qtags" style="margin-bottom:4px"><span class="etag">${esc(it.exam)}</span><span class="sj">${esc(it.subject)}</span>${cTag(it.c)}${diffTag(it.diff)}</div>
         <span style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${esc(it.q || 'โจทย์เป็นรูปภาพ')}</span>`}</td>
-      <td class="r nw">${edit ? `<button class="btn sm" type="button" data-it="${it.pos}" data-ia="${it.locked ? 'unlock' : 'lock'}">${it.locked ? 'ล็อกแล้ว · ปลด' : 'ล็อก'}</button>
-        ${it.locked ? '' : `<button class="btn sm" type="button" data-it="${it.pos}" data-ia="replace">เปลี่ยนข้อ</button><button class="link mute" type="button" data-it="${it.pos}" data-ia="remove" style="margin-left:6px">เอาออก</button>`}` : it.locked ? '<span class="m">ล็อก</span>' : ''}</td></tr>`).join('');
+      <td class="r nw">${edit ? `<button class="btn sm" type="button" data-it="${it.pos}" data-ia="${it.locked ? 'unlock' : 'lock'}">${it.locked ? 'ปลดล็อก' : 'ล็อก'}</button>
+        ${it.locked ? '' : `<button class="btn sm" type="button" data-it="${it.pos}" data-ia="replace">เปลี่ยนข้อ</button><button class="link mute" type="button" data-it="${it.pos}" data-ia="remove" style="margin-left:6px">นำออก</button>`}` : it.locked ? '<span class="m">ล็อก</span>' : ''}</td></tr>`).join('');
   return `<div class="cols">
     <div class="wide" style="display:flex;flex-direction:column;gap:20px">
-      <section class="sec" aria-labelledby="h-q"><div class="sec-h"><div class="t"><h2 id="h-q">สัดส่วนข้อสอบ</h2><span class="s">จำนวนข้อต่อวิชา · คอลัมน์ขวาคือข้อในคลังที่ใช้ได้ตามที่มาของข้อที่เลือก</span></div></div>
+      <section class="sec" aria-labelledby="h-q"><div class="sec-h"><div class="t"><h2 id="h-q">สัดส่วนข้อสอบ</h2></div></div>
         <div class="tw"><table class="tb"><thead><tr><th>ประเภท</th><th>วิชา</th><th>จำนวนข้อ</th><th>ข้อในคลังที่ใช้ได้</th><th></th></tr></thead>
-          <tbody>${quotaRows || '<tr><td colspan="5" class="m">ยังไม่มีวิชา เพิ่มวิชาด้านล่าง</td></tr>'}</tbody></table></div>
+          <tbody>${quotaRows || '<tr><td colspan="5" class="m">ยังไม่มีวิชา</td></tr>'}</tbody></table></div>
         <div class="sec-pad" style="flex-direction:row;flex-wrap:wrap;justify-content:space-between;align-items:center;border-top:1px solid var(--line-2)">
           ${!lock && addable.length ? `<div class="addrow"><select id="add-exam" aria-label="ประเภทข้อสอบ">${addable.map(x => `<option>${esc(x.e)}</option>`).join('')}</select>
             <select id="add-sub" aria-label="วิชา"></select><button class="btn sm" type="button" id="add-go">+ เพิ่มวิชา</button></div>` : '<span></span>'}
-          <b class="num">รวม ${total} ข้อ · ราว ${Math.max(10, Math.round(total * 1.75))} นาที</b></div>
-        ${d.exams.length === 1 ? `<p class="note" style="padding:0 20px 14px">${esc(d.level)} ใช้ O-NET อย่างเดียว · A-Level TGAT TPAT ใช้ได้เฉพาะ ม.6</p>` : ''}</section>
+          <b class="num">รวม ${total} ข้อ · ประมาณ ${Math.max(10, Math.round(total * 1.75))} นาที</b></div></section>
       <section class="sec" aria-labelledby="h-it"><div class="sec-h line"><div class="t"><h2 id="h-it">รายการข้อ${d.exists ? ` (${items.length} / ${d.summary.need} ข้อ)` : ''}</h2>
-          <span class="s">ล็อกข้อที่ต้องการเก็บ แล้วกดสุ่มเติม ข้อที่ไม่ล็อกอาจถูกเปลี่ยนเมื่อสัดส่วนเปลี่ยน</span></div>
+          <span class="s">ข้อที่ไม่ล็อกอาจถูกเปลี่ยนเมื่อสุ่มใหม่</span></div>
           ${edit && d.exists ? `<button class="btn pri sm" type="button" data-a="fill"${A.dirty ? ' disabled title="บันทึกร่างก่อน"' : ''}>สุ่มเติมให้ครบ ${d.summary.need} ข้อ</button>` : ''}</div>
-        ${d.exists ? (items.length ? `<div class="tw"><table class="tb"><tbody>${itemRows}</tbody></table></div>` : '<p class="empty">ยังไม่มีข้อ กด "สุ่มเติมให้ครบ"</p>')
-          : `<p class="empty">${edit ? 'ตั้งสัดส่วนและเวลา แล้วกด "บันทึกร่าง" ก่อน จึงสุ่มข้อได้' : 'ยังไม่ได้สร้างแบบประเมินของระดับชั้นนี้'}</p>`}
-        ${A.dirty && d.exists ? '<p class="note" style="padding:0 20px 14px">บันทึกร่างก่อน แล้วจึงสุ่มเติม</p>' : ''}</section>
+        ${d.exists ? (items.length ? `<div class="tw"><table class="tb"><tbody>${itemRows}</tbody></table></div>` : '<p class="empty">ยังไม่มีข้อ</p>')
+          : `<p class="empty">${edit ? 'บันทึกร่างก่อนสุ่มข้อ' : 'ยังไม่ได้สร้างแบบประเมินของระดับชั้นนี้'}</p>`}</section>
     </div>
     <div class="narrow">
       <section class="sec" aria-labelledby="h-time"><div class="sec-h"><h2 id="h-time">ชื่อและกำหนดเวลา</h2></div>
         <div class="sec-pad" style="padding-top:0">
           <div class="field"><label for="f-title">ชื่อแบบประเมิน</label><input id="f-title" class="box" maxlength="120" value="${esc(c.title)}" ${lock ? 'disabled' : ''}></div>
-          <div class="field"><label for="f-open">เปิดให้ทำ</label><input id="f-open" class="box" type="datetime-local" value="${esc(c.openAt)}" ${lock ? 'disabled' : ''}><span class="date-hint" data-for="f-open" aria-live="polite">${dtHint(c.openAt)}</span><span class="note">เว้นว่าง = เปิดทันทีที่กดประกาศ</span></div>
-          <div class="field"><label for="f-close">ปิดรับ</label><input id="f-close" class="box" type="datetime-local" value="${esc(c.closeAt)}" ${lock ? 'disabled' : ''}><span class="date-hint" data-for="f-close" aria-live="polite">${dtHint(c.closeAt)}</span><span class="note">เว้นว่าง = เปิดจนกว่าจะกดปิดรับ</span></div>
+          <div class="field"><label for="f-open">เปิดให้ทำ</label><input id="f-open" class="box" type="datetime-local" value="${esc(c.openAt)}" ${lock ? 'disabled' : ''}><span class="date-hint" data-for="f-open" aria-live="polite">${dtHint(c.openAt)}</span><span class="note">เว้นว่าง = เปิดเมื่อประกาศ</span></div>
+          <div class="field"><label for="f-close">ปิดรับ</label><input id="f-close" class="box" type="datetime-local" value="${esc(c.closeAt)}" ${lock ? 'disabled' : ''}><span class="date-hint" data-for="f-close" aria-live="polite">${dtHint(c.closeAt)}</span><span class="note">เว้นว่าง = ไม่กำหนดเวลาปิด</span></div>
         </div></section>
       <section class="sec" aria-labelledby="h-src"><div class="sec-h"><h2 id="h-src">ที่มาของข้อ</h2></div>
         <div class="sec-pad" style="padding-top:0;gap:8px" role="radiogroup" aria-labelledby="h-src">${d.sources.map(x => `<button type="button" class="src" role="radio" aria-checked="${x === c.source}" data-src="${esc(x)}" ${lock ? 'disabled' : ''}>
@@ -1834,34 +1824,33 @@ function asmToggles(c, edit, draft) {
   const rows = [['shuffle', 'คละลำดับข้อ', draft], ['shuffleOpts', 'คละตัวเลือก', draft], ['tags', 'แสดงป้ายประเภท วิชา และระดับ C', true],
     ['showScore', 'แสดงคะแนนหลังส่ง', true], ['showAns', 'แสดงเฉลยหลังส่ง', true]].filter(x => x[2]);
   return `<section class="sec" aria-labelledby="h-tg"><div class="sec-h"><h2 id="h-tg">การทำและการแสดงผล</h2></div>
-    <div class="toggles">${rows.map(([k, l]) => `<div><span id="tg-${k}">${l}</span><button type="button" class="sw" role="switch" aria-labelledby="tg-${k}" aria-checked="${!!c[k]}" data-tg="${k}" ${edit ? '' : 'disabled'}></button></div>`).join('')}
-      <div><span>เข้าทำด้วย</span><span class="m">รหัสนักเรียนอย่างเดียว</span></div></div></section>`;
+    <div class="toggles">${rows.map(([k, l]) => `<div><span id="tg-${k}">${l}</span><button type="button" class="sw" role="switch" aria-labelledby="tg-${k}" aria-checked="${!!c[k]}" data-tg="${k}" ${edit ? '' : 'disabled'}></button></div>`).join('')}</div></section>`;
 }
 
 function asmLive(d, c, s, edit) {
   const p = d.progress || { rooms: [], done: 0, size: 0, pct: null, dups: [] };
   const full = p.rooms.filter(x => x.size && x.done >= x.size).length;
   const tl = [
-    { d: 'ok', b: 'ประกาศแล้ว', s: 'ลิงก์และ QR เดียวทั้งระดับชั้น ครูประจำชั้นเห็นการ์ดส่งต่อในหน้าห้องเรียนของตน' },
-    { d: s.phase === 'scheduled' ? 'next' : 'ok', b: 'เปิดให้ทำ' + (s.openShort ? ' ' + s.openShort + ' น.' : ' ทันทีที่ประกาศ'), s: 'นักเรียนเข้าทำด้วยรหัสนักเรียน ทำที่บ้านได้' },
-    { d: s.phase === 'live' ? 'next' : s.phase === 'closed' ? 'ok' : 'wait', b: 'ครูประจำชั้นติดตามและเตือนในกลุ่มห้อง', s: 'ระบบไม่ส่งเตือนอัตโนมัติ ครูกด "ส่งข้อความเตือนพร้อมยอดห้อง" หรือผู้ดูแลคัดลอกข้อความเตือนจากตารางด้านซ้าย' },
-    { d: s.phase === 'closed' ? 'ok' : 'wait', b: 'ปิดรับ' + (s.closeShort ? ' ' + s.closeShort : ' เมื่อกดปิดรับ'), s: 'หลังปิดรับ ผลรวมขึ้นในหน้ารายงานของระดับชั้น' }
+    { d: 'ok', b: 'ประกาศแล้ว', s: 'ครูประจำชั้นส่งลิงก์ต่อจากหน้าห้องเรียน' },
+    { d: s.phase === 'scheduled' ? 'next' : 'ok', b: 'เปิดให้ทำ' + (s.openShort ? ' ' + s.openShort + ' น.' : ' เมื่อประกาศ'), s: '' },
+    { d: s.phase === 'live' ? 'next' : s.phase === 'closed' ? 'ok' : 'wait', b: 'ครูประจำชั้นติดตามและเตือนในกลุ่มห้อง', s: 'ระบบไม่ส่งข้อความเตือนอัตโนมัติ' },
+    { d: s.phase === 'closed' ? 'ok' : 'wait', b: 'ปิดรับ' + (s.closeShort ? ' ' + s.closeShort : ' เมื่อกดปิดรับ'), s: 'ผลแสดงในรายงานการใช้ในคาบ' }
   ];
   return `<section class="sec"><div class="kpis">
       <div><span>ทำแล้ว</span><b>${p.done.toLocaleString('en-US')} <span style="font-size:15px;color:var(--muted);font-weight:500">/ ${p.size.toLocaleString('en-US')} คน</span></b><span>${p.pct === null ? '—' : p.pct + '%'}${p.unknown ? ` · ไม่ระบุห้อง ${p.unknown}` : ''}</span></div>
-      <div><span>ห้องที่ทำครบ</span><b>${full} <span style="font-size:15px;color:var(--muted);font-weight:500">/ ${p.rooms.length} ห้อง</span></b><span>นับจากจำนวนนักเรียนในชีตห้องเรียน</span></div>
-      <div><span>ปิดรับ</span><b style="font-size:20px">${esc(s.closeShort || 'ยังไม่กำหนด')}</b><span>${s.closeMs && s.phase !== 'closed' ? 'อีก ' + leftText(s.closeMs) : s.phase === 'closed' ? 'ปิดรับแล้ว' : 'เปิดจนกว่าจะกดปิดรับ'}</span></div>
-      <div><span>ข้อในชุด</span><b>${s.have} ข้อ</b><span>ราว ${s.minutes} นาที · ตอบแล้ว ${d.answered} ครั้ง</span></div></div></section>
+      <div><span>ห้องที่ทำครบ</span><b>${full} <span style="font-size:15px;color:var(--muted);font-weight:500">/ ${p.rooms.length} ห้อง</span></b><span></span></div>
+      <div><span>ปิดรับ</span><b style="font-size:20px">${esc(s.closeShort || 'ยังไม่กำหนด')}</b><span>${s.closeMs && s.phase !== 'closed' ? 'อีก ' + leftText(s.closeMs) : s.phase === 'closed' ? 'ปิดรับแล้ว' : 'ไม่กำหนดเวลาปิด'}</span></div>
+      <div><span>ข้อในชุด</span><b>${s.have} ข้อ</b><span>ประมาณ ${s.minutes} นาที · ตอบแล้ว ${d.answered} ครั้ง</span></div></div></section>
     <div class="cols">
-      <section class="sec wide" aria-labelledby="h-prog"><div class="sec-h"><div class="t"><h2 id="h-prog">ความคืบหน้ารายห้อง</h2><span class="s">อัปเดต ${esc(d.asOf)} · นับรหัสนักเรียนไม่ซ้ำ</span></div>
+      <section class="sec wide" aria-labelledby="h-prog"><div class="sec-h"><div class="t"><h2 id="h-prog">ความคืบหน้ารายห้อง</h2><span class="s">ข้อมูล ณ ${esc(d.asOf)}</span></div>
           <button class="link" type="button" id="pg-reload">โหลดใหม่</button></div>
         <div class="tw"><table class="tb"><thead><tr><th>ห้อง</th><th>ครูประจำชั้น</th><th>ทำแล้ว</th><th></th></tr></thead>
           <tbody>${p.rooms.map(x => `<tr class="top"><td class="b">${esc(x.room)}</td>
-            <td>${x.covered ? `<span>${esc(x.homeroom)}</span><div class="m" style="font-size:13px">${x.seen ? 'เห็นการ์ดล่าสุด ' + esc(x.seen) : 'ยังไม่ได้เปิดหน้าห้องเรียนหลังประกาศ'}</div>`
-              : `<span class="wait">${esc(x.why || 'ยังไม่ระบุในชีตห้องเรียน')}</span><div class="m" style="font-size:13px">ส่งข้อความเข้ากลุ่ม LINE ห้องเอง</div>`}</td>
+            <td>${x.covered ? `<span>${esc(x.homeroom)}</span><div class="m" style="font-size:13px">${x.seen ? 'เปิดดูล่าสุด ' + esc(x.seen) : 'ยังไม่ได้เปิดดู'}</div>`
+              : `<span class="wait">${esc(x.why || 'ยังไม่ระบุในชีตห้องเรียน')}</span>`}</td>
             <td><div class="meter"><div class="track${x.pct !== null && x.pct < 50 && s.phase !== 'scheduled' ? ' low' : ''}"><span style="width:${x.pct || 0}%"></span></div><span class="v">${x.done} / ${x.size || '?'}</span></div></td>
             <td class="r nw">${!x.covered && x.share && s.phase !== 'closed' ? `<button class="btn sm" type="button" data-copy="${esc(x.share)}">คัดลอกข้อความส่งต่อ</button> ` : ''}${s.phase === 'live' && x.size && x.done < x.size ? `<button class="btn sm" type="button" data-copy="${esc(x.remind)}">คัดลอกข้อความเตือน</button>` : x.size && x.done >= x.size ? '<span class="st ok">ครบแล้ว</span>' : ''}</td></tr>`).join('')}</tbody></table></div>
-        ${p.dups.length ? `<details class="more"><summary>รหัสที่ส่งซ้ำ ${p.dups.length} รหัส</summary><div class="sec-pad" style="padding-top:0"><span>${p.dups.map(x => `${esc(x.id)} (${x.n} ครั้ง)`).join(' · ')}</span><span class="note">ระบบนับเฉพาะครั้งแรก ถ้าเป็นรหัสที่เพื่อนกรอกผิด ให้ครูประจำชั้นตรวจสอบ</span></div></details>` : ''}</section>
+        ${p.dups.length ? `<details class="more"><summary>รหัสที่ส่งซ้ำ ${p.dups.length} รหัส</summary><div class="sec-pad" style="padding-top:0"><span>${p.dups.map(x => `${esc(x.id)} (${x.n} ครั้ง)`).join(' · ')}</span><span class="note">ระบบนับเฉพาะครั้งแรก</span></div></details>` : ''}</section>
       <div class="narrow">
         <section class="sec" aria-labelledby="h-share"><div class="sec-h"><h2 id="h-share">ช่องทางส่งให้นักเรียน</h2></div>
           <div class="sec-pad" style="padding-top:0"><div class="share-row"><div class="qrbox" id="as-qr"></div>
@@ -1885,9 +1874,9 @@ function leftText(ms) {
 
 function asmBind(d, s, edit, draftView) {
   const m = adMain();
-  $('#as-back').onclick = () => { if (A.dirty && !confirm('มีการแก้ไขที่ยังไม่บันทึก ออกจากหน้านี้?')) return; A.dirty = false; adShow('overview'); };
-  $$('[data-tab]', m).forEach(b => b.onclick = () => { if (b.dataset.tab === d.level) return; if (A.dirty && !confirm('มีการแก้ไขที่ยังไม่บันทึก เปลี่ยนระดับชั้น?')) return; asmLoad(b.dataset.tab); });
-  $$('[data-copy]', m).forEach(b => b.onclick = () => copyText(b.dataset.copy, b.dataset.copy.startsWith('http') ? 'คัดลอกลิงก์แล้ว' : 'คัดลอกข้อความแล้ว วางในกลุ่ม LINE ห้องได้เลย'));
+  $('#as-back').onclick = () => { if (A.dirty && !confirm('มีการแก้ไขที่ยังไม่บันทึก ต้องการออกจากหน้านี้หรือไม่')) return; A.dirty = false; adShow('overview'); };
+  $$('[data-tab]', m).forEach(b => b.onclick = () => { if (b.dataset.tab === d.level) return; if (A.dirty && !confirm('มีการแก้ไขที่ยังไม่บันทึก ต้องการเปลี่ยนระดับชั้นหรือไม่')) return; asmLoad(b.dataset.tab); });
+  $$('[data-copy]', m).forEach(b => b.onclick = () => copyText(b.dataset.copy, b.dataset.copy.startsWith('http') ? 'คัดลอกลิงก์แล้ว' : 'คัดลอกข้อความแล้ว'));
   const qr = $('#as-qr'); if (qr && s.link) drawQr(qr, s.link, 320);
   const rl = $('#pg-reload'); if (rl) rl.onclick = () => asmLoad(d.level);
   $$('[data-a]', m).forEach(b => b.onclick = () => asmAct(b.dataset.a, b));
@@ -1926,16 +1915,16 @@ async function asmBusy(btn, fn, okMsg) {
 async function asmAct(a, btn) {
   const d = A.d, lv = d.level;
   if (a === 'preview') return asmPreview();
-  if (a === 'create') return asmBusy(btn, () => api('adminAssessSave', lv, A.cfg), 'สร้างร่างแล้ว กดสุ่มเติมให้ครบได้เลย');
-  if (a === 'fill') return asmBusy(btn, () => api('adminAssessFill', lv), r => r.short.length ? 'คลังไม่พอ: ' + r.short.join(' · ') : 'สุ่มเติมครบแล้ว');
+  if (a === 'create') return asmBusy(btn, () => api('adminAssessSave', lv, A.cfg), 'สร้างร่างแล้ว');
+  if (a === 'fill') return asmBusy(btn, () => api('adminAssessFill', lv), r => r.short.length ? 'ข้อในคลังไม่เพียงพอ: ' + r.short.join(' · ') : 'สุ่มเติมครบแล้ว');
   if (a === 'publish') {
-    if (A.dirty) return toast('บันทึกร่างก่อน แล้วจึงประกาศ');
+    if (A.dirty) return toast('กรุณาบันทึกร่างก่อนประกาศ');
     const s = d.summary;
-    openSheet(sheetHead('ประกาศให้นักเรียนทำ?', `${lv} · ${s.have} ข้อ ราว ${s.minutes} นาที`) + `
-      <div class="notice">${s.openText ? 'นักเรียนเริ่มทำได้ ' + esc(s.openText) : 'นักเรียนเริ่มทำได้ทันที'}${s.closeText ? ' · ปิดรับ ' + esc(s.closeText) : ' · เปิดจนกว่าจะกดปิดรับ'}</div>
-      <p class="note">หลังประกาศ เปลี่ยนข้อและสัดส่วนไม่ได้ (ถ้ายังไม่มีคนตอบ กลับเป็นร่างได้) · ครูประจำชั้นจะเห็นการ์ดส่งต่อเข้ากลุ่ม LINE ห้องในหน้าห้องเรียนของตน</p>
-      ${s.have < s.need ? `<div class="notice wait">มีข้อ ${s.have} จาก ${s.need} ข้อตามสัดส่วน</div>` : ''}
-      ${(d.uncovered || []).length ? `<div class="notice wait"><span><b>${d.uncovered.map(x => esc(x.room)).join(', ')}</b> ไม่มีครูประจำชั้นที่ส่งลิงก์ต่อได้ หลังประกาศ คัดลอกข้อความส่งต่อของห้องเหล่านี้จากตารางความคืบหน้า แล้วส่งเข้ากลุ่ม LINE ห้องเอง</span></div>` : ''}
+    openSheet(sheetHead('ยืนยันการประกาศแบบประเมิน', `${lv} · ${s.have} ข้อ ประมาณ ${s.minutes} นาที`) + `
+      <div class="notice">${s.openText ? 'เปิดให้ทำ ' + esc(s.openText) : 'เปิดให้ทำทันที'}${s.closeText ? ' · ปิดรับ ' + esc(s.closeText) : ' · ไม่กำหนดเวลาปิด'}</div>
+      <p class="note">หลังประกาศจะแก้ไขข้อและสัดส่วนไม่ได้</p>
+      ${s.have < s.need ? `<div class="notice wait">มีข้อ ${s.have} จาก ${s.need} ข้อ ยังไม่ครบตามสัดส่วน</div>` : ''}
+      ${(d.uncovered || []).length ? `<div class="notice wait"><span><b>${d.uncovered.map(x => esc(x.room)).join(', ')}</b> ไม่มีครูประจำชั้นที่ส่งลิงก์ต่อได้</span></div>` : ''}
       <span class="err" id="go-err" role="alert"></span><button class="btn-p" type="button" id="go">ประกาศ</button>`, () => {
       $('#go').onclick = async () => {
         $('#go').disabled = true;
@@ -1955,11 +1944,11 @@ async function asmAct(a, btn) {
     return asmBusy(btn, () => api('adminAssessStatus', lv, 'เปิด'), 'เปิดรับอีกครั้งแล้ว');
   }
   if (a === 'todraft') {
-    if (!confirm('กลับเป็นร่างเพื่อแก้ข้อ? นักเรียนจะเปิดลิงก์ไม่ได้จนกว่าจะประกาศใหม่')) return;
+    if (!confirm('ยืนยันการกลับเป็นร่าง นักเรียนจะเข้าทำไม่ได้จนกว่าจะประกาศใหม่')) return;
     return asmBusy(btn, () => api('adminAssessStatus', lv, 'ร่าง'), 'กลับเป็นร่างแล้ว');
   }
   if (a === 'newround') {
-    if (!confirm('เริ่มแบบประเมินรอบใหม่ของ ' + lv + '? รอบเดิมยังเก็บผลไว้ในชีต')) return;
+    if (!confirm('ยืนยันการเริ่มแบบประเมินรอบใหม่ของ ' + lv)) return;
     const t = A.cfg.title.replace(/ครั้งที่\s*(\d+)/, (x, n) => 'ครั้งที่ ' + (Number(n) + 1));
     return asmBusy(btn, () => api('adminAssessSave', lv, Object.assign({}, A.cfg, { title: t === A.cfg.title ? A.cfg.title + ' (รอบใหม่)' : t, openAt: '', closeAt: '', newRound: true })), 'สร้างรอบใหม่แล้ว (ร่าง)');
   }
@@ -1970,7 +1959,7 @@ async function asmAct(a, btn) {
       <span class="err" id="go-err" role="alert"></span><button class="btn-p" type="button" id="go">${reopen ? 'บันทึกและเปิดรับ' : 'บันทึกเวลาใหม่'}</button>`, () => {
       $('#go').onclick = async () => {
         const v = $('#x-close').value;
-        if (!v || new Date(v) <= new Date()) { $('#go-err').textContent = 'เลือกเวลาปิดรับที่ยังไม่ถึง'; return; }
+        if (!v || new Date(v) <= new Date()) { $('#go-err').textContent = 'กรุณาเลือกเวลาปิดรับในอนาคต'; return; }
         $('#go').disabled = true;
         try {
           await api('adminAssessSave', lv, Object.assign({}, A.cfg, { closeAt: v }));
@@ -1983,8 +1972,8 @@ async function asmAct(a, btn) {
   }
   if (a === 'poster') {
     const s = d.summary, pa = $('#print-area');
-    pa.innerHTML = `<h1>${esc(s.title)}</h1><p>นักเรียน ${esc(lv)} ทุกคน · ทำนอกเวลาเรียน · กรอกแค่รหัสนักเรียน · ${s.need} ข้อ ราว ${s.minutes} นาที</p><div id="pa-qr"></div>
-      <p>${s.closeText ? 'ปิดรับ ' + esc(s.closeText) : ''}</p><p style="font-size:11pt">${esc(s.link)}</p><p style="font-size:11pt">ไม่มีอุปกรณ์ ใช้ห้องคอมช่วงพักกลางวันได้</p>`;
+    pa.innerHTML = `<h1>${esc(s.title)}</h1><p>นักเรียนชั้น ${esc(lv)} · ${s.need} ข้อ ประมาณ ${s.minutes} นาที</p><div id="pa-qr"></div>
+      <p>${s.closeText ? 'ปิดรับ ' + esc(s.closeText) : ''}</p><p style="font-size:11pt">${esc(s.link)}</p><p style="font-size:11pt">นักเรียนที่ไม่มีอุปกรณ์ ใช้ห้องคอมพิวเตอร์ของโรงเรียนได้ในช่วงพักกลางวัน</p>`;
     drawQr($('#pa-qr'), s.link, 600);
     setTimeout(() => window.print(), 300);
   }
@@ -1992,11 +1981,11 @@ async function asmAct(a, btn) {
 
 function asmPreview() {
   const d = A.d, items = (d.items || []).filter(x => !x.missing);
-  if (!items.length) return toast('ยังไม่มีข้อในชุด กดสุ่มเติมให้ครบก่อน');
+  if (!items.length) return toast('ยังไม่มีข้อในชุด');
   let i = 0;
   const draw = () => {
     const it = items[i];
-    openSheet(sheetHead('แบบที่นักเรียนเห็น', `ข้อ ${i + 1} / ${items.length}${A.cfg.tags ? '' : ' · ซ่อนป้ายประเภทและวิชา'}${A.cfg.shuffleOpts ? ' · นักเรียนเห็นตัวเลือกสลับลำดับ' : ''}`) + `
+    openSheet(sheetHead('แบบที่นักเรียนเห็น', `ข้อ ${i + 1} / ${items.length}${A.cfg.tags ? '' : ' · ซ่อนป้ายประเภทและวิชา'}${A.cfg.shuffleOpts ? ' · ตัวเลือกสลับลำดับ' : ''}`) + `
       <div class="stu" style="padding:0">
         ${A.cfg.tags ? `<div class="qtags"><span class="ctag solid">${esc(it.exam)}</span><span class="sj">${esc(it.subject)}</span>${it.c ? '<span class="sep">·</span>' + cTag(it.c) : ''}</div>` : ''}
         ${it.q ? `<h1 class="sm">${esc(it.q)}</h1>` : ''}${it.img ? `<figure><img src="${esc(it.img)}" alt="รูปโจทย์" referrerpolicy="no-referrer"></figure>` : ''}
@@ -2034,33 +2023,33 @@ function dbRender() {
   const weak = D.weak.filter(x => subj === 'all' || x.s === subj).slice(0, 12);
   const reps = D.reports.filter(x => subj === 'all' || x.subject === subj);
   adMain().innerHTML = `
-    <div class="pg-head"><div class="t"><h1>รายงานการใช้ในคาบ</h1><p>${D.upto ? `ถึงสัปดาห์ที่ ${D.upto}` : 'ยังไม่ถึงสัปดาห์ที่ 1 ตามชีตสัปดาห์'} · นับการใช้เมื่อนักเรียนตอบตั้งแต่ร้อยละ ${D.useMin} ของห้อง</p></div>
+    <div class="pg-head"><div class="t"><h1>รายงานการใช้ในคาบ</h1><p>${D.upto ? `ถึงสัปดาห์ที่ ${D.upto} · ` : ''}นับเป็นการใช้เมื่อนักเรียนตอบตั้งแต่ร้อยละ ${D.useMin} ของห้อง</p></div>
       <div class="acts"><select class="box" id="db-sub" aria-label="วิชา" style="width:auto;min-width:180px"><option value="all">ทุกวิชา</option>${D.subjects.map(s => `<option ${s === subj ? 'selected' : ''}>${esc(s)}</option>`).join('')}</select></div></div>
     <div class="tabs" role="tablist" aria-label="ระดับชั้น">${D.levels.map(l => `<button type="button" role="tab" data-lvl="${esc(l)}" aria-selected="${l === D.level}">${esc(l)}</button>`).join('')}</div>
-    ${!D.upto ? `<div class="notice wait">ยังไม่เริ่มนับโควตา${D.firstWeek ? ` สัปดาห์ที่ 1 เริ่มจันทร์ ${esc(D.firstWeek)}` : ''} ตัวเลขด้านล่างเป็นการทดลองใช้ ยังไม่นับเป็นผลโครงการ</div>` : ''}
+    ${!D.upto ? `<div class="notice wait">ยังไม่เริ่มนับโควตา${D.firstWeek ? ` (สัปดาห์ที่ 1 เริ่มวันจันทร์ที่ ${esc(D.firstWeek)})` : ''} ข้อมูลด้านล่างเป็นช่วงทดลองใช้</div>` : ''}
     <section class="sec"><div class="kpis">
       ${k1 === null ? kpi(`ครูนำไปใช้`, '—', 'ยังไม่มีสัปดาห์ที่วัดผลได้', null) : kpi(`ครูนำไปใช้ (${tUsing} จาก ${teachers.length} คน)`, k1 + '%', `เป้าหมาย ≥ ${D.goal}% · ${k1 >= D.goal ? 'ผ่าน' : 'ยังไม่ผ่าน'}`, k1 >= D.goal)}
       ${k2 === null ? kpi('ห้อง–วิชาใช้ต่อเนื่อง', '—', 'ยังไม่มีสัปดาห์ที่วัดผลได้', null) : kpi(`ห้อง–วิชาใช้ต่อเนื่อง (${contRooms} จาก ${measured.length})`, k2 + '%', `เป้าหมาย ≥ ${D.goal}% · ${k2 >= D.goal ? 'ผ่าน' : 'ยังไม่ผ่าน'}`, k2 >= D.goal)}
       ${!ap || ap.pct === null ? kpi('ทำแบบประเมินรวมแล้ว', '—', D.assess ? 'ยังไม่มีข้อมูลจำนวนนักเรียน' : 'ยังไม่ได้สร้างแบบประเมินของระดับชั้นนี้', null)
         : kpi(`ทำแบบประเมินรวมแล้ว (${ap.done} จาก ${ap.size} คน)`, ap.pct + '%', `เป้าหมาย 100% · ${ap.pct >= 100 ? 'ผ่าน' : 'ยังไม่ผ่าน'}`, ap.pct >= 100)}</div></section>
     <section class="sec" aria-labelledby="h-wk"><div class="sec-h"><div class="t"><h2 id="h-wk">การใช้รายสัปดาห์ · ${esc(D.level)}</h2>
-        <span class="s">ร้อยละนักเรียนที่ตอบข้อประจำคาบในสัปดาห์นั้น · ใช้ต่อเนื่อง = ใช้ครบตั้งแต่ร้อยละ ${D.contMin} ของสัปดาห์ที่นับโควตา</span></div>
+        <span class="s">ใช้ต่อเนื่อง = ผ่านเกณฑ์ตั้งแต่ร้อยละ ${D.contMin} ของสัปดาห์ที่นับโควตา</span></div>
         ${rows.length ? '<button class="btn sm" type="button" id="db-copy">คัดลอกตาราง</button>' : ''}</div>
-      <div class="strip"><span><span class="cell ok">≥${D.useMin}%</span> นับเป็นการใช้</span><span><span class="cell no">—</span> ยังไม่ใช้หรือไม่ถึงเกณฑ์</span><span><span class="cell pp">กระดาษ</span> แบบกระดาษ</span><span><span class="cell off">รอ</span> สัปดาห์นี้ยังไม่จบ</span><span><span class="cell off">หยุด</span> ไม่นับโควตา</span></div>
+      <div class="strip"><span><span class="cell ok">≥${D.useMin}%</span> นับเป็นการใช้</span><span><span class="cell no">—</span> ไม่ถึงเกณฑ์</span><span><span class="cell pp">กระดาษ</span> แบบกระดาษ</span><span><span class="cell off">รอ</span> สัปดาห์ปัจจุบัน</span><span><span class="cell off">หยุด</span> ไม่นับโควตา</span></div>
       <div class="tw"><table class="tb">${rows.length ? `<thead><tr><th>ห้อง–วิชา</th><th>ครู</th>${D.weeks.map(w => `<th class="c">${esc(w)}</th>`).join('')}<th class="c">ต่อเนื่อง</th></tr></thead>
         <tbody>${rows.map(r => { const c = cont(r); return `<tr><td class="b">${esc(r.r)} ${esc(r.s)}</td><td class="m nw">${esc(r.t)}</td>${r.w.map(v => `<td class="c">${cell(v)}</td>`).join('')}<td class="c">${c === null ? '<span class="cell off">—</span>' : `<span class="cell ${c >= D.contMin ? 'ok' : 'no'}">${c}%</span>`}</td></tr>`; }).join('')}</tbody>`
         : '<tbody><tr><td class="m">ยังไม่มีห้อง–วิชาของระดับชั้นนี้ในชีตครูผู้สอน</td></tr></tbody>'}</table></div></section>
     <div class="cols">
-      <section class="sec half" aria-labelledby="h-weak"><div class="sec-h"><div class="t"><h2 id="h-weak">ตัวชี้วัดที่ยังอ่อน</h2><span class="s">ร้อยละตอบถูกจากคำตอบในคาบ เรียงจากน้อยไปมาก · แสดงเมื่อมีคนตอบอย่างน้อย ${D.weakMin || 10} คน</span></div></div>
+      <section class="sec half" aria-labelledby="h-weak"><div class="sec-h"><div class="t"><h2 id="h-weak">ตัวชี้วัดที่ยังอ่อน</h2><span class="s">ร้อยละตอบถูก เรียงจากน้อยไปมาก · ผู้ตอบอย่างน้อย ${D.weakMin || 10} คน</span></div></div>
         <div class="sec-pad" style="padding-top:0">${weak.length ? weak.map(x => `<div class="meter" style="display:grid;grid-template-columns:minmax(0,1fr) 120px 44px;gap:10px;align-items:center;font-size:14px">
           <span title="${esc(x.k)} · ${esc(x.s)}" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(x.k)} <span class="m" style="font-size:13px">${esc(x.s)} · ${x.n} คน</span></span>
-          <div class="track${x.v < 50 ? ' low' : ''}"><span style="width:${x.v}%"></span></div><b class="num" style="text-align:right">${x.v}%</b></div>`).join('') : `<p class="m">${D.weakFew ? 'ยังไม่มีตัวชี้วัดที่มีคนตอบถึงเกณฑ์' : 'ยังไม่มีคำตอบของวิชานี้'}</p>`}
-          ${D.weakFew ? `<p class="m" style="font-size:13px">อีก ${D.weakFew} ตัวชี้วัดคนตอบยังน้อย ยังไม่แสดง</p>` : ''}</div></section>
-      <section class="sec half" aria-labelledby="h-bk"><div class="sec-h"><div class="t"><h2 id="h-bk">คลังข้อสอบ ${esc(D.level)}</h2><span class="s">จำนวนข้อตามที่กำหนดในคอลัมน์ "ใช้สำหรับ"</span></div></div>
+          <div class="track${x.v < 50 ? ' low' : ''}"><span style="width:${x.v}%"></span></div><b class="num" style="text-align:right">${x.v}%</b></div>`).join('') : `<p class="m">${D.weakFew ? 'ยังไม่มีตัวชี้วัดที่มีผู้ตอบถึงเกณฑ์' : 'ยังไม่มีคำตอบของวิชานี้'}</p>`}
+          ${D.weakFew ? `<p class="m" style="font-size:13px">ไม่แสดง ${D.weakFew} ตัวชี้วัดที่มีผู้ตอบน้อยกว่าเกณฑ์</p>` : ''}</div></section>
+      <section class="sec half" aria-labelledby="h-bk"><div class="sec-h"><div class="t"><h2 id="h-bk">คลังข้อสอบ ${esc(D.level)}</h2></div></div>
         <div class="tw"><table class="tb"><thead><tr><th>ประเภท</th><th>วิชา</th><th class="r">ใช้ในคาบแล้ว</th><th class="r">ใช้ในคาบได้</th><th class="r">ใช้ในแบบประเมินได้</th></tr></thead>
           <tbody>${D.bank.length ? D.bank.map(b => `<tr><td><span class="etag">${esc(b.exam)}</span></td><td class="b">${esc(b.subject)}</td><td class="r num">${b.used}</td><td class="r num">${b.cls}</td><td class="r num">${b.assess}</td></tr>`).join('') : '<tr><td colspan="5" class="m">คลังข้อสอบของระดับชั้นนี้ยังว่าง</td></tr>'}</tbody></table></div></section>
     </div>
-    <section class="sec" aria-labelledby="h-rp"><div class="sec-h"><div class="t"><h2 id="h-rp">รายงานคาบล่าสุด</h2><span class="s">ระดับที่ครูใช้สอน และบันทึกหลังปิดรับ</span></div></div>
+    <section class="sec" aria-labelledby="h-rp"><div class="sec-h"><div class="t"><h2 id="h-rp">รายงานคาบล่าสุด</h2></div></div>
       <div class="tw"><table class="tb">${reps.length ? `<thead><tr><th>วันที่</th><th>ห้อง–วิชา</th><th>ครู</th><th>ข้อสอบ</th><th>ระดับที่ใช้สอน</th><th>บันทึก</th></tr></thead>
         <tbody>${reps.map(x => `<tr class="top"><td class="nw m">${esc(x.at)}</td><td class="b">${esc(x.room)} ${esc(x.subject)}</td><td class="nw">${esc(x.t)}</td><td class="m" style="min-width:160px">${esc([x.exam, x.ind].filter(Boolean).join(' · '))}</td>
           <td>${cTag(x.c) || '—'}</td><td class="read">${esc([x.chips, x.note].filter(Boolean).join(' — ')) || '<span class="m">—</span>'}</td></tr>`).join('')}</tbody>`
@@ -2071,7 +2060,7 @@ function dbRender() {
     const txt = v => v === 'x' ? 'หยุด' : v === 'w' ? 'รอ' : v === 'p' ? 'กระดาษ' : v ? v + '%' : '-';
     const lines = [['ห้อง', 'วิชา', 'ครู', ...D.weeks, 'ต่อเนื่อง'].join('\t')]
       .concat(rows.map(r => { const c = cont(r); return [r.r, r.s, r.t, ...r.w.map(txt), c === null ? '-' : c + '%'].join('\t'); }));
-    copyText(lines.join('\n'), 'คัดลอกตารางแล้ว วางใน Excel หรือ Google Sheets ได้เลย');
+    copyText(lines.join('\n'), 'คัดลอกตารางแล้ว');
   };
   $$('[data-lvl]', adMain()).forEach(b => b.onclick = () => { if (b.dataset.lvl !== D.level) { DB.subject = 'all'; dbLoad(b.dataset.lvl); } });
 }
@@ -2085,7 +2074,7 @@ async function screenInit(token) {
     let d;
     try { d = await run('screenData', token); } catch (e) { return; }
     if (d.closed) {
-      fs.innerHTML = `<div></div><div class="fs-closed"><b class="fs-room">${d.room ? 'ห้อง ' + esc(d.room) : ''}</b><span>ปิดรับคำตอบแล้ว หรือลิงก์นี้หมดอายุ</span></div><div></div>`;
+      fs.innerHTML = `<div></div><div class="fs-closed"><b class="fs-room">${d.room ? 'ห้อง ' + esc(d.room) : ''}</b><span>ปิดรับคำตอบแล้ว</span></div><div></div>`;
       return true;
     }
     if (!drawn) {
@@ -2093,9 +2082,9 @@ async function screenInit(token) {
         <div class="fs-top"><h2>${esc(d.subject)} · ข้อประจำคาบ</h2><span>ปิดรับอัตโนมัติ ${esc(d.deadline)}</span></div>
         <div class="fs-main">${d.q ? `<p class="fs-q">${esc(d.q)}</p>` : ''}<div class="fs-qr" id="fs-qr"></div>
           <div class="fs-side"><span class="fs-room">ห้อง ${esc(d.room)}</span>
-            <span>สแกน QR Code หรือพิมพ์รหัสห้อง</span><span class="fs-code">${fmtCode(d.code)}</span>
+            <span>สแกน QR Code หรือกรอกรหัสห้อง</span><span class="fs-code">${fmtCode(d.code)}</span>
             <span class="fs-count">ตอบแล้ว <b id="fs-count">${d.sent}</b> จาก ${d.size || '?'} คน</span></div></div>
-        <p class="fs-foot">ใช้ได้เฉพาะห้อง ${esc(d.room)} ขณะเปิดรับคำตอบ · ไม่ต้องกรอกชื่อหรืออีเมล</p>`;
+        <p class="fs-foot">ใช้ได้เฉพาะห้อง ${esc(d.room)}</p>`;
       drawQr($('#fs-qr'), d.link); drawn = true;
     } else $('#fs-count').textContent = d.sent;
   };
@@ -2111,7 +2100,7 @@ function startStaff() {
     if (ME.canDash) return startAdmin(PARAMS.page === 'dashboard' ? 'usage' : 'overview');
     // ครูที่ไม่มีสิทธิ์เปิดลิงก์ผู้ดูแล: ออกจากระบบในลิงก์นี้ ไม่พาไปหน้าครู
     const t = TK.get(); TK.clear(); run('logout', t).catch(() => {});
-    return showLogin('บัญชีนี้ไม่มีสิทธิ์เข้าหน้าผู้ดูแลระบบ ครูผู้สอนให้ใช้ลิงก์หน้าครู (ปุ่มในริชเมนู LINE OA)');
+    return showLogin('บัญชีนี้ไม่มีสิทธิ์เข้าหน้าผู้ดูแลระบบ กรุณาเข้าผ่านเมนูหน้าครูใน LINE OA');
   }
   startTeacher();
 }
