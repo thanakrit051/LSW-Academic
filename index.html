@@ -7,7 +7,7 @@
 <title>ระบบฝึกข้อสอบระดับชาติ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&family=Noto+Sans+Thai+Looped:wght@400;500;600&display=swap">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 /* หน้าตาตาม mockup v19 (ระบบจริง/ออกแบบ/mockup):
    หน้านักเรียนและหน้าครูเป็นคอลัมน์มือถือ ปุ่มหลักติดล่างจอ · หน้าผู้ดูแลเป็นจอคอมมีเมนูด้านซ้าย */
@@ -71,7 +71,8 @@ svg { flex: none; }
 .ibtn { width: 40px; height: 40px; margin: -4px 0 -4px -10px; border: 0; background: transparent; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; color: var(--ink); }
 .ibtn:hover { background: var(--bg); }
 .dock { position: sticky; bottom: 0; z-index: 4; background: var(--surface); border-top: 1px solid var(--line); padding: 12px 14px; padding-bottom: max(26px, calc(12px + env(safe-area-inset-bottom))); display: flex; flex-direction: column; gap: 6px; }
-.dock .cap { font-size: 12px; color: var(--muted); text-align: center; line-height: 1.5; }
+.dock .cap { font-size: 13px; color: var(--muted); text-align: center; line-height: 1.5; }
+.dock .cap.strong { font-size: 15px; color: var(--ink); font-weight: 600; }
 .dock .cap.left { text-align: left; font-size: 13px; }
 .dock .two { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 10px; }
 .pad { padding: 14px; display: flex; flex-direction: column; gap: 12px; }
@@ -122,7 +123,7 @@ button:disabled, .btn-p:disabled { opacity: .5; cursor: not-allowed; }
 .hero-top .who b { font-size: 20px; font-weight: 600; }
 .hero-top .side { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.35; flex: none; }
 .hero-top .side span { font-size: 13px; color: var(--hero-sub); }
-.hero-top .side button { background: none; border: 0; padding: 4px 0; margin: -2px 0; color: var(--hero-ink); font-size: 12px; text-decoration: underline; text-underline-offset: 3px; }
+.hero-top .side button { background: none; border: 0; min-height: 44px; padding: 0 0 0 12px; margin: -10px 0; color: var(--hero-ink); font-size: 14px; text-decoration: underline; text-underline-offset: 3px; }
 .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); background: var(--hero-cell); border-radius: 12px; }
 .stats > div { padding: 10px 12px; display: flex; flex-direction: column; min-width: 0; }
 .stats > div + div { border-left: 1px solid var(--hero-rule); }
@@ -139,11 +140,14 @@ button:disabled, .btn-p:disabled { opacity: .5; cursor: not-allowed; }
 .mini { display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; border-radius: 12px; background: var(--bg); }
 .mini .q { font-family: var(--font-read); font-size: 15px; line-height: 1.55; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .mini .tags { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-.focus .links { display: flex; gap: 18px; flex-wrap: wrap; }
+.focus .links { display: flex; gap: 4px 18px; flex-wrap: wrap; }
+.focus .links button { min-height: 44px; }
+.wk { font-size: 13px; line-height: 1.5; color: var(--warn-ink); padding: 8px 12px; border-radius: 10px; background: var(--warn-soft); }
+.wk.ok { color: var(--good); background: var(--good-soft); }
 .focus .count { display: flex; flex-direction: column; gap: 8px; }
 .focus .count .r { display: flex; justify-content: space-between; align-items: baseline; font-size: 14px; color: var(--ink-2); }
 .focus .count .r b { font-size: 20px; color: var(--ink); }
-.steps { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; font-size: 12px; line-height: 1.4; }
+.steps { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; font-size: 13px; line-height: 1.4; }
 .steps li { display: flex; flex-direction: column; gap: 6px; color: var(--muted); }
 .steps li::before { content: ""; height: 4px; border-radius: 2px; background: var(--line); }
 .steps li.done::before { background: var(--brand); opacity: .45; }
@@ -185,8 +189,8 @@ button.row:hover { background: var(--surface-2); }
 .chips { display: flex; gap: 6px; flex-wrap: wrap; }
 .chips.scroll { flex-wrap: nowrap; overflow-x: auto; margin-right: -14px; padding-right: 14px; scrollbar-width: none; }
 .chips.scroll::-webkit-scrollbar { display: none; }
-.chip { height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); font-size: 13px; font-weight: 500; white-space: nowrap; flex: none; }
-.chips.scroll .chip { height: 40px; }
+.chip { height: 44px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); font-size: 13px; font-weight: 500; white-space: nowrap; flex: none; }
+.chips.scroll .chip { height: 44px; }
 .chip[aria-checked="true"], .chip[aria-pressed="true"] { border-color: var(--brand); background: var(--brand-soft); color: var(--brand); font-weight: 600; }
 .chip[aria-checked="true"]::before, .chip[aria-pressed="true"]::before { content: "✓ "; }
 .selectbox { position: relative; height: 52px; border: 1px solid var(--line-strong); border-radius: 12px; background: var(--surface); display: flex; align-items: center; gap: 8px; padding: 0 14px; }
@@ -280,7 +284,14 @@ textarea.memo { font-family: var(--font-read); font-size: 15px; line-height: 1.6
 .field { display: flex; flex-direction: column; gap: 6px; }
 .field > label, .field > .lab { font-size: 13px; color: var(--muted); }
 .input { height: 48px; border: 1px solid var(--line-strong); border-radius: 10px; padding: 0 12px; background: var(--surface); color: var(--ink); width: 100%; font-size: 16px; }
-.input::placeholder { color: var(--faint); }
+.input::placeholder { color: var(--mute); }
+.pw-wrap { position: relative; }
+.pw-wrap .input { padding-right: 76px; }
+.pw-eye { position: absolute; right: 2px; top: 50%; transform: translateY(-50%); min-height: 44px; padding: 0 12px; background: none; border: 0; color: var(--brand); font-size: 14px; font-weight: 500; }
+.remember { display: flex; align-items: flex-start; gap: 10px; min-height: 44px; padding: 6px 0; font-size: 15px; color: var(--ink); cursor: pointer; }
+.remember input { width: 20px; height: 20px; margin: 2px 0 0; flex: none; accent-color: var(--brand); }
+.remember small { display: block; font-size: 13px; color: var(--muted); line-height: 1.5; }
+.date-hint { font-size: 13px; color: var(--muted); min-height: 1.5em; }
 .input.code-in { height: 64px; font-size: 30px; letter-spacing: .14em; text-align: center; font-variant-numeric: tabular-nums; }
 .input.id-in { height: 56px; font-size: 22px; letter-spacing: .1em; font-variant-numeric: tabular-nums; }
 
@@ -399,7 +410,7 @@ table.tb { width: 100%; border-collapse: collapse; font-size: 14px; }
 .meter .track { flex-grow: 1; }
 .meter .v { font-variant-numeric: tabular-nums; min-width: 28px; text-align: right; white-space: nowrap; }
 .cell { font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.cell.ok { color: var(--good); } .cell.no { color: var(--bad); } .cell.pp { color: var(--warn); } .cell.off { color: var(--faint); font-weight: 500; }
+.cell.ok { color: var(--good); } .cell.no { color: var(--muted); } .cell.pp { color: var(--warn); } .cell.off { color: var(--mute); font-weight: 500; }
 .strip { margin: 0 20px 12px; padding: 10px 14px; border-radius: 10px; background: var(--bg); display: flex; flex-wrap: wrap; gap: 6px 24px; font-size: 13px; color: var(--ink-2); }
 .issues > div { display: flex; gap: 12px; align-items: flex-start; padding: 12px 20px; border-top: 1px solid var(--line-2); }
 .issues .dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 8px; flex: none; background: currentColor; color: inherit; }
@@ -471,6 +482,8 @@ details.more > summary::-webkit-details-marker { display: none; }
 .fs-top h2 { font-size: clamp(1.2rem, 2.6vw, 1.8rem); font-weight: 600; }
 .fs-main { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: clamp(16px, 5vw, 64px); }
 .fs-qr canvas, .fs-qr img { display: block; width: min(68vh, 86vw); height: auto; image-rendering: pixelated; }
+.fs-q { flex-basis: 100%; max-width: 60ch; margin: 0 auto; text-align: center; font-family: var(--font-read); font-size: clamp(1.2rem, 2.8vw, 2.1rem); line-height: 1.5; color: #101828; }
+.fs-main:has(.fs-q) .fs-qr canvas, .fs-main:has(.fs-q) .fs-qr img { width: min(52vh, 80vw); }
 .fs-side { display: grid; gap: 6px; justify-items: center; text-align: center; }
 .fs-room { font-size: clamp(2rem, 6vw, 4rem); font-weight: 700; line-height: 1.1; }
 .fs-code { font-size: clamp(2.2rem, 7vw, 4.6rem); font-weight: 700; letter-spacing: .08em; font-variant-numeric: tabular-nums; color: #173f8a; }
@@ -548,7 +561,12 @@ async function copyText(text, okMsg) {
   catch (e) { prompt('คัดลอกข้อความนี้', text); }
 }
 const lineShare = (msg) => 'https://line.me/R/share?text=' + encodeURIComponent(msg);
+// ไลบรารี QR โหลดแบบ defer (ไม่ขวางหน้าแรกของนักเรียน) ถ้ายังโหลดไม่เสร็จ รอจนเสร็จแล้ววาด
 function drawQr(el, text, size) {
+  if (typeof QRCode === 'undefined') {
+    if (document.readyState !== 'complete') { window.addEventListener('load', () => document.contains(el) && drawQr(el, text, size), { once: true }); return true; }
+    el.textContent = 'สร้าง QR Code ไม่ได้ ใช้รหัสห้องหรือลิงก์แทน'; return false;
+  }
   try { new QRCode(el, { text, width: size || 720, height: size || 720, colorDark: '#000000', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M }); return true; }
   catch (e) { el.textContent = 'สร้าง QR Code ไม่ได้ ใช้รหัสห้องหรือลิงก์แทน'; return false; }
 }
@@ -581,6 +599,21 @@ function go(v) {
   window.scrollTo(0, 0);
 }
 
+// ช่องวันเวลาของเบราว์เซอร์แสดงตามภาษาเครื่อง (อาจเป็น ค.ศ./อังกฤษ): เขียนวันแบบไทยกำกับใต้ช่อง
+function dtHint(v) {
+  if (!v) return '';
+  const d = new Date(v);
+  if (isNaN(d)) return '';
+  try { return d.toLocaleString('th-TH', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) + ' น.'; }
+  catch (e) { return ''; }
+}
+document.addEventListener('input', e => {
+  const t = e.target;
+  if (!t || t.type !== 'datetime-local' || !t.id) return;
+  const h = document.querySelector(`.date-hint[data-for="${t.id}"]`);
+  if (h) h.textContent = dtHint(t.value);
+});
+
 /* ===================== แผ่นล่าง (sheet) ===================== */
 let sheetBack = null;
 function openSheet(html, after) {
@@ -600,13 +633,45 @@ const sheetHead = (title, sub) => `<div class="sh-head"><div class="t"><b id="sh
   <button class="ibtn" type="button" data-x aria-label="ปิด" style="margin:-6px -8px 0 0">${IC.close}</button></div>`;
 $('#scrim').addEventListener('click', e => { if (e.target.id === 'scrim') closeSheet(); });
 document.addEventListener('keydown', e => {
-  if (e.key !== 'Escape') return;
-  if (!$('#fs').hidden && !PARAMS.screen) closeFs(); else if (!$('#scrim').hidden) closeSheet();
+  if (e.key === 'Escape') {
+    if (!$('#fs').hidden && !PARAMS.screen) closeFs(); else if (!$('#scrim').hidden) closeSheet();
+    return;
+  }
+  // แผ่นล่างเปิดอยู่: Tab วนอยู่ในแผ่น ไม่หลุดไปหน้าหลังฉาก
+  if (e.key === 'Tab' && !$('#scrim').hidden) {
+    const f = $$('button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])', $('#sheet')).filter(x => x.offsetParent !== null);
+    if (!f.length) return;
+    const first = f[0], last = f[f.length - 1];
+    if (!$('#sheet').contains(document.activeElement)) { e.preventDefault(); first.focus(); }
+    else if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    return;
+  }
+  // ปุ่มลูกศรในกลุ่มตัวเลือก (radiogroup) และแท็บ (tablist): เลื่อนและเลือกทันที
+  const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
+  const me = document.activeElement;
+  if (!step || !me || !me.matches('[role=radio], [role=tab]')) return;
+  const group = me.closest('[role=radiogroup], [role=tablist]');
+  if (!group) return;
+  const items = $$(me.matches('[role=tab]') ? '[role=tab]' : '[role=radio]', group).filter(x => !x.disabled);
+  const i = items.indexOf(me);
+  if (i < 0) return;
+  e.preventDefault();
+  const next = items[(i + step + items.length) % items.length];
+  const sel = next.matches('[role=tab]') ? 'data-tab' : null;
+  next.click();
+  // ปุ่มถูกวาดใหม่หลังคลิก: หาตัวที่ถูกเลือกในกลุ่มเดิมแล้วโฟกัส
+  requestAnimationFrame(() => {
+    const live = document.contains(next) ? next
+      : $$('[role=radiogroup] [aria-checked="true"], [role=tablist] [aria-selected="true"]').find(x => x.textContent === next.textContent);
+    live && live.focus();
+  });
 });
 $('#sheet').setAttribute('aria-labelledby', 'sh-title');
 
 /* ===================== เข้าสู่ระบบครู =====================
-   โทเค็นเก็บใน localStorage (ติ๊กจำไว้) หรือ sessionStorage (คอมใช้ร่วมกัน ปิดแท็บแล้วหลุด) */
+   โทเค็นเก็บใน localStorage (ติ๊กจำไว้ เป็นค่าเริ่มต้นในหน้าครู อยู่ได้ 30 วันนับจากใช้ครั้งล่าสุด)
+   หรือ sessionStorage (เอาติ๊กออก สำหรับเครื่องใช้ร่วมกัน ปิดแท็บแล้วหลุด) */
 const TK = {
   get() { try { return localStorage.getItem('tk') || sessionStorage.getItem('tk') || ''; } catch (e) { return ''; } },
   set(t, remember) { try { (remember ? localStorage : sessionStorage).setItem('tk', t); } catch (e) {} },
@@ -633,8 +698,9 @@ function showLogin(note) {
         <div class="field"><label for="lg-id">ID (รหัส 13 หลัก)</label>
           <input id="lg-id" class="input num" inputmode="numeric" autocomplete="username" maxlength="17" placeholder="0000000000000"></div>
         <div class="field"><label for="lg-pw">รหัสผ่าน</label>
-          <input id="lg-pw" class="input" type="password" autocomplete="current-password" placeholder="รหัสผ่านที่ผู้ดูแลระบบตั้งให้"></div>
-        <label style="display:flex;gap:10px;align-items:center;font-size:14px;color:var(--ink-2)"><input type="checkbox" id="lg-remember" style="width:20px;height:20px"> จำการเข้าสู่ระบบในเครื่องนี้ (ไม่ติ๊กถ้าใช้คอมร่วมกัน)</label>
+          <div class="pw-wrap"><input id="lg-pw" class="input" type="password" autocomplete="current-password" placeholder="รหัสผ่านที่ผู้ดูแลระบบตั้งให้">
+            <button type="button" class="pw-eye" id="lg-eye" aria-pressed="false" aria-controls="lg-pw">แสดง</button></div></div>
+        <label class="remember"><input type="checkbox" id="lg-remember" ${adminLink() ? '' : 'checked'}> <span>จำการเข้าสู่ระบบในเครื่องนี้ 30 วัน<small>เอาติ๊กออกถ้าใช้คอมหรือโทรศัพท์ร่วมกับคนอื่น</small></span></label>
         <span class="err" id="lg-err" role="alert">${esc(note || '')}</span>
       </div>
       <p class="note" style="padding:0 4px">ลืมรหัสผ่าน แจ้งผู้ดูแลระบบให้ตั้งใหม่ ระบบไม่ส่งรหัสทางอีเมล</p>
@@ -645,6 +711,11 @@ function showLogin(note) {
   $('#lg-go').onclick = doLogin;
   $('#lg-pw').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
   $('#lg-id').addEventListener('keydown', e => { if (e.key === 'Enter') $('#lg-pw').focus(); });
+  $('#lg-eye').onclick = () => {
+    const pw = $('#lg-pw'), show = pw.type === 'password';
+    pw.type = show ? 'text' : 'password';
+    $('#lg-eye').textContent = show ? 'ซ่อน' : 'แสดง'; $('#lg-eye').setAttribute('aria-pressed', String(show));
+  };
   if ($('#lg-student')) $('#lg-student').onclick = () => { STU.step = 'code'; go('student'); stuRender(); };
   $('#lg-id').focus();
 }
@@ -656,14 +727,16 @@ async function doLogin() {
   if (!pw) { err.textContent = 'กรอกรหัสผ่าน'; return; }
   const b = $('#lg-go'); b.disabled = true; b.textContent = 'กำลังเข้าสู่ระบบ…'; err.textContent = '';
   try {
-    const res = await run('login', id, pw);
-    TK.set(res.token, $('#lg-remember').checked);
+    const remember = $('#lg-remember').checked;
+    const res = await run('login', id, pw, remember);
+    TK.set(res.token, remember && res.remember !== false);
     ME = Object.assign({}, ME, res.me);
     startStaff();
   } catch (e) { err.textContent = failMsg(e); b.disabled = false; b.textContent = 'เข้าสู่ระบบ'; }
 }
 
 async function doLogout() {
+  if (!confirm('ออกจากระบบในเครื่องนี้? ครั้งหน้าต้องกรอก ID และรหัสผ่านใหม่')) return;
   const t = TK.get(); TK.clear();
   T.data = null; A.ov = null; A.d = null; DB.d = null;
   try { await run('logout', t); } catch (e) {}
@@ -752,13 +825,26 @@ function stuRender() {
           ${STU.err ? `<span class="err" role="alert">${esc(STU.err)}</span>` : ''}</div>
       </main>
       <div class="dock"><button class="btn-p" id="stu-start" type="button">เริ่มทำข้อสอบ</button></div>`;
-    $('#stu-start').onclick = () => {
+    $('#stu-start').onclick = async () => {
       const v = $('#stu-no').value.trim();
       if (!/^\d{4,6}$/.test(v)) { STU.err = 'กรอกรหัสนักเรียนเป็นตัวเลข 4–6 หลัก'; STU.no = v; return stuRender(); }
-      Object.assign(STU, { no: v, err: '', step: 'quiz' }); stuSave(); stuRender();
+      const b = $('#stu-start'); b.disabled = true; b.textContent = 'กำลังตรวจรหัส…';
+      // เตือนแบบนุ่มถ้ารหัสไม่อยู่ในรายชื่อห้อง (เน็ตช้าหรือตรวจไม่ได้ ข้ามไปทำได้เลย ไม่ให้นักเรียนติด)
+      let chk = null;
+      try { chk = await Promise.race([run('studentCheck', { r: STU.roundId, studentId: v }), wait(4000).then(() => null)]); } catch (e) { chk = null; }
+      Object.assign(STU, { no: v, err: '', step: chk && chk.inRoom === false ? 'idcheck' : 'quiz' }); stuSave(); stuRender();
     };
     $('#stu-no').addEventListener('keydown', e => { if (e.key === 'Enter') $('#stu-start').click(); });
     $('#stu-no').focus();
+    return;
+  }
+  if (STU.step === 'idcheck') {
+    el.innerHTML = stuBar('ห้อง ' + I.room) + `
+      <main class="stu"><div class="notice wait" role="alert"><span>ไม่พบรหัส <b>${esc(STU.no)}</b> ในรายชื่อห้อง ${esc(I.room)} ตรวจว่าพิมพ์ถูกไหม ถ้ารหัสนี้ถูกแล้ว ทำต่อได้เลย</span></div></main>
+      <div class="dock"><div class="two"><button class="btn-s" type="button" id="ic-fix">แก้รหัส</button><button class="btn-p" type="button" id="ic-ok">รหัสถูกแล้ว ทำต่อ</button></div></div>`;
+    $('#ic-fix').onclick = () => { STU.step = 'id'; store.del('draft-' + STU.roundId); stuRender(); };
+    $('#ic-ok').onclick = () => { STU.step = 'quiz'; stuSave(); stuRender(); };
+    $('#ic-fix').focus();
     return;
   }
   if (STU.step === 'quiz' || STU.step === 'confirm') {
@@ -770,17 +856,18 @@ function stuRender() {
         </div>`;
     el.innerHTML = stuBar(`ห้อง ${I.room} · รหัสนักเรียน ${STU.no}`) + `
       <main class="stu">
-        <div class="meta"><span>แนว ${esc(it.exam)}${it.ind ? ' · ' + esc(it.ind) : it.topic ? ' · ' + esc(it.topic) : ''}</span>${cTag(it.c)}</div>
+        <div class="meta"><span>แนว ${esc(it.exam)}${it.topic ? ' · ' + esc(it.topic) : ''}</span><button class="link" type="button" id="stu-fix">แก้รหัส ${esc(STU.no)}</button></div>
         ${it.q ? `<h1 id="q-stem">${esc(it.q)}</h1>` : '<h1 id="q-stem" class="sr">โจทย์</h1>'}
         ${it.img ? `<figure><img src="${esc(it.img)}" alt="รูปโจทย์" referrerpolicy="no-referrer"></figure>` : ''}
         ${body}
       </main>
       <div class="dock">${STU.step === 'confirm'
-        ? `<span class="cap" role="alert">ส่งคำตอบ ${it.type === 'number' ? esc(STU.pick) : OPT_L[Number(STU.pick) - 1]} ใช่ไหม ส่งแล้วแก้ไม่ได้</span>
+        ? `<span class="cap strong" role="alert">รหัส ${esc(STU.no)} ตอบ ${it.type === 'number' ? esc(STU.pick) : OPT_L[Number(STU.pick) - 1]} ใช่ไหม ส่งแล้วแก้ไม่ได้</span>
            <div class="two"><button class="btn-s" type="button" id="c-no">กลับ</button><button class="btn-p" type="button" id="c-yes">ยืนยันส่ง</button></div>`
         : `<span class="cap">ส่งได้ครั้งเดียว · ครูจะเฉลยหน้าห้องหลังปิดรับ</span>
            <button class="btn-p" type="button" id="q-send" ${has ? '' : 'disabled'}>ส่งคำตอบ</button>`}</div>`;
     $$('.opt', el).forEach(b => b.onclick = () => { STU.pick = b.dataset.k; STU.step = 'quiz'; stuSave(); stuRender(); $(`.opt[data-k="${b.dataset.k}"]`).focus(); });
+    $('#stu-fix').onclick = () => { STU.step = 'id'; STU.err = ''; stuRender(); };
     const numIn = $('#q-num');
     if (numIn) numIn.oninput = () => { STU.pick = numIn.value.trim() || null; stuSave(); $('#q-send') && ($('#q-send').disabled = !STU.pick); };
     if (STU.step === 'confirm') { $('#c-no').onclick = () => { STU.step = 'quiz'; stuRender(); }; $('#c-yes').onclick = () => stuSubmit(); $('#c-yes').focus(); }
@@ -788,8 +875,8 @@ function stuRender() {
     return;
   }
   if (STU.step === 'sending') {
-    el.innerHTML = stuBar(`ห้อง ${I.room} · รหัสนักเรียน ${STU.no}`) + `<main class="stu"><div class="loading" role="status">กำลังส่งคำตอบ…</div>
-      <div class="notice">บันทึกคำตอบไว้ในเครื่องแล้ว ถ้าอินเทอร์เน็ตช้า ระบบจะส่งซ้ำเองจนสำเร็จ ไม่ต้องทำใหม่</div></main>`;
+    el.innerHTML = stuBar(`ห้อง ${I.room} · รหัสนักเรียน ${STU.no}`) + `<main class="stu"><div class="loading" role="status">${STU.tries ? `ยังส่งไม่สำเร็จ ระบบกำลังลองส่งอีกครั้ง (ครั้งที่ ${STU.tries + 1})` : 'กำลังส่งคำตอบ…'}</div>
+      <div class="notice">บันทึกคำตอบไว้ในเครื่องแล้ว ถ้าอินเทอร์เน็ตช้า ระบบจะส่งซ้ำเองจนสำเร็จ ไม่ต้องทำใหม่ และไม่ต้องปิดหน้านี้</div></main>`;
     return;
   }
   if (STU.step === 'done') {
@@ -799,7 +886,7 @@ function stuRender() {
         <div class="done-big"><span class="ic">${IC.check}</span><b>ส่งคำตอบแล้ว</b><span class="muted">คุณตอบ ${it.type === 'number' ? esc(STU.pick ?? '—') : (STU.pick ? OPT_L[Number(STU.pick) - 1] + ' ' + esc(it.opts[Number(STU.pick) - 1] ?? '') : 'ไม่ได้ตอบ')}</span></div>
         ${r.dup ? `<div class="notice wait" role="status">รหัส ${esc(STU.no)} เคยตอบข้อนี้แล้ว ระบบนับเฉพาะครั้งแรก ถ้ากรอกรหัสผิด แจ้งครูผู้สอน</div>` : ''}
         <div id="stu-review"><div class="notice">เฉลยและคำอธิบายจะขึ้นที่หน้านี้หลังครูปิดรับคำตอบ</div></div>
-        ${I.open ? '<div class="foot-links"><button type="button" id="stu-next">ทำแทนเพื่อนอีกคนด้วยเครื่องนี้</button></div>' : ''}
+        ${I.open ? '<div class="foot-links"><button type="button" id="stu-next">ให้เพื่อนที่ไม่มีโทรศัพท์ใช้เครื่องนี้ตอบต่อ</button></div>' : ''}
       </main>`;
     const nx = $('#stu-next');
     if (nx) nx.onclick = () => { Object.assign(STU, { step: 'id', no: '', pick: null, result: null, err: '' }); stuRender(); };
@@ -811,12 +898,13 @@ async function stuSubmit(payload) {
   const rid = STU.roundId;
   payload = payload || { roundId: rid, studentId: STU.no, answers: [STU.pick], subId: uid() };
   store.set('outbox-' + rid, payload); store.del('draft-' + rid);
-  STU.step = 'sending'; stuRender();
+  STU.step = 'sending'; STU.tries = 0; stuRender();
   for (let tries = 0; ; tries++) {
     try { STU.result = await run('studentSubmit', payload); break; }
     catch (e) {
       const m = userMsg(e);
       if (m) { store.del('outbox-' + rid); STU.err = m; STU.step = 'error'; STU.retry = () => stuLoad({ r: rid }); return stuRender(); }
+      STU.tries = tries + 1; if (STU.step === 'sending') stuRender();
       await wait(Math.min(1000 * 2 ** tries, 15000));
     }
   }
@@ -884,7 +972,7 @@ function asRender() {
       <div class="dock"><button class="btn-p" type="button" id="as-retry">ลองใหม่</button></div>`;
     $('#as-retry').onclick = asInit; return;
   }
-  if (AS.step === 'scheduled') { el.innerHTML = asHero() + `<main class="pad">${asMix()}<div class="notice">แบบประเมินนี้เปิดให้ทำ <b>${esc(I.openText)}</b> กลับมาเปิดลิงก์นี้อีกครั้งตอนนั้น</div></main>`; return; }
+  if (AS.step === 'scheduled') { el.innerHTML = asHero() + `<main class="pad">${asMix()}<div class="notice"><span>แบบประเมินนี้เปิดให้ทำ <b>${esc(I.openText)}</b> กลับมาเปิดลิงก์นี้อีกครั้งตอนนั้น</span></div></main>`; return; }
   if (AS.step === 'closed') { el.innerHTML = asHero() + '<main class="pad"><div class="notice">แบบประเมินนี้ปิดรับแล้ว ถ้ายังไม่ได้ทำ แจ้งครูประจำชั้น</div></main>'; return; }
   if (AS.step === 'id') {
     el.innerHTML = asHero() + `<main class="pad">
@@ -987,7 +1075,7 @@ function asGrid(onlyLeft) {
 function asConfirm() {
   const n = AS.info.items.length, left = AS.answers.filter(blank).length;
   openSheet(sheetHead('ส่งแบบประเมิน?', 'ส่งได้ครั้งเดียว ส่งแล้วแก้ไม่ได้') +
-    `<div class="notice ${left ? 'wait' : 'ok'}">${left ? `ยังไม่ได้ตอบ <b>${left}</b> ข้อ จาก ${n} ข้อ` : `ตอบครบ ${n} ข้อแล้ว`}</div>
+    `<div class="notice ${left ? 'wait' : 'ok'}"><span>${left ? `ยังไม่ได้ตอบ <b>${left}</b> ข้อ จาก ${n} ข้อ` : `ตอบครบ ${n} ข้อแล้ว`}</span></div>
     ${left ? `<div class="grid-jump">${[...Array(n).keys()].filter(p => blank(AS.answers[AS.order[p]])).slice(0, 40).map(p => `<button type="button" data-p="${p}">${p + 1}</button>`).join('')}</div>` : ''}
     <div class="dock" style="position:static;padding:0;border:0;background:none"><div class="two"><button class="btn-s" type="button" data-x>ทำต่อ</button><button class="btn-p" type="button" id="c-yes">ยืนยันส่ง</button></div></div>`, () => {
     $$('#sheet [data-p]').forEach(b => b.onclick = () => { AS.i = +b.dataset.p; closeSheet(); asSave(); asRender(); });
@@ -1057,7 +1145,7 @@ function roomStatus(r) {
   if (r.state === 'idle') return { cls: 'wait', text: 'ยังไม่เลือกข้อ' };
   if (r.state === 'planned') return r.item.missing ? { cls: 'bad', text: 'ไม่พบข้อที่เลือกไว้ในคลัง' } : { cls: 'info', text: 'เลือกข้อแล้ว รอเปิดรับ' };
   if (r.state === 'open') return { cls: 'ok', text: `เปิดรับอยู่ · ตอบแล้ว ${r.sent || 0}/${r.size || '?'}` };
-  if (!r.report) return { cls: 'bad', text: (r.state === 'paper' ? 'แบบกระดาษ' : 'ปิดรับแล้ว') + ' · ยังไม่ส่งรายงาน' };
+  if (!r.report) return { cls: 'wait', text: (r.state === 'paper' ? 'แบบกระดาษ' : 'ปิดรับแล้ว') + ' · รอส่งรายงาน' };
   return { cls: 'mute', text: 'ส่งรายงานแล้ว' + (r.result && r.result.pct !== null && r.result.pct !== undefined ? ` · ถูก ${r.result.pct}%` : '') };
 }
 function mainAction(r) {
@@ -1094,6 +1182,21 @@ function miniItem(it) {
     <div class="q">${it.q ? esc(it.q) : 'โจทย์เป็นรูปภาพ'}</div>${it.ind || it.topic ? `<span class="note">${esc(it.ind || it.topic)}</span>` : ''}</div>`;
 }
 
+// สัปดาห์นี้ห้อง–วิชานี้นับเป็นการใช้แล้วหรือยัง (กฎเดียวกับรายงานของผู้บริหาร)
+function weekLine(r) {
+  const W = (T.data && T.data.weekInfo) || {}, w = r.week;
+  if (!w || !r.size) return '';
+  if (w.counted) return `<div class="wk ok"><b>สัปดาห์ที่ ${W.n} นับเป็นการใช้แล้ว</b><span>${w.paper ? 'แบบกระดาษ · ' : ''}ตอบ ${w.sent} จาก ${r.size} คน (เกณฑ์ ${w.need} คน)</span></div>`;
+  return `<div class="wk"><b>สัปดาห์ที่ ${W.n}: ตอบแล้ว ${w.sent} จาก ${r.size} คน</b>
+    <span>ต้องถึง ${w.need} คน (ร้อยละ ${W.useMin} ของห้อง) จึงนับเป็นการใช้ของสัปดาห์นี้${w.out ? ` · รหัสที่ไม่อยู่ในรายชื่อห้อง ${w.out} คน ไม่นับ` : ''}</span></div>`;
+}
+function weekBadge(W) {
+  if (!W) return '';
+  if (W.n) return W.quota ? `สัปดาห์ที่ ${W.n}` : `สัปดาห์ที่ ${W.n} · ไม่นับ`;
+  if (W.before) return `เริ่มนับ ${W.before}`;
+  return W.after ? 'จบช่วงนับแล้ว' : 'นอกช่วงนับ';
+}
+
 function focusCard(r) {
   const st = roomStatus(r);
   let body = '';
@@ -1103,7 +1206,7 @@ function focusCard(r) {
   if (r.state === 'open') body = miniItem(r.item) + `<div class="count"><div class="r"><span>ตอบแล้ว</span><span><b class="num">${r.sent || 0}</b> / ${r.size || '?'} คน</span></div>
       <div class="track"><span style="width:${pct(r.sent || 0, r.size)}%"></span></div>
       <span class="note">รหัสห้อง <b class="num">${fmtCode(r.code)}</b> · ${r.mode === 'นอกคาบ' ? 'ทำนอกคาบ ' : ''}ปิดรับเอง ${esc(r.mode === 'นอกคาบ' ? r.deadline : r.deadlineHm + ' น.')}</span></div>
-      <div class="links"><button class="link" type="button" data-f="fs">ฉายเต็มจอ</button></div>`;
+      <div class="links"><button class="link" type="button" data-f="fs">ฉายเต็มจอ</button><button class="link mute" type="button" data-f="paper">เน็ตล่ม บันทึกแบบกระดาษ</button></div>`;
   if (isDone(r)) {
     const res = r.result || {};
     body = miniItem(r.item) + `<div class="count"><div class="r"><span>${r.state === 'paper' ? 'แบบกระดาษ · ' : ''}ตอบถูก</span><span><b class="num">${res.pct ?? '—'}${res.pct !== null && res.pct !== undefined ? '%' : ''}</b> จาก ${res.n || 0} คน</span></div></div>
@@ -1113,14 +1216,14 @@ function focusCard(r) {
   return `<section class="card focus" aria-label="ห้องที่ต้องทำต่อ">
     <div class="focus-head"><div class="t"><span><b>${esc(r.room)}</b>${r.extra ? '<span class="now-tag warn">ค้างรายงาน</span>' : ''}</span>
       <span class="sub">${esc(r.subject)}${when ? ' · ' + esc(when) : ''}</span></div><span class="st ${st.cls}">${esc(st.text.split(' · ')[0])}</span></div>
-    ${body}${stepsHtml(r)}</section>`;
+    ${body}${r.extra ? '' : weekLine(r)}${stepsHtml(r)}</section>`;
 }
 
 function roomRow(r) {
   const st = roomStatus(r);
   const when = r.extra && r.day ? `ปิดรับ${r.day}` : '';
   return `<button class="row" type="button" data-row="${esc(r.key)}"><span class="t"><b>${esc(r.room)} <small>${esc(r.subject)}</small></b>
-      <span class="${st.cls}">${esc(st.text)}${when ? `<span class="muted"> · ${esc(when)}</span>` : ''}</span></span>${IC.chev}</button>`;
+      <span class="${st.cls}">${esc(st.text)}${when ? `<span class="muted"> · ${esc(when)}</span>` : ''}${r.week && r.week.counted && !r.extra ? '<span class="muted"> · สัปดาห์นี้นับแล้ว</span>' : ''}</span></span>${IC.chev}</button>`;
 }
 
 function homeroomCard(h) {
@@ -1145,8 +1248,8 @@ function renderHome() {
   const act = f ? mainAction(f) : null;
   el.innerHTML = `
     <header class="hero"><div class="hero-top"><div class="who"><span>${esc(D.teacher.name)}${subjects ? ' · ' + esc(subjects) : ''}</span><b>${esc(D.today)}</b></div>
-        <div class="side">${D.week ? `<span>สัปดาห์ที่ ${D.week}</span>` : '<span>นอกสัปดาห์ที่นับ</span>'}<button type="button" id="t-menu">เมนู</button></div></div>
-      <div class="stats" role="group" aria-label="สรุปห้องที่สอน"><div><span>ห้องที่สอน</span><b>${D.roomCount}</b></div><div><span>ยังไม่เลือกข้อ</span><b>${D.unpicked}</b></div><div><span>รายงานค้าง</span><b>${D.owe}</b></div></div></header>
+        <div class="side"><span>${esc(weekBadge(D.weekInfo) || (D.week ? 'สัปดาห์ที่ ' + D.week : ''))}</span><button type="button" id="t-menu" aria-haspopup="dialog">เมนู</button></div></div>
+      <div class="stats" role="group" aria-label="สรุปห้องที่สอน"><div><span>ห้องที่สอน</span><b>${D.roomCount}</b></div><div><span>รอเลือกข้อ</span><b>${D.unpicked}</b></div><div><span>รอส่งรายงาน</span><b>${D.owe}</b></div></div></header>
     <main class="pad">
       ${!D.rooms.length && !(D.extra || []).length ? `<div class="card empty">ยังไม่พบห้องที่คุณสอนในชีตครูผู้สอน<br>แจ้งผู้ดูแลระบบให้เพิ่มแถวที่มีรหัสครู ${esc(D.teacher.tid)}</div>` : ''}
       ${f ? focusCard(f) : ''}
@@ -1163,6 +1266,7 @@ function renderHome() {
     if (a === 'pick') openPicker(f);
     if (a === 'more') moreSheet(f);
     if (a === 'fs') openFs(f);
+    if (a === 'paper') paperSheet(f);
     if (a === 'result') tShow('result', f.key);
   });
 }
@@ -1227,11 +1331,11 @@ function outSheet(r, itemId) {
 
 function paperSheet(r, itemId) {
   openSheet(sheetHead('บันทึกแบบกระดาษ', `${r.room} · ${r.subject} · ใช้เมื่ออินเทอร์เน็ตใช้ไม่ได้`) + `
-    <p class="note">เขียนข้อบนกระดาน ให้นักเรียนตอบในสมุด แล้วนับจำนวน</p>
+    <p class="note">เขียนข้อบนกระดาน ให้นักเรียนตอบในสมุด แล้วนับจำนวน${r.state === 'open' ? ' · ระบบจะปิดรับออนไลน์ของรอบนี้ และใช้ตัวเลขจากกระดาษแทน' : ''}</p>
     <div class="field"><label for="p-n">จำนวนนักเรียนที่ทำ</label><input id="p-n" class="input num" inputmode="numeric" placeholder="จาก ${r.size || '?'} คน"></div>
     <div class="field"><label for="p-k">จำนวนที่ตอบถูก</label><input id="p-k" class="input num" inputmode="numeric" placeholder="เช่น 21"></div>
     <span class="err" id="p-err" role="alert"></span>
-    <p class="note">นับเป็นการใช้ แต่ภาพรวมจะติดป้าย "แบบกระดาษ" และหัวหน้ากลุ่มสาระสุ่มตรวจ</p>
+    <p class="note">นับเป็นการใช้ของสัปดาห์เมื่อจำนวนนักเรียนที่ทำถึงร้อยละ ${esc((T.data && T.data.weekInfo && T.data.weekInfo.useMin) || 50)} ของห้อง เหมือนแบบออนไลน์ · รายงานติดป้าย "แบบกระดาษ" และหัวหน้ากลุ่มสาระสุ่มตรวจ</p>
     <button class="btn-p" type="button" id="go">บันทึก</button>`, () => {
     $('#go').onclick = async () => {
       const n = +$('#p-n').value, k = +$('#p-k').value;
@@ -1277,7 +1381,9 @@ async function openPicker(r) {
   }
   if (T.page !== 'pick' || T.key !== r.key) return;
   const items = P.d.items;
-  P.exam = P.d.exams.find(x => items.some(i => i.exam === x)) || P.d.exams[0];
+  // เปิดที่ประเภทข้อสอบที่มีวิชาของห้องนี้ก่อน (ม.6 มีหลายสนาม วิชาอาจอยู่ใน A-Level/TPAT ไม่ใช่ O-NET)
+  P.exam = P.d.exams.find(x => items.some(i => i.exam === x && i.subject === r.subject))
+    || P.d.exams.find(x => items.some(i => i.exam === x)) || P.d.exams[0];
   const subs = subjectsOf(P.exam);
   P.subject = subs.indexOf(r.subject) >= 0 ? r.subject : subs[0] || '';
   P.topic = '';
@@ -1381,22 +1487,24 @@ function renderLive(r) {
     <main class="live">
       <div class="qrbox" id="lv-qr" aria-label="QR Code สำหรับนักเรียนสแกน"></div>
       <div class="code"><span>หรือพิมพ์รหัสห้อง</span><b>${fmtCode(r.code)}</b></div>
-      <div class="answered"><div class="r"><span>ตอบแล้ว</span><span><b class="num" id="lv-n">${r.sent || 0}</b><small> / ${r.size || '?'} คน</small></span></div>
+      <div class="answered"><div class="r" aria-live="polite" aria-atomic="true"><span>ตอบแล้ว</span><span><b class="num" id="lv-n">${r.sent || 0}</b><small> / ${r.size || '?'} คน</small></span></div>
         <div class="track"><span id="lv-bar" style="width:${pct(r.sent || 0, r.size)}%"></span></div></div>
       <div class="acts3"><button type="button" id="lv-fs">${IC.expand}ฉายเต็มจอ</button>
         <a href="${esc(lineShare(msg))}" target="_blank" rel="noopener">${IC.chat}ส่งกลุ่ม LINE</a>
         <a href="${esc(lineShare(scr))}" target="_blank" rel="noopener">${IC.screen}ส่งลิงก์ฉายจอ</a></div>
       <p class="note" style="text-align:center">"ส่งลิงก์ฉายจอ" ส่งเข้า LINE ตัวเอง แล้วเปิดบนคอมห้องเรียน หน้าฉายใช้ได้จนกว่าจะปิดรับ</p>
+      <div class="foot-links"><button type="button" id="lv-paper">เน็ตล่ม บันทึกแบบกระดาษแทน</button></div>
     </main>
     <div class="dock"><button class="btn-p${T.arm ? ' arm' : ''}" type="button" id="lv-close">${T.arm ? 'แตะอีกครั้งเพื่อปิดรับ' : 'ปิดรับคำตอบ'}</button>
-      <span class="cap">${T.arm ? 'ปิดแล้วนักเรียนที่ยังไม่ตอบจะส่งไม่ได้ และทุกคนเห็นเฉลยในเครื่อง' : `ลืมกดปิด ระบบปิดให้เอง ${esc(r.mode === 'นอกคาบ' ? r.deadline : r.deadlineHm + ' น.')}`}</span>
+      <span class="cap" aria-live="polite">${T.arm ? 'ปิดแล้วนักเรียนที่ยังไม่ตอบจะส่งไม่ได้ และทุกคนเห็นเฉลยในเครื่อง' : `ลืมกดปิด ระบบปิดให้เอง ${esc(r.mode === 'นอกคาบ' ? r.deadline : r.deadlineHm + ' น.')}`}</span>
       <span class="err" id="lv-err" role="alert" style="text-align:center"></span></div>`;
   drawQr($('#lv-qr'), r.link, 600);
   $('#lv-back').onclick = () => tShow('home');
   $('#lv-fs').onclick = () => openFs(r);
+  $('#lv-paper').onclick = () => paperSheet(r);
   $('#lv-close').onclick = async e => {
     const b = e.currentTarget;
-    if (!T.arm) { T.arm = true; renderLive(r); clearTimeout(T.armTimer); T.armTimer = setTimeout(() => { if (T.arm && T.page === 'live') { T.arm = false; renderLive(r); } }, 5000); $('#lv-close').focus(); return; }
+    if (!T.arm) { T.arm = true; renderLive(r); clearTimeout(T.armTimer); T.armTimer = setTimeout(() => { if (T.arm && T.page === 'live') { T.arm = false; renderLive(r); } }, 8000); $('#lv-close').focus(); return; }
     clearTimeout(T.armTimer);
     b.disabled = true; b.textContent = 'กำลังปิดรับ…';
     try { await api('closeRound', r.roundId); }
@@ -1410,7 +1518,7 @@ function renderLive(r) {
 function renderResult(r) {
   const el = $('#view-teacher'), it = r.item || {}, res = r.result || {};
   const rp = T.rep[r.key] || (T.rep[r.key] = {
-    c: (r.report && r.report.c) || it.c || '', chips: new Set(r.report && r.report.chips ? r.report.chips.split(' · ') : []),
+    c: (r.report && r.report.c) || '', chips: new Set(r.report && r.report.chips ? r.report.chips.split(' · ') : []),
     note: (r.report && r.report.note) || '', editing: !r.report
   });
   let stats = '';
@@ -1419,20 +1527,21 @@ function renderResult(r) {
   else {
     stats = `<div class="big"><b>${res.pct}%</b><span>ตอบถูก ${res.ok} จาก ${res.n} คน</span></div>`;
     if (res.dist) {
-      const hot = res.top && res.top.pct >= 20 ? res.top.k : 0;
+      const hot = res.top && res.top.pct >= 15 && res.top.n >= 3 ? res.top.k : 0;
       stats += `<div class="dist" aria-label="จำนวนที่เลือกแต่ละตัวเลือก">${res.dist.map((v, j) => {
         const key = String(j + 1) === String(it.ans), cls = key ? 'key' : (j + 1 === hot ? 'hot' : '');
         return `<div class="r"><span class="l${key ? ' key' : ''}" title="${esc(it.opts[j])}">${OPT_L[j]} ${esc(short(it.opts[j], 10))}${key ? ' ✓' : ''}</span>
           <span class="b"><span class="${cls}" style="width:${pct(v, res.n)}%"></span></span><span class="n">${v} คน</span></div>`; }).join('')}</div>`;
       if (hot) stats += `<p class="warnline">${res.top.n} คนเลือก ${OPT_L[hot - 1]} (${esc(short(it.opts[hot - 1], 24))})${res.top.why ? ' ซึ่ง' + esc(res.top.why) : ''} ควรอธิบายซ้ำ</p>`;
     } else if (it.type === 'number') stats += `<p class="note">คำตอบที่ถูก: <b>${esc(it.ans)}</b>${res.blank ? ` · ไม่ตอบ ${res.blank} คน` : ''}</p>`;
-    if (res.pct < 50 && !(res.top && res.top.pct >= 20)) stats += '<p class="warnline">ตอบถูกต่ำกว่าร้อยละ 50 ควรอธิบายซ้ำก่อนจบคาบ</p>';
+    if (res.pct < 50 && !(res.top && res.top.pct >= 15 && res.top.n >= 3)) stats += '<p class="warnline">ตอบถูกต่ำกว่าร้อยละ 50 ควรอธิบายซ้ำก่อนจบคาบ</p>';
   }
   const repHtml = !rp.editing && r.report ? `
     <div class="sent-box"><div class="h"><span class="st ok">ส่งรายงานแล้ว${r.report.at ? ' · ' + esc(r.report.at) : ''}</span><button class="link" type="button" id="rp-edit">แก้ไข</button></div>
       <div class="mini" style="background:none;padding:0;gap:6px"><div class="tags">${cTag(r.report.c, 'on-white')}${r.report.chips ? r.report.chips.split(' · ').map(c => `<span class="note">· ${esc(c)}</span>`).join('') : ''}</div></div>
       ${r.report.note ? `<p>${esc(r.report.note)}</p>` : ''}</div>`
     : `<div class="lv-head"><span id="lab-lv">ระดับที่ใช้สอน</span><b>${rp.c ? esc(rp.c + ' ' + C_TXT[rp.c]) : 'เลือก 1 ระดับ'}</b></div>
+      ${it.c && C_TXT[it.c] ? `<p class="note" style="margin:-4px 0 0">ข้อนี้ในคลังเป็น ${esc(it.c)} เลือกตามที่สอนจริงในคาบ</p>` : ''}
       <div class="levels" role="radiogroup" aria-labelledby="lab-lv">${Object.keys(C_TXT).map(c => `<button type="button" role="radio" aria-checked="${rp.c === c}" data-c="${c}" title="${C_TXT[c]}">${c}</button>`).join('')}</div>
       <div class="chips" role="group" aria-label="ตัวเลือกด่วน">${REPORT_CHIPS.map(c => `<button type="button" class="chip" aria-pressed="${rp.chips.has(c)}" data-chip="${esc(c)}">${esc(c)}</button>`).join('')}</div>
       <textarea class="memo" id="rp-note" rows="1" maxlength="300" aria-label="บันทึกเพิ่มเติม" placeholder="พิมพ์เพิ่มได้ (ไม่บังคับ)">${esc(rp.note)}</textarea>
@@ -1498,7 +1607,7 @@ function openFs(r) {
   fs.dataset.key = r.key;
   fs.innerHTML = `
     <div class="fs-top"><h2>${esc(r.subject)} · ข้อประจำคาบ</h2><button class="btn" type="button" id="fs-x">ปิดหน้าจอนี้ (Esc)</button></div>
-    <div class="fs-main"><div class="fs-qr" id="fs-qr"></div>
+    <div class="fs-main">${r.item && r.item.q ? `<p class="fs-q">${esc(r.item.q)}</p>` : ''}<div class="fs-qr" id="fs-qr"></div>
       <div class="fs-side"><span class="fs-room">ห้อง ${esc(r.room)}</span>
         <span>สแกน QR Code หรือพิมพ์รหัสห้อง</span><span class="fs-code">${fmtCode(r.code)}</span>
         <span class="fs-count">ตอบแล้ว <b id="fs-count">${r.sent || 0}</b> จาก ${r.size || '?'} คน</span></div></div>
@@ -1649,9 +1758,11 @@ function asmRender() {
   const tabs = `<div class="tabs" role="tablist" aria-label="ระดับชั้น">${d.levels.map(x => `<button type="button" role="tab" data-tab="${esc(x.level)}" aria-selected="${x.level === d.level}">${esc(x.level)}${x.phase ? ` <span style="font-size:12px;font-weight:400">· ${esc((PHASE[x.phase] || PHASE.none)[1].split(' · ')[0])}</span>` : ''}</button>`).join('')}</div>`;
   const head = `<button class="back" type="button" id="as-back">← ภาพรวมข้อมูล</button>
     <div class="pg-head"><div class="t"><div><h1>${esc(c.title || 'แบบประเมินรวม ' + d.level)}</h1>${phaseSt(phase)}</div>
-        <p>${esc(d.level)} · นักเรียน ${d.students.toLocaleString('en-US')} คน ${d.roomCount} ห้อง · ครูประจำชั้น ${d.homeroomCount} จาก ${d.roomCount} ห้อง</p></div>
+        <p>${esc(d.level)} · นักเรียน ${d.students.toLocaleString('en-US')} คน ${d.roomCount} ห้อง · ครูประจำชั้นที่ส่งลิงก์ต่อได้ ${d.homeroomCount} จาก ${d.roomCount} ห้อง</p></div>
       <div class="acts">${asmActs(d, phase)}</div></div>${tabs}
     ${edit ? '' : '<div class="notice">คุณดูได้อย่างเดียว ผู้ดูแลระบบเป็นผู้แก้ไขและประกาศแบบประเมิน</div>'}
+    ${(d.uncovered || []).length ? `<div class="notice wait" role="note"><span><b>${d.uncovered.length} ห้องไม่มีครูประจำชั้นที่ส่งลิงก์ต่อได้:</b> ${d.uncovered.map(x => `${esc(x.room)} (${esc(x.why)})`).join(' · ')}
+      <br>ลิงก์จะไม่ถึงนักเรียนห้องเหล่านี้เอง แก้ในชีตห้องเรียน/ชีตครู หรือหลังประกาศ กด "คัดลอกข้อความส่งต่อ" ในตารางความคืบหน้าแล้วส่งเอง</span></div>` : ''}
     <span class="err" id="as-err" role="alert"></span>`;
   adMain().innerHTML = head + (draftView ? asmDraft(d, c, edit) : asmLive(d, c, s, edit)) +
     (A.dirty && edit ? `<div class="savebar" role="region" aria-label="การแก้ไขที่ยังไม่บันทึก"><span>มีการแก้ไขที่ยังไม่บันทึก</span>
@@ -1709,8 +1820,8 @@ function asmDraft(d, c, edit) {
       <section class="sec" aria-labelledby="h-time"><div class="sec-h"><h2 id="h-time">ชื่อและกำหนดเวลา</h2></div>
         <div class="sec-pad" style="padding-top:0">
           <div class="field"><label for="f-title">ชื่อแบบประเมิน</label><input id="f-title" class="box" maxlength="120" value="${esc(c.title)}" ${lock ? 'disabled' : ''}></div>
-          <div class="field"><label for="f-open">เปิดให้ทำ</label><input id="f-open" class="box" type="datetime-local" value="${esc(c.openAt)}" ${lock ? 'disabled' : ''}><span class="note">เว้นว่าง = เปิดทันทีที่กดประกาศ</span></div>
-          <div class="field"><label for="f-close">ปิดรับ</label><input id="f-close" class="box" type="datetime-local" value="${esc(c.closeAt)}" ${lock ? 'disabled' : ''}><span class="note">เว้นว่าง = เปิดจนกว่าจะกดปิดรับ</span></div>
+          <div class="field"><label for="f-open">เปิดให้ทำ</label><input id="f-open" class="box" type="datetime-local" value="${esc(c.openAt)}" ${lock ? 'disabled' : ''}><span class="date-hint" data-for="f-open" aria-live="polite">${dtHint(c.openAt)}</span><span class="note">เว้นว่าง = เปิดทันทีที่กดประกาศ</span></div>
+          <div class="field"><label for="f-close">ปิดรับ</label><input id="f-close" class="box" type="datetime-local" value="${esc(c.closeAt)}" ${lock ? 'disabled' : ''}><span class="date-hint" data-for="f-close" aria-live="polite">${dtHint(c.closeAt)}</span><span class="note">เว้นว่าง = เปิดจนกว่าจะกดปิดรับ</span></div>
         </div></section>
       <section class="sec" aria-labelledby="h-src"><div class="sec-h"><h2 id="h-src">ที่มาของข้อ</h2></div>
         <div class="sec-pad" style="padding-top:0;gap:8px" role="radiogroup" aria-labelledby="h-src">${d.sources.map(x => `<button type="button" class="src" role="radio" aria-checked="${x === c.source}" data-src="${esc(x)}" ${lock ? 'disabled' : ''}>
@@ -1745,9 +1856,11 @@ function asmLive(d, c, s, edit) {
       <section class="sec wide" aria-labelledby="h-prog"><div class="sec-h"><div class="t"><h2 id="h-prog">ความคืบหน้ารายห้อง</h2><span class="s">อัปเดต ${esc(d.asOf)} · นับรหัสนักเรียนไม่ซ้ำ</span></div>
           <button class="link" type="button" id="pg-reload">โหลดใหม่</button></div>
         <div class="tw"><table class="tb"><thead><tr><th>ห้อง</th><th>ครูประจำชั้น</th><th>ทำแล้ว</th><th></th></tr></thead>
-          <tbody>${p.rooms.map(x => `<tr><td class="b">${esc(x.room)}</td><td class="m">${esc(x.homeroom || 'ยังไม่ระบุในชีตห้องเรียน')}</td>
+          <tbody>${p.rooms.map(x => `<tr class="top"><td class="b">${esc(x.room)}</td>
+            <td>${x.covered ? `<span>${esc(x.homeroom)}</span><div class="m" style="font-size:13px">${x.seen ? 'เห็นการ์ดล่าสุด ' + esc(x.seen) : 'ยังไม่ได้เปิดหน้าห้องเรียนหลังประกาศ'}</div>`
+              : `<span class="wait">${esc(x.why || 'ยังไม่ระบุในชีตห้องเรียน')}</span><div class="m" style="font-size:13px">ส่งข้อความเข้ากลุ่ม LINE ห้องเอง</div>`}</td>
             <td><div class="meter"><div class="track${x.pct !== null && x.pct < 50 && s.phase !== 'scheduled' ? ' low' : ''}"><span style="width:${x.pct || 0}%"></span></div><span class="v">${x.done} / ${x.size || '?'}</span></div></td>
-            <td class="r">${s.phase === 'live' && x.size && x.done < x.size ? `<button class="btn sm" type="button" data-copy="${esc(x.remind)}">คัดลอกข้อความเตือน</button>` : x.size && x.done >= x.size ? '<span class="st ok">ครบแล้ว</span>' : ''}</td></tr>`).join('')}</tbody></table></div>
+            <td class="r nw">${!x.covered && x.share && s.phase !== 'closed' ? `<button class="btn sm" type="button" data-copy="${esc(x.share)}">คัดลอกข้อความส่งต่อ</button> ` : ''}${s.phase === 'live' && x.size && x.done < x.size ? `<button class="btn sm" type="button" data-copy="${esc(x.remind)}">คัดลอกข้อความเตือน</button>` : x.size && x.done >= x.size ? '<span class="st ok">ครบแล้ว</span>' : ''}</td></tr>`).join('')}</tbody></table></div>
         ${p.dups.length ? `<details class="more"><summary>รหัสที่ส่งซ้ำ ${p.dups.length} รหัส</summary><div class="sec-pad" style="padding-top:0"><span>${p.dups.map(x => `${esc(x.id)} (${x.n} ครั้ง)`).join(' · ')}</span><span class="note">ระบบนับเฉพาะครั้งแรก ถ้าเป็นรหัสที่เพื่อนกรอกผิด ให้ครูประจำชั้นตรวจสอบ</span></div></details>` : ''}</section>
       <div class="narrow">
         <section class="sec" aria-labelledby="h-share"><div class="sec-h"><h2 id="h-share">ช่องทางส่งให้นักเรียน</h2></div>
@@ -1774,7 +1887,7 @@ function asmBind(d, s, edit, draftView) {
   const m = adMain();
   $('#as-back').onclick = () => { if (A.dirty && !confirm('มีการแก้ไขที่ยังไม่บันทึก ออกจากหน้านี้?')) return; A.dirty = false; adShow('overview'); };
   $$('[data-tab]', m).forEach(b => b.onclick = () => { if (b.dataset.tab === d.level) return; if (A.dirty && !confirm('มีการแก้ไขที่ยังไม่บันทึก เปลี่ยนระดับชั้น?')) return; asmLoad(b.dataset.tab); });
-  $$('[data-copy]', m).forEach(b => b.onclick = () => copyText(b.dataset.copy, b.dataset.copy.startsWith('http') ? 'คัดลอกลิงก์แล้ว' : 'คัดลอกข้อความเตือนแล้ว วางในกลุ่ม LINE ห้องได้เลย'));
+  $$('[data-copy]', m).forEach(b => b.onclick = () => copyText(b.dataset.copy, b.dataset.copy.startsWith('http') ? 'คัดลอกลิงก์แล้ว' : 'คัดลอกข้อความแล้ว วางในกลุ่ม LINE ห้องได้เลย'));
   const qr = $('#as-qr'); if (qr && s.link) drawQr(qr, s.link, 320);
   const rl = $('#pg-reload'); if (rl) rl.onclick = () => asmLoad(d.level);
   $$('[data-a]', m).forEach(b => b.onclick = () => asmAct(b.dataset.a, b));
@@ -1822,6 +1935,7 @@ async function asmAct(a, btn) {
       <div class="notice">${s.openText ? 'นักเรียนเริ่มทำได้ ' + esc(s.openText) : 'นักเรียนเริ่มทำได้ทันที'}${s.closeText ? ' · ปิดรับ ' + esc(s.closeText) : ' · เปิดจนกว่าจะกดปิดรับ'}</div>
       <p class="note">หลังประกาศ เปลี่ยนข้อและสัดส่วนไม่ได้ (ถ้ายังไม่มีคนตอบ กลับเป็นร่างได้) · ครูประจำชั้นจะเห็นการ์ดส่งต่อเข้ากลุ่ม LINE ห้องในหน้าห้องเรียนของตน</p>
       ${s.have < s.need ? `<div class="notice wait">มีข้อ ${s.have} จาก ${s.need} ข้อตามสัดส่วน</div>` : ''}
+      ${(d.uncovered || []).length ? `<div class="notice wait"><span><b>${d.uncovered.map(x => esc(x.room)).join(', ')}</b> ไม่มีครูประจำชั้นที่ส่งลิงก์ต่อได้ หลังประกาศ คัดลอกข้อความส่งต่อของห้องเหล่านี้จากตารางความคืบหน้า แล้วส่งเข้ากลุ่ม LINE ห้องเอง</span></div>` : ''}
       <span class="err" id="go-err" role="alert"></span><button class="btn-p" type="button" id="go">ประกาศ</button>`, () => {
       $('#go').onclick = async () => {
         $('#go').disabled = true;
@@ -1852,7 +1966,7 @@ async function asmAct(a, btn) {
   if (a === 'extend') {
     const reopen = d.summary.phase === 'closed';
     openSheet(sheetHead(reopen ? 'เปิดรับอีกครั้ง' : 'ขยายเวลา', lv) + `
-      <div class="field"><label for="x-close">ปิดรับใหม่</label><input id="x-close" class="input" type="datetime-local" value="${esc(A.cfg.closeAt)}"></div>
+      <div class="field"><label for="x-close">ปิดรับใหม่</label><input id="x-close" class="input" type="datetime-local" value="${esc(A.cfg.closeAt)}"><span class="date-hint" data-for="x-close" aria-live="polite">${dtHint(A.cfg.closeAt)}</span></div>
       <span class="err" id="go-err" role="alert"></span><button class="btn-p" type="button" id="go">${reopen ? 'บันทึกและเปิดรับ' : 'บันทึกเวลาใหม่'}</button>`, () => {
       $('#go').onclick = async () => {
         const v = $('#x-close').value;
@@ -1923,22 +2037,25 @@ function dbRender() {
     <div class="pg-head"><div class="t"><h1>รายงานการใช้ในคาบ</h1><p>${D.upto ? `ถึงสัปดาห์ที่ ${D.upto}` : 'ยังไม่ถึงสัปดาห์ที่ 1 ตามชีตสัปดาห์'} · นับการใช้เมื่อนักเรียนตอบตั้งแต่ร้อยละ ${D.useMin} ของห้อง</p></div>
       <div class="acts"><select class="box" id="db-sub" aria-label="วิชา" style="width:auto;min-width:180px"><option value="all">ทุกวิชา</option>${D.subjects.map(s => `<option ${s === subj ? 'selected' : ''}>${esc(s)}</option>`).join('')}</select></div></div>
     <div class="tabs" role="tablist" aria-label="ระดับชั้น">${D.levels.map(l => `<button type="button" role="tab" data-lvl="${esc(l)}" aria-selected="${l === D.level}">${esc(l)}</button>`).join('')}</div>
+    ${!D.upto ? `<div class="notice wait">ยังไม่เริ่มนับโควตา${D.firstWeek ? ` สัปดาห์ที่ 1 เริ่มจันทร์ ${esc(D.firstWeek)}` : ''} ตัวเลขด้านล่างเป็นการทดลองใช้ ยังไม่นับเป็นผลโครงการ</div>` : ''}
     <section class="sec"><div class="kpis">
       ${k1 === null ? kpi(`ครูนำไปใช้`, '—', 'ยังไม่มีสัปดาห์ที่วัดผลได้', null) : kpi(`ครูนำไปใช้ (${tUsing} จาก ${teachers.length} คน)`, k1 + '%', `เป้าหมาย ≥ ${D.goal}% · ${k1 >= D.goal ? 'ผ่าน' : 'ยังไม่ผ่าน'}`, k1 >= D.goal)}
       ${k2 === null ? kpi('ห้อง–วิชาใช้ต่อเนื่อง', '—', 'ยังไม่มีสัปดาห์ที่วัดผลได้', null) : kpi(`ห้อง–วิชาใช้ต่อเนื่อง (${contRooms} จาก ${measured.length})`, k2 + '%', `เป้าหมาย ≥ ${D.goal}% · ${k2 >= D.goal ? 'ผ่าน' : 'ยังไม่ผ่าน'}`, k2 >= D.goal)}
       ${!ap || ap.pct === null ? kpi('ทำแบบประเมินรวมแล้ว', '—', D.assess ? 'ยังไม่มีข้อมูลจำนวนนักเรียน' : 'ยังไม่ได้สร้างแบบประเมินของระดับชั้นนี้', null)
         : kpi(`ทำแบบประเมินรวมแล้ว (${ap.done} จาก ${ap.size} คน)`, ap.pct + '%', `เป้าหมาย 100% · ${ap.pct >= 100 ? 'ผ่าน' : 'ยังไม่ผ่าน'}`, ap.pct >= 100)}</div></section>
     <section class="sec" aria-labelledby="h-wk"><div class="sec-h"><div class="t"><h2 id="h-wk">การใช้รายสัปดาห์ · ${esc(D.level)}</h2>
-        <span class="s">ร้อยละนักเรียนที่ตอบข้อประจำคาบในสัปดาห์นั้น · ใช้ต่อเนื่อง = ใช้ครบตั้งแต่ร้อยละ ${D.contMin} ของสัปดาห์ที่นับโควตา</span></div></div>
+        <span class="s">ร้อยละนักเรียนที่ตอบข้อประจำคาบในสัปดาห์นั้น · ใช้ต่อเนื่อง = ใช้ครบตั้งแต่ร้อยละ ${D.contMin} ของสัปดาห์ที่นับโควตา</span></div>
+        ${rows.length ? '<button class="btn sm" type="button" id="db-copy">คัดลอกตาราง</button>' : ''}</div>
       <div class="strip"><span><span class="cell ok">≥${D.useMin}%</span> นับเป็นการใช้</span><span><span class="cell no">—</span> ยังไม่ใช้หรือไม่ถึงเกณฑ์</span><span><span class="cell pp">กระดาษ</span> แบบกระดาษ</span><span><span class="cell off">รอ</span> สัปดาห์นี้ยังไม่จบ</span><span><span class="cell off">หยุด</span> ไม่นับโควตา</span></div>
       <div class="tw"><table class="tb">${rows.length ? `<thead><tr><th>ห้อง–วิชา</th><th>ครู</th>${D.weeks.map(w => `<th class="c">${esc(w)}</th>`).join('')}<th class="c">ต่อเนื่อง</th></tr></thead>
         <tbody>${rows.map(r => { const c = cont(r); return `<tr><td class="b">${esc(r.r)} ${esc(r.s)}</td><td class="m nw">${esc(r.t)}</td>${r.w.map(v => `<td class="c">${cell(v)}</td>`).join('')}<td class="c">${c === null ? '<span class="cell off">—</span>' : `<span class="cell ${c >= D.contMin ? 'ok' : 'no'}">${c}%</span>`}</td></tr>`; }).join('')}</tbody>`
         : '<tbody><tr><td class="m">ยังไม่มีห้อง–วิชาของระดับชั้นนี้ในชีตครูผู้สอน</td></tr></tbody>'}</table></div></section>
     <div class="cols">
-      <section class="sec half" aria-labelledby="h-weak"><div class="sec-h"><div class="t"><h2 id="h-weak">ตัวชี้วัดที่ยังอ่อน</h2><span class="s">ร้อยละตอบถูกจากคำตอบในคาบ เรียงจากน้อยไปมาก</span></div></div>
+      <section class="sec half" aria-labelledby="h-weak"><div class="sec-h"><div class="t"><h2 id="h-weak">ตัวชี้วัดที่ยังอ่อน</h2><span class="s">ร้อยละตอบถูกจากคำตอบในคาบ เรียงจากน้อยไปมาก · แสดงเมื่อมีคนตอบอย่างน้อย ${D.weakMin || 10} คน</span></div></div>
         <div class="sec-pad" style="padding-top:0">${weak.length ? weak.map(x => `<div class="meter" style="display:grid;grid-template-columns:minmax(0,1fr) 120px 44px;gap:10px;align-items:center;font-size:14px">
-          <span title="${esc(x.s)} · ตอบ ${x.n} ครั้ง" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(x.k)} <span class="m" style="font-size:12px">${esc(x.s)}</span></span>
-          <div class="track${x.v < 50 ? ' low' : ''}"><span style="width:${x.v}%"></span></div><b class="num" style="text-align:right">${x.v}%</b></div>`).join('') : '<p class="m">ยังไม่มีคำตอบของวิชานี้</p>'}</div></section>
+          <span title="${esc(x.k)} · ${esc(x.s)}" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(x.k)} <span class="m" style="font-size:13px">${esc(x.s)} · ${x.n} คน</span></span>
+          <div class="track${x.v < 50 ? ' low' : ''}"><span style="width:${x.v}%"></span></div><b class="num" style="text-align:right">${x.v}%</b></div>`).join('') : `<p class="m">${D.weakFew ? 'ยังไม่มีตัวชี้วัดที่มีคนตอบถึงเกณฑ์' : 'ยังไม่มีคำตอบของวิชานี้'}</p>`}
+          ${D.weakFew ? `<p class="m" style="font-size:13px">อีก ${D.weakFew} ตัวชี้วัดคนตอบยังน้อย ยังไม่แสดง</p>` : ''}</div></section>
       <section class="sec half" aria-labelledby="h-bk"><div class="sec-h"><div class="t"><h2 id="h-bk">คลังข้อสอบ ${esc(D.level)}</h2><span class="s">จำนวนข้อตามที่กำหนดในคอลัมน์ "ใช้สำหรับ"</span></div></div>
         <div class="tw"><table class="tb"><thead><tr><th>ประเภท</th><th>วิชา</th><th class="r">ใช้ในคาบแล้ว</th><th class="r">ใช้ในคาบได้</th><th class="r">ใช้ในแบบประเมินได้</th></tr></thead>
           <tbody>${D.bank.length ? D.bank.map(b => `<tr><td><span class="etag">${esc(b.exam)}</span></td><td class="b">${esc(b.subject)}</td><td class="r num">${b.used}</td><td class="r num">${b.cls}</td><td class="r num">${b.assess}</td></tr>`).join('') : '<tr><td colspan="5" class="m">คลังข้อสอบของระดับชั้นนี้ยังว่าง</td></tr>'}</tbody></table></div></section>
@@ -1949,6 +2066,13 @@ function dbRender() {
           <td>${cTag(x.c) || '—'}</td><td class="read">${esc([x.chips, x.note].filter(Boolean).join(' — ')) || '<span class="m">—</span>'}</td></tr>`).join('')}</tbody>`
         : '<tbody><tr><td class="m">ยังไม่มีรายงานคาบของระดับชั้นนี้</td></tr></tbody>'}</table></div></section>`;
   $('#db-sub').onchange = e => { DB.subject = e.target.value; dbRender(); };
+  const cp = $('#db-copy');
+  if (cp) cp.onclick = () => {
+    const txt = v => v === 'x' ? 'หยุด' : v === 'w' ? 'รอ' : v === 'p' ? 'กระดาษ' : v ? v + '%' : '-';
+    const lines = [['ห้อง', 'วิชา', 'ครู', ...D.weeks, 'ต่อเนื่อง'].join('\t')]
+      .concat(rows.map(r => { const c = cont(r); return [r.r, r.s, r.t, ...r.w.map(txt), c === null ? '-' : c + '%'].join('\t'); }));
+    copyText(lines.join('\n'), 'คัดลอกตารางแล้ว วางใน Excel หรือ Google Sheets ได้เลย');
+  };
   $$('[data-lvl]', adMain()).forEach(b => b.onclick = () => { if (b.dataset.lvl !== D.level) { DB.subject = 'all'; dbLoad(b.dataset.lvl); } });
 }
 
@@ -1967,7 +2091,7 @@ async function screenInit(token) {
     if (!drawn) {
       fs.innerHTML = `
         <div class="fs-top"><h2>${esc(d.subject)} · ข้อประจำคาบ</h2><span>ปิดรับอัตโนมัติ ${esc(d.deadline)}</span></div>
-        <div class="fs-main"><div class="fs-qr" id="fs-qr"></div>
+        <div class="fs-main">${d.q ? `<p class="fs-q">${esc(d.q)}</p>` : ''}<div class="fs-qr" id="fs-qr"></div>
           <div class="fs-side"><span class="fs-room">ห้อง ${esc(d.room)}</span>
             <span>สแกน QR Code หรือพิมพ์รหัสห้อง</span><span class="fs-code">${fmtCode(d.code)}</span>
             <span class="fs-count">ตอบแล้ว <b id="fs-count">${d.sent}</b> จาก ${d.size || '?'} คน</span></div></div>
@@ -1996,10 +2120,15 @@ async function boot() {
   PARAMS = Object.fromEntries(new URLSearchParams(location.search));
   if (PARAMS.screen) return screenInit(PARAMS.screen);
   const asStudent = PARAMS.r || PARAMS.code || PARAMS.a || PARAMS.page === 'student';
-  try { ME = await run('whoAmI', asStudent ? '' : TK.get()); } catch (e) { ME = {}; }
+  // นักเรียน: เปิดข้อสอบทันที ไม่รอ whoAmI (ใช้แค่ชื่อโรงเรียน) เน็ตช้าจะได้ไม่เห็นจอขาว
+  if (asStudent) {
+    run('whoAmI', '').then(m => { ME = m || {}; if (ME.school) document.title = 'ระบบฝึกข้อสอบระดับชาติ · ' + ME.school; }).catch(() => {});
+    if (PARAMS.a) { go('assess'); return asInit(); }
+    go('student'); return stuInit();
+  }
+  $('#view-login').innerHTML = '<main><div class="loading">กำลังเปิดระบบ…</div></main>'; go('login');
+  try { ME = await run('whoAmI', TK.get()); } catch (e) { ME = {}; }
   if (ME.school) document.title = 'ระบบฝึกข้อสอบระดับชาติ · ' + ME.school;
-  if (PARAMS.a) { go('assess'); return asInit(); }
-  if (asStudent) { go('student'); return stuInit(); }
   if (ME.canTeach) return startStaff();
   if (['teacher', 'dashboard', 'admin'].indexOf(PARAMS.page) >= 0) return showLogin(TK.get() ? 'หมดเวลาการใช้งาน กรุณาเข้าสู่ระบบอีกครั้ง' : '');
   go('student'); stuInit();
