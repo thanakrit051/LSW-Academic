@@ -56,6 +56,8 @@ a { color: var(--brand); }
 :focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; }
 .num { font-variant-numeric: tabular-nums; }
 .read { font-family: var(--font-read); }
+/* โจทย์/คำอธิบายจากคลังข้อสอบ: ขึ้นบรรทัดใหม่ตามข้อความในชีต (บทอ่าน บทสนทนา ข้อความหลายบรรทัด) */
+#q-stem, .stem, .fs-q, div.q, p.q, .stu h1.sm, span.read, p.read { white-space: pre-line; }
 .muted { color: var(--muted); }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 svg { flex: none; }
