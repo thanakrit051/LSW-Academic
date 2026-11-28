@@ -207,6 +207,24 @@ button.row:hover { background: var(--surface-2); }
 .selectbox .n { font-size: 13px; color: var(--muted); white-space: nowrap; }
 .selectbox select { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; border: 0; }
 .selectbox:focus-within { outline: 3px solid var(--brand); outline-offset: 2px; }
+/* หน้าเลือกข้อแบบกระชับ: ตัวกรองไม่เกิน 4 แถว ไม่มีหัวข้อกำกับ */
+.filters.compact { padding: 10px 14px; gap: 8px; }
+.filters.compact .hint { font-size: 13px; color: var(--muted); }
+.filters.compact .chip { height: 36px; padding: 0 12px; }
+.filters.compact .cfilter .chip { height: 32px; padding: 0 10px; font-size: 12.5px; }
+.seg { display: flex; gap: 2px; padding: 2px; border-radius: 10px; background: var(--surface-2); border: 1px solid var(--line); }
+.seg button { flex: 1 1 0; height: 34px; border: 0; border-radius: 8px; background: transparent; font-size: 13px; font-weight: 600; color: var(--muted); }
+.seg button[aria-checked="true"] { background: var(--surface); color: var(--brand); box-shadow: 0 1px 2px rgba(16, 24, 40, .12); }
+.filters.compact .selectbox { height: 40px; border-radius: 10px; padding: 0 12px; }
+.filters.compact .selectbox .k { font-size: 13px; color: var(--muted); flex: none; }
+.filters.compact .selectbox .v { font-size: 14px; }
+.pad.tight { padding: 10px 10px 14px; gap: 8px; }
+.pad.tight .sec-label { font-weight: 500; color: var(--muted); padding: 0 4px; }
+.pad.tight .qi { padding: 11px 14px; gap: 4px; }
+.pad.tight .qi .stem { font-size: 14.5px; line-height: 1.5; }
+.qi .foot.one { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dock.tight { padding: 10px 14px; padding-bottom: max(14px, calc(10px + env(safe-area-inset-bottom))); }
+.dock.tight .btn-p, .dock.tight .btn-s { height: 48px; font-size: 15px; }
 .qlist { background: var(--surface); border-radius: 16px; display: flex; flex-direction: column; overflow: hidden; }
 .qi { padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; border: 0; background: transparent; text-align: left; color: var(--ink); width: 100%; }
 .qi + .qi { border-top: 1px solid var(--line-2); }
@@ -1106,7 +1124,7 @@ function stuRender() {
 
 async function stuSubmit(payload) {
   const rid = STU.roundId;
-  payload = payload || { roundId: rid, studentId: STU.no, answers: [STU.pick], subId: uid() };
+  payload = payload || { roundId: rid, studentId: STU.no, answers: [STU.pick], subId: uid(), itemId: ((STU.info && STU.info.items[0]) || {}).id || '' };
   store.set('outbox-' + rid, payload); store.del('draft-' + rid);
   STU.step = 'sending'; STU.tries = 0; stuRender();
   for (let tries = 0; ; tries++) {
@@ -1426,7 +1444,7 @@ function focusCard(r) {
   if (r.state === 'open') body = miniItem(r.item) + `<div class="count"><div class="r"><span>ตอบแล้ว</span><span><b class="num">${r.sent || 0}</b> / ${r.size || '?'} คน</span></div>
       <div class="track"><span style="width:${pct(r.sent || 0, r.size)}%"></span></div>
       <span class="note">รหัสห้อง <b class="num">${fmtCode(r.code)}</b> · ${r.mode === 'นอกคาบ' ? 'ทำนอกคาบ ' : ''}ปิดรับอัตโนมัติ ${esc(r.mode === 'นอกคาบ' ? r.deadline : r.deadlineHm + ' น.')}</span></div>
-      <div class="links"><button class="link" type="button" data-f="fs">ฉายเต็มจอ</button><button class="link mute" type="button" data-f="paper">บันทึกแบบกระดาษ</button></div>`;
+      <div class="links"><button class="link" type="button" data-f="fs">ฉายเต็มจอ</button><button class="link" type="button" data-f="change">เปลี่ยนข้อ</button><button class="link mute" type="button" data-f="paper">บันทึกแบบกระดาษ</button></div>`;
   if (isDone(r)) {
     const res = r.result || {};
     body = miniItem(r.item) + `<div class="count"><div class="r"><span>${r.state === 'paper' ? 'แบบกระดาษ · ' : ''}ตอบถูก</span><span><b class="num">${res.pct ?? '—'}${res.pct !== null && res.pct !== undefined ? '%' : ''}</b> จาก ${res.n || 0} คน</span></div></div>
@@ -1488,6 +1506,7 @@ function renderHome() {
   $$('[data-f]', el).forEach(b => b.onclick = () => {
     const a = b.dataset.f;
     if (a === 'pick') openPicker(f);
+    if (a === 'change') changeStart(f);
     if (a === 'more') moreSheet(f);
     if (a === 'fs') openFs(f);
     if (a === 'paper') paperSheet(f);
@@ -1619,7 +1638,7 @@ function cancelSheet(r) {
 
 /* ----- หน้าเลือกข้อสอบ: 1 ประเภท → 2 วิชา → 3 เรื่อง → 4 ระดับความคิด → 5 แตะเลือกข้อ ----- */
 // คลังของแต่ละห้องเก็บไว้ใน T.bank[ห้อง] = { menu, items สะสม, loaded } โหลดข้อเต็มทีละประเภท–วิชา (ไม่โหลดทั้งระดับชั้นทีเดียว)
-const P = { d: null, exam: '', subject: '', topic: '', c: '', sel: '', loading: false };
+const P = { d: null, exam: '', subject: '', topic: '', c: '', sel: '', loading: false, change: false };
 const ALL_EXAMS = ['O-NET', 'A-Level', 'TGAT', 'TPAT'];
 const subjectsOf = ex => ((P.d && P.d.menu[ex]) || []).map(x => x[0]);
 const subCount = (ex, sb) => { const m = ((P.d && P.d.menu[ex]) || []).find(x => x[0] === sb); return m ? m[1] : 0; };
@@ -1654,10 +1673,18 @@ async function bankPrefetch() {
   } finally { T.prefetching = false; }
 }
 
-async function openPicker(r) {
-  T.key = r.key; T.page = 'pick'; P.sel = ''; P.c = '';
+// เปลี่ยนข้อของรอบที่เปิดรับอยู่: มีนักเรียนตอบแล้วเปลี่ยนไม่ได้ (คำตอบเป็นของข้อเดิม)
+function changeStart(r) {
+  if (r.sent) return openSheet(sheetHead('เปลี่ยนข้อไม่ได้', `${r.room} · ${r.subject}`) +
+    `<div class="notice wait"><span>มีนักเรียนส่งคำตอบแล้ว ${r.sent} คน คำตอบเหล่านี้เป็นของข้อเดิม จึงเปลี่ยนข้อในรอบนี้ไม่ได้<br>ถ้าต้องการใช้ข้ออื่น ให้ปิดรับคำตอบรอบนี้ก่อน แล้วกด เลือกข้อคาบถัดไป</span></div>
+    <div class="dock" style="position:static;padding:0;border:0;background:none"><button class="btn-s" type="button" data-x style="width:100%">เข้าใจแล้ว</button></div>`);
+  openPicker(r, true);
+}
+
+async function openPicker(r, change) {
+  T.key = r.key; T.page = 'pick'; P.sel = ''; P.c = ''; P.change = !!change;
   const el = $('#view-teacher');
-  const plan = r.state === 'planned' && r.item && !r.item.missing ? r.item : null;
+  const plan = (r.state === 'planned' || P.change) && r.item && !r.item.missing ? r.item : null;
   if (!T.bank[r.key] || (plan && !T.bank[r.key].loaded[plan.exam + '|' + plan.subject])) {
     el.innerHTML = pickBar(r) + '<main><div class="loading">กำลังโหลดคลังข้อสอบ…</div></main>';
     $('#pk-back').onclick = () => tShow('home');
@@ -1668,7 +1695,7 @@ async function openPicker(r) {
   if (T.page !== 'pick' || T.key !== r.key) return;
   P.exam = P.d.exam; P.subject = P.d.sub; P.topic = '';
   if (plan && P.d.items.some(i => i.id === plan.id)) {
-    P.exam = plan.exam; P.subject = plan.subject; P.topic = plan.topic; P.sel = plan.id;
+    P.exam = plan.exam; P.subject = plan.subject; P.topic = plan.topic; P.sel = P.change ? '' : plan.id;
   }
   window.scrollTo(0, 0);
   renderPicker();
@@ -1688,7 +1715,7 @@ async function pickGo(exam, sub) {
 
 function pickBar(r) {
   return `<header class="bar"><button class="ibtn" type="button" id="pk-back" aria-label="กลับหน้าห้องเรียน">${IC.back}</button>
-    <div class="t"><b>เลือกข้อสอบ</b><span>${esc(r.room)} · ${esc(r.subject)}</span></div></header>`;
+    <div class="t"><b>${P.change && T.page === 'pick' ? 'เปลี่ยนข้อ' : 'เลือกข้อสอบ'}</b><span>${esc(r.room)} · ${esc(r.subject)}${P.change && T.page === 'pick' ? ' · ใช้ QR เดิม' : ''}</span></div></header>`;
 }
 
 function renderPicker() {
@@ -1705,35 +1732,31 @@ function renderPicker() {
   const subs = subjectsOf(P.exam);
   const sel = d.items.find(i => i.id === P.sel);
   el.innerHTML = pickBar(r) + `
-    <div class="filters">
-      <div class="fgroup"><span class="lab" id="lab-exam">1 · ประเภทข้อสอบ</span>
-        <div class="exams" role="radiogroup" aria-labelledby="lab-exam">${ALL_EXAMS.map(x => {
-          const ok = d.exams.indexOf(x) >= 0;
-          return `<button type="button" role="radio" data-exam="${x}" aria-checked="${P.exam === x}"${ok ? '' : ' aria-disabled="true"'}>${x}</button>`; }).join('')}</div>
-        ${d.exams.length < ALL_EXAMS.length ? '<span class="hint">A-Level, TGAT และ TPAT ใช้ได้เฉพาะ ม.6</span>' : ''}</div>
-      <div class="fgroup"><span class="lab" id="lab-sub">2 · วิชา</span>
-        ${subs.length ? `<div class="chips scroll" role="radiogroup" aria-labelledby="lab-sub">${subs.map(s => `<button type="button" class="chip" role="radio" data-sub="${esc(s)}" aria-checked="${P.subject === s}">${esc(s)}</button>`).join('')}</div>`
-          : '<span class="hint">ไม่มีข้อสอบประเภทนี้สำหรับระดับชั้นนี้</span>'}</div>
-      ${inSub.length ? `<div class="fgroup"><label class="lab" for="pk-topic">3 · เรื่อง</label>
-        <div class="selectbox"><span class="v">${esc(P.topic || 'ทุกเรื่อง')}</span><span class="n">${inTopic.filter(byC).length} ข้อ</span>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
-          <select id="pk-topic"><option value="">ทุกเรื่อง (${inSub.filter(byC).length} ข้อ)</option>${topics.map(t => `<option value="${esc(t)}" ${P.topic === t ? 'selected' : ''}>${esc(t)} (${inSub.filter(i => i.topic === t && byC(i)).length} ข้อ)</option>`).join('')}</select></div></div>
-      <div class="fgroup"><span class="lab" id="lab-c">4 · ระดับความคิด</span>
-        <div class="chips cfilter" role="radiogroup" aria-labelledby="lab-c">
-          <button type="button" class="chip" role="radio" data-c="" aria-checked="${!P.c}">ทุกระดับ <span class="n">${inTopic.length}</span></button>
-          ${cs.map(c => `<button type="button" class="chip" role="radio" data-c="${c}" aria-checked="${P.c === c}">${c} ${esc(C_TXT[c] || '')} <span class="n">${inTopic.filter(i => i.c === c).length}</span></button>`).join('')}</div></div>` : ''}
+    <div class="filters compact">
+      ${d.exams.length > 1 ? `<div class="seg" role="radiogroup" aria-label="ประเภทข้อสอบ">${d.exams.map(x =>
+        `<button type="button" role="radio" data-exam="${x}" aria-checked="${P.exam === x}">${x}</button>`).join('')}</div>` : ''}
+      ${subs.length ? `<div class="chips scroll" role="radiogroup" aria-label="วิชา">${subs.map(s => `<button type="button" class="chip" role="radio" data-sub="${esc(s)}" aria-checked="${P.subject === s}">${esc(s)}</button>`).join('')}</div>`
+        : '<span class="hint">ไม่มีข้อสอบประเภทนี้สำหรับระดับชั้นนี้</span>'}
+      ${inSub.length ? `<div class="selectbox"><span class="k">เรื่อง</span><span class="v">${esc(P.topic || 'ทุกเรื่อง')}</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+          <select id="pk-topic" aria-label="เรื่อง"><option value="">ทุกเรื่อง (${inSub.filter(byC).length} ข้อ)</option>${topics.map(t => `<option value="${esc(t)}" ${P.topic === t ? 'selected' : ''}>${esc(t)} (${inSub.filter(i => i.topic === t && byC(i)).length} ข้อ)</option>`).join('')}</select></div>
+        <div class="chips scroll cfilter" role="radiogroup" aria-label="ระดับความคิด">
+          <button type="button" class="chip" role="radio" data-c="" aria-checked="${!P.c}">ทุกระดับ</button>
+          ${cs.map(c => `<button type="button" class="chip" role="radio" data-c="${c}" aria-checked="${P.c === c}" title="${esc(C_TXT[c] || '')}">${c} ${esc(C_TXT[c] || '')}</button>`).join('')}</div>` : ''}
     </div>
-    <main class="pad">
-      <span class="sec-label" id="lab-list">${inSub.length ? '5' : '3'} · เลือกข้อ</span>
+    <main class="pad tight">
       ${!loaded ? '<div class="loading">กำลังโหลดข้อสอบวิชานี้…</div>'
-        : list.length ? `<div class="qlist" role="radiogroup" aria-labelledby="lab-list">${list.map(pickItemHtml).join('')}</div>`
+        : list.length ? `<span class="sec-label" id="lab-list">${list.length} ข้อ${P.topic || P.c ? ' ตามตัวกรอง' : ''} · แตะเพื่อดูเฉลยและเลือก</span>
+          <div class="qlist" role="radiogroup" aria-labelledby="lab-list">${list.map(pickItemHtml).join('')}</div>`
         : `<div class="card empty">${inTopic.length ? 'ไม่มีข้อระดับ ' + esc(P.c) + ' ในหมวดนี้ ลองเลือก ทุกระดับ' : 'ไม่มีข้อสอบในหมวดนี้'}</div>`}
     </main>
-    <div class="dock">
-      <button class="btn-p" type="button" id="pk-go" ${sel ? '' : 'disabled'}>ใช้ข้อนี้และเปิดรับคำตอบ</button>
-      <span class="cap"><button class="link" type="button" id="pk-more" ${sel ? '' : 'disabled'} style="font-size:14px">ตัวเลือกอื่น</button></span>
+    <div class="dock tight">
+      ${P.change ? `<button class="btn-p" type="button" id="pk-go" ${sel ? '' : 'disabled'}>เปลี่ยนเป็นข้อนี้</button>
+        ${r.item && !r.item.missing ? `<span class="cap">ข้อเดิม: ${esc(r.item.src || r.item.topic || '')}</span>` : ''}`
+      : `<div class="two"><button class="btn-s" type="button" id="pk-more" ${sel ? '' : 'disabled'}>ตัวเลือกอื่น</button>
+        <button class="btn-p" type="button" id="pk-go" ${sel ? '' : 'disabled'}>ใช้ข้อนี้ เปิดรับคำตอบ</button></div>`}
       <span class="err" id="pk-err" role="alert" style="text-align:center"></span></div>`;
-  $('#pk-back').onclick = () => tShow('home');
+  $('#pk-back').onclick = () => P.change && r.state === 'open' ? tShow('live', r.key) : tShow('home');
   $$('[data-exam]', el).forEach(b => b.onclick = () => {
     if (b.getAttribute('aria-disabled') === 'true') return toast(`${d.level} เลือกได้เฉพาะ ${d.exams.join(', ')}`);
     const ex = b.dataset.exam, ss = subjectsOf(ex);
@@ -1743,8 +1766,8 @@ function renderPicker() {
   const tp = $('#pk-topic'); if (tp) tp.onchange = () => { P.topic = tp.value; P.sel = ''; renderPicker(); };
   $$('[data-c]', el).forEach(b => b.onclick = () => { P.c = b.dataset.c; P.sel = ''; renderPicker(); });
   $$('[data-item]', el).forEach(b => b.onclick = () => { P.sel = P.sel === b.dataset.item ? '' : b.dataset.item; renderPicker(); const x = $(`[data-item="${CSS.escape(b.dataset.item)}"]`); x && x.focus(); });
-  $('#pk-go').onclick = e => pickStart(r, P.sel, 'in', '', e.currentTarget);
-  $('#pk-more').onclick = () => moreSheet(r, P.sel);
+  $('#pk-go').onclick = e => P.change ? changeGo(r, P.sel, e.currentTarget) : pickStart(r, P.sel, 'in', '', e.currentTarget);
+  const more = $('#pk-more'); if (more) more.onclick = () => moreSheet(r, P.sel);
   window.scrollTo(0, keepY);
 }
 
@@ -1754,9 +1777,9 @@ function pickItemHtml(it) {
   return `<button type="button" class="qi" role="radio" aria-checked="${on}" data-item="${esc(it.id)}">
     <span class="h">${cTag(it.c, on ? 'on-white' : '')}${diffTag(it.diff)}${it.used ? `<span class="foot"><span class="wait">ห้องนี้ทำแล้ว ${esc(it.used)}</span></span>` : ''}<span class="radio"></span></span>
     ${on && it.img ? `<img src="${esc(it.img)}" alt="รูปโจทย์" referrerpolicy="no-referrer">` : ''}
-    <span class="stem"${on ? '' : ' style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden"'}>${it.q ? esc(it.q) : 'โจทย์เป็นรูปภาพ'}</span>
+    <span class="stem"${on ? '' : ' style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden"'}>${it.q ? esc(it.q) : 'โจทย์เป็นรูปภาพ'}</span>
     ${on ? keyHtml(it) : ''}
-    <span class="foot">${TYPE_TXT[it.type] && it.type !== 'number' ? `<b>${TYPE_TXT[it.type]}</b> · ` : ''}${esc(it.ind || it.topic)}${it.src ? ' · ' + esc(it.src) : ''} · ${others}</span>
+    <span class="foot${on ? '' : ' one'}">${it.src ? esc(it.src) + ' · ' : ''}${TYPE_TXT[it.type] && it.type !== 'number' ? `<b>${TYPE_TXT[it.type]}</b> · ` : ''}${P.topic ? '' : esc(it.ind || it.topic) + ' · '}${others}</span>
     ${on && it.why ? `<span class="foot read">${esc(it.why)}</span>` : ''}
   </button>`;
 }
@@ -1769,6 +1792,19 @@ async function pickOnly(r, itemId, btn) {
   closeSheet(); delete T.bank[r.key];
   toast('บันทึกข้อที่เลือกแล้ว');
   T.focus = r.key; await tLoad();
+}
+
+async function changeGo(r, itemId, btn) {
+  if (!itemId) return;
+  if (r.item && itemId === r.item.id) return tShow(r.state === 'open' ? 'live' : 'home', r.key);
+  btn.disabled = true; const t0 = btn.textContent; btn.textContent = 'กำลังเปลี่ยนข้อ…';
+  try { await apiHome('changeItem', r.roundId, itemId); }
+  catch (e) { btn.disabled = false; btn.textContent = t0; $('#pk-err').textContent = failMsg(e); return; }
+  P.change = false; delete T.bank[r.key];
+  toast('เปลี่ยนข้อแล้ว นักเรียนสแกน QR เดิมได้เลย');
+  await tLoad(true);
+  const nr = roomOf(r.key);
+  tShow(nr && nr.state === 'open' ? 'live' : 'home', r.key);
 }
 
 async function pickStart(r, itemId, mode, dl, btn) {
@@ -1804,7 +1840,7 @@ function renderLive(r) {
       <div class="acts3"><button type="button" id="lv-fs">${IC.expand}ฉายเต็มจอ</button>
         <a href="${esc(lineShare(msg))}" target="_blank" rel="noopener">${IC.chat}ส่งเข้ากลุ่ม LINE</a>
         <a href="${esc(lineShare(scr))}" target="_blank" rel="noopener">${IC.screen}ส่งลิงก์ฉายจอ</a></div>
-      <div class="foot-links"><button type="button" id="lv-copy-scr">คัดลอกลิงก์ฉายจอ (เปิดในคอมห้องเรียน)</button><button type="button" id="lv-paper">บันทึกแบบกระดาษแทน</button></div>
+      <div class="foot-links"><button type="button" id="lv-change">เปลี่ยนข้อ (ใช้ QR เดิม)</button><button type="button" id="lv-copy-scr">คัดลอกลิงก์ฉายจอ (เปิดในคอมห้องเรียน)</button><button type="button" id="lv-paper">บันทึกแบบกระดาษแทน</button></div>
     </main>
     <div class="dock"><button class="btn-p${T.arm ? ' arm' : ''}" type="button" id="lv-close">${T.arm ? 'กดอีกครั้งเพื่อยืนยัน' : 'ปิดรับคำตอบ'}</button>
       ${T.arm && closeShort(r) ? `<div class="notice wait" role="status"><span>${closeShort(r)}</span></div>` : ''}
@@ -1814,6 +1850,7 @@ function renderLive(r) {
   $('#lv-back').onclick = () => tShow('home');
   $('#lv-fs').onclick = () => openFs(r);
   $('#lv-paper').onclick = () => paperSheet(r);
+  $('#lv-change').onclick = () => changeStart(r);
   $('#lv-copy-scr').onclick = () => copyText(r.screenLink, 'คัดลอกลิงก์ฉายจอแล้ว นำไปเปิดในเบราว์เซอร์ของคอมห้องเรียน');
   $('#lv-close').onclick = async e => {
     const b = e.currentTarget;
