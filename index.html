@@ -131,6 +131,13 @@ button:disabled, .btn-p:disabled { opacity: .5; cursor: not-allowed; }
 .hero-top .side { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.35; flex: none; }
 .hero-top .side span { font-size: 13px; color: var(--hero-sub); }
 .hero-top .side button { background: none; border: 0; min-height: 44px; padding: 0 0 0 12px; margin: -10px 0; color: var(--hero-ink); font-size: 14px; text-decoration: underline; text-underline-offset: 3px; }
+.resline { display: flex; align-items: baseline; gap: 10px; padding: 2px 2px 0; }
+.resline b { font-size: 26px; font-weight: 700; line-height: 1.2; color: var(--good); }
+.resline b.bad { color: var(--bad); }
+.resline span { font-size: 14px; color: var(--ink-2); }
+.resline.none span { color: var(--muted); }
+.fbtn { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; min-height: 48px; padding: 0 14px; border-radius: 12px; border: 1px solid var(--brand-line); background: var(--brand-soft); color: var(--brand); font-size: 15px; font-weight: 600; text-align: left; }
+.fbtn svg { flex: none; color: var(--brand) !important; }
 .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); background: var(--hero-cell); border-radius: 12px; }
 .stats > div { padding: 10px 12px; display: flex; flex-direction: column; min-width: 0; }
 .stats > div + div { border-left: 1px solid var(--hero-rule); }
@@ -239,8 +246,8 @@ button.row:hover { background: var(--surface-2); }
 .qi img { max-width: 100%; max-height: 180px; object-fit: contain; border-radius: 8px; background: #fff; align-self: flex-start; }
 .ans { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; font-size: 14px; font-variant-numeric: tabular-nums; }
 .ans.one { grid-template-columns: minmax(0, 1fr); }
-.ans span { padding: 6px 10px; border-radius: 8px; background: var(--surface); border: 1px solid var(--line); line-height: 1.45; }
-.ans span.key { background: var(--good-soft); border-color: var(--good); color: var(--good); font-weight: 600; }
+.ans > span { padding: 6px 10px; border-radius: 8px; background: var(--surface); border: 1px solid var(--line); line-height: 1.45; }
+.ans > span.key { background: var(--good-soft); border-color: var(--good); color: var(--good); font-weight: 600; }
 
 /* ===== หน้าครู: QR รับคำตอบ ===== */
 .live { padding: 28px 24px 24px; display: flex; flex-direction: column; align-items: center; gap: 24px; }
@@ -379,7 +386,7 @@ textarea.memo { font-family: var(--font-read); font-size: 15px; line-height: 1.6
 .rv { display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); }
 .rv .h { display: flex; justify-content: space-between; font-weight: 600; font-size: 15px; }
 .rv .yes { color: var(--good); } .rv .no { color: var(--bad); }
-.rv span { font-size: 14px; line-height: 1.55; }
+.rv > span { font-size: 14px; line-height: 1.55; }
 .as-start { padding: 22px 18px 18px; padding-top: max(22px, env(safe-area-inset-top)); background: var(--hero); color: var(--hero-ink); display: flex; flex-direction: column; gap: 6px; }
 .as-start span { font-size: 13px; color: var(--hero-sub); }
 .as-start span.d { font-size: 14px; }
@@ -1447,14 +1454,17 @@ function focusCard(r) {
       <div class="links"><button class="link" type="button" data-f="fs">ฉายเต็มจอ</button><button class="link" type="button" data-f="change">เปลี่ยนข้อ</button><button class="link mute" type="button" data-f="paper">บันทึกแบบกระดาษ</button></div>`;
   if (isDone(r)) {
     const res = r.result || {};
-    body = miniItem(r.item) + `<div class="count"><div class="r"><span>${r.state === 'paper' ? 'แบบกระดาษ · ' : ''}ตอบถูก</span><span><b class="num">${res.pct ?? '—'}${res.pct !== null && res.pct !== undefined ? '%' : ''}</b> จาก ${res.n || 0} คน</span></div></div>
-      ${r.report ? `<div class="links"><button class="link" type="button" data-f="result">ดูผลและรายงานที่ส่ง</button></div>` : ''}`;
+    const has = res.n && res.pct !== null && res.pct !== undefined;
+    body = miniItem(r.item) + (has
+      ? `<div class="resline"><b class="num ${res.pct < 50 ? 'bad' : ''}">${res.pct}%</b><span>ตอบถูก ${res.ok || 0} จาก ${res.n} คน${r.state === 'paper' ? ' · แบบกระดาษ' : ''}</span></div>`
+      : `<div class="resline none"><span>ไม่มีนักเรียนส่งคำตอบในรอบนี้</span></div>`)
+      + (r.report ? `<button class="fbtn" type="button" data-f="result"><span>ดูผลรายข้อและรายงานที่ส่ง</span>${IC.chev}</button>` : '');
   }
   const when = r.extra ? `รอบ${r.day ? ' ' + r.day : 'ก่อนหน้า'}` : '';
   return `<section class="card focus" id="t-focus" tabindex="-1" aria-label="ห้องที่ต้องทำต่อ ${esc(r.room)} ${esc(r.subject)}">
     <div class="focus-head"><div class="t"><span><b>${esc(r.room)}</b>${r.extra ? '<span class="now-tag warn">ค้างรายงาน</span>' : ''}</span>
       <span class="sub">${esc(r.subject)}${when ? ' · ' + esc(when) : ''}</span></div><span class="st ${st.cls}">${esc(st.text.split(' · ')[0])}</span></div>
-    ${body}${r.extra ? '' : weekLine(r)}${stepsHtml(r)}</section>`;
+    ${body}${r.extra ? '' : weekLine(r)}</section>`;
 }
 
 function roomRow(r) {
@@ -1486,8 +1496,7 @@ function renderHome() {
   const act = f ? mainAction(f) : null;
   el.innerHTML = `
     <header class="hero"><div class="hero-top"><div class="who"><span>${esc(D.teacher.name)}${subjects ? ' · ' + esc(subjects) : ''}</span><b>${esc(D.today)}</b></div>
-        <div class="side"><span>${esc(weekBadge(D.weekInfo) || (D.week ? 'สัปดาห์ที่ ' + D.week : ''))}</span><button type="button" id="t-menu" aria-haspopup="dialog">เมนู</button></div></div>
-      <div class="stats" role="group" aria-label="สรุปห้องที่สอน"><div><span>ห้องที่สอน</span><b>${D.roomCount}</b></div><div><span>รอเลือกข้อ</span><b>${D.unpicked}</b></div><div><span>รอส่งรายงาน</span><b>${D.owe}</b></div></div></header>
+        <div class="side"><span>${esc(weekBadge(D.weekInfo) || (D.week ? 'สัปดาห์ที่ ' + D.week : ''))}</span><button type="button" id="t-menu" aria-haspopup="dialog">เมนู</button></div></div></header>
     <main class="pad">
       ${!D.rooms.length && !(D.extra || []).length ? `<div class="card empty">ไม่พบห้องที่สอนในชีตครูผู้สอน<br>กรุณาแจ้งผู้ดูแลระบบ (รหัสครู ${esc(D.teacher.tid)})</div>` : ''}
       ${f ? focusCard(f) : ''}
