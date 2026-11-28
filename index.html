@@ -198,6 +198,8 @@ button.row:hover { background: var(--surface-2); }
 .chips.scroll::-webkit-scrollbar { display: none; }
 .chip { height: 44px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); font-size: 13px; font-weight: 500; white-space: nowrap; flex: none; }
 .chips.scroll .chip { height: 44px; }
+.cfilter .chip { height: 36px; padding: 0 12px; }
+.cfilter .chip .n { color: var(--muted); font-weight: 400; margin-left: 2px; }
 .chip[aria-checked="true"], .chip[aria-pressed="true"] { border-color: var(--brand); background: var(--brand-soft); color: var(--brand); font-weight: 600; }
 .chip[aria-checked="true"]::before, .chip[aria-pressed="true"]::before { content: "✓ "; }
 .selectbox { position: relative; height: 52px; border: 1px solid var(--line-strong); border-radius: 12px; background: var(--surface); display: flex; align-items: center; gap: 8px; padding: 0 14px; }
@@ -606,14 +608,15 @@ details.more > summary::-webkit-details-marker { display: none; }
    ข้อความ error ที่ขึ้นต้นด้วย E: คือข้อความสำหรับผู้ใช้ (ไม่ส่งซ้ำ)
    ===================================================================== */
 const API_URL = 'https://script.google.com/macros/s/AKfycbxev61VIerkQDKF5mAa5nnDB8isE1y81qAkTpkpCsdhxDscurG0xnTtvgRcrWnn9u7l/exec';
-async function run(fn, ...a) {
+async function run(fn, ...a) { return (await runFull(fn, a, false)).data; }
+async function runFull(fn, a, home) {
   let j;
   try {
-    const r = await fetch(API_URL, { method: 'POST', credentials: 'omit', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ fn, args: a }) });
+    const r = await fetch(API_URL, { method: 'POST', credentials: 'omit', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(home ? { fn, args: a, home: true } : { fn, args: a }) });
     j = await r.json();
   } catch (e) { throw new Error('NET'); }
   if (!j || !j.ok) throw new Error((j && j.error) || 'NET');
-  return j.data;
+  return j;
 }
 const userMsg = (e) => { const m = String((e && e.message) || e || '').match(/E:([\s\S]*)$/); return m ? m[1].trim() : null; };
 const NET_MSG = 'ไม่สามารถเชื่อมต่อระบบได้ กรุณาตรวจสอบอินเทอร์เน็ตแล้วลองอีกครั้ง';
@@ -864,6 +867,17 @@ const TK = {
 async function api(fn, ...a) {
   try { return await run(fn, TK.get(), ...a); }
   catch (e) {
+    if (/^LOGIN:/.test(userMsg(e) || '')) { TK.clear(); showLogin('หมดเวลาการใช้งาน กรุณาเข้าสู่ระบบอีกครั้ง'); }
+    throw e;
+  }
+}
+// ปุ่มของครูที่ต้องโหลดหน้าห้องเรียนใหม่หลังทำเสร็จ: ให้เซิร์ฟเวอร์ส่งหน้าห้องเรียนกลับมาในคำขอเดียวกัน (tLoad ถัดไปไม่ต้องโหลดซ้ำ)
+async function apiHome(fn, ...a) {
+  try {
+    const j = await runFull(fn, [TK.get(), ...a], true);
+    T.next = j.home ? { home: j.home, at: Date.now() } : null;
+    return j.data;
+  } catch (e) {
     if (/^LOGIN:/.test(userMsg(e) || '')) { TK.clear(); showLogin('หมดเวลาการใช้งาน กรุณาเข้าสู่ระบบอีกครั้ง'); }
     throw e;
   }
@@ -1305,7 +1319,7 @@ async function asSubmit(payload) {
 }
 
 /* ===================== หน้าครู: ห้องเรียนวันนี้ → เลือกข้อ → QR รับคำตอบ → ผลและรายงาน ===================== */
-const T = { data: null, timer: null, page: 'home', key: '', focus: '', bank: {}, rep: {}, arm: false };
+const T = { data: null, next: null, timer: null, page: 'home', key: '', focus: '', bank: {}, bankP: {}, rep: {}, arm: false };
 const REPORT_CHIPS = ['เฉลยหน้าห้องแล้ว', 'อธิบายตัวลวงซ้ำ', 'อินเทอร์เน็ตขัดข้อง', 'ใช้กระดาษบางส่วน'];
 
 const allRooms = () => T.data ? T.data.rooms.concat(T.data.extra || []) : [];
@@ -1322,7 +1336,8 @@ async function tInit() {
 
 async function tLoad(keepPage) {
   if (!T.data) $('#view-teacher').innerHTML = '<main><div class="loading">กำลังโหลดห้องเรียน…</div></main>';
-  try { T.data = await api('teacherHome'); }
+  const nx = T.next; T.next = null;
+  try { T.data = nx && Date.now() - nx.at < 15000 ? nx.home : await api('teacherHome'); }
   catch (e) {
     if (/^LOGIN:/.test(userMsg(e) || '')) return;
     $('#view-teacher').innerHTML = `<main class="pad"><div class="notice wait" role="alert">${esc(failMsg(e))}</div></main>
@@ -1332,6 +1347,7 @@ async function tLoad(keepPage) {
   }
   if (!keepPage) T.page = 'home';
   tRender();
+  setTimeout(bankPrefetch, 800);
 }
 
 function tRender() {
@@ -1493,7 +1509,7 @@ function teacherMenu() {
 /* ----- เริ่มรับคำตอบในคาบจากข้อที่เลือกไว้ ----- */
 async function startIn(r, btn) {
   if (btn) { btn.disabled = true; btn.textContent = 'กำลังเปิดรับ…'; }
-  try { await api('startRound', r.roundId, 'in', ''); }
+  try { await apiHome('startRound', r.roundId, 'in', ''); }
   catch (e) { if (btn) { btn.disabled = false; btn.textContent = mainAction(r).label; } toast(failMsg(e)); return; }
   await tLoad(true);
   tShow('live', r.key);
@@ -1542,8 +1558,8 @@ function outSheet(r, itemId) {
     $('#go').onclick = async () => {
       const b = $('#go'); b.disabled = true; b.textContent = 'กำลังเปิดรับ…';
       try {
-        if (itemId) await api('pickAndStart', r.room, r.subject, itemId, 'out', $('#dl').value);
-        else await api('startRound', r.roundId, 'out', $('#dl').value);
+        if (itemId) await apiHome('pickAndStart', r.room, r.subject, itemId, 'out', $('#dl').value);
+        else await apiHome('startRound', r.roundId, 'out', $('#dl').value);
       } catch (e) { $('#go-err').textContent = failMsg(e); b.disabled = false; b.textContent = 'เปิดรับนอกคาบ'; return; }
       closeSheet(); delete T.bank[r.key];
       await tLoad(true); tShow('live', r.key);
@@ -1581,7 +1597,7 @@ function paperSheet(r, itemId) {
       const b = $('#go'); b.disabled = true;
       try {
         const rid = itemId ? (await api('pickItem', r.room, r.subject, itemId)).roundId : r.roundId;
-        await api('savePaper', rid, n, k);
+        await apiHome('savePaper', rid, n, k);
       } catch (e) { $('#p-err').textContent = failMsg(e); b.disabled = false; return; }
       closeSheet(); delete T.bank[r.key];
       await tLoad(true); tShow('result', r.key);
@@ -1595,39 +1611,79 @@ function cancelSheet(r) {
     <div class="dock" style="position:static;padding:0;border:0;background:none"><div class="two"><button class="btn-s" type="button" data-x>กลับ</button><button class="btn-p arm" type="button" id="go">ยกเลิกข้อนี้</button></div></div>`, () => {
     $('#go').onclick = async () => {
       $('#go').disabled = true;
-      try { await api('cancelPick', r.roundId); } catch (e) { $('#go-err').textContent = failMsg(e); $('#go').disabled = false; return; }
+      try { await apiHome('cancelPick', r.roundId); } catch (e) { $('#go-err').textContent = failMsg(e); $('#go').disabled = false; return; }
       closeSheet(); await tLoad();
     };
   });
 }
 
-/* ----- หน้าเลือกข้อสอบ: 1 ประเภท → 2 วิชา → 3 เรื่อง → 4 แตะเลือกข้อ ----- */
-const P = { d: null, exam: '', subject: '', topic: '', sel: '' };
+/* ----- หน้าเลือกข้อสอบ: 1 ประเภท → 2 วิชา → 3 เรื่อง → 4 ระดับความคิด → 5 แตะเลือกข้อ ----- */
+// คลังของแต่ละห้องเก็บไว้ใน T.bank[ห้อง] = { menu, items สะสม, loaded } โหลดข้อเต็มทีละประเภท–วิชา (ไม่โหลดทั้งระดับชั้นทีเดียว)
+const P = { d: null, exam: '', subject: '', topic: '', c: '', sel: '', loading: false };
 const ALL_EXAMS = ['O-NET', 'A-Level', 'TGAT', 'TPAT'];
-const subjectsOf = ex => [...new Set(P.d.items.filter(i => i.exam === ex).map(i => i.subject))];
+const subjectsOf = ex => ((P.d && P.d.menu[ex]) || []).map(x => x[0]);
+const subCount = (ex, sb) => { const m = ((P.d && P.d.menu[ex]) || []).find(x => x[0] === sb); return m ? m[1] : 0; };
+
+// โหลดคลังของห้อง (exam/sub ว่าง = ให้เซิร์ฟเวอร์เลือกประเภท–วิชาของห้องนี้) แล้วรวมเข้ากับที่โหลดไว้
+function bankGet(r, exam, sub) {
+  const have = T.bank[r.key];
+  if (have && (!exam || have.loaded[exam + '|' + sub])) return Promise.resolve(have);
+  const pk = r.key + '|' + (exam || '') + '|' + (sub || '');
+  if (!T.bankP[pk]) {
+    T.bankP[pk] = api('bankBrowse', r.room, r.subject, exam || '', sub || '').then(d => {
+      const cur = T.bank[r.key];
+      const b = cur || { room: d.room, subject: d.subject, level: d.level, exams: d.exams, menu: d.menu, exam: d.exam, sub: d.sub, items: [], loaded: {} };
+      b.menu = d.menu;
+      if (!b.loaded[d.exam + '|' + d.sub]) { b.items = b.items.concat(d.items); b.loaded[d.exam + '|' + d.sub] = true; }
+      T.bank[r.key] = b;
+      return b;
+    }).finally(() => { delete T.bankP[pk]; });
+  }
+  return T.bankP[pk];
+}
+
+// โหลดคลังของทุกห้องไว้ล่วงหน้าทีละห้อง (หลังหน้าห้องเรียนขึ้นแล้ว) กดเลือกข้อจะเปิดได้ทันที
+async function bankPrefetch() {
+  if (T.prefetching) return;
+  T.prefetching = true;
+  try {
+    for (const r of (T.data ? T.data.rooms : [])) {
+      if (T.bank[r.key] || $('#view-teacher').hidden) continue;
+      try { await bankGet(r); } catch (e) { break; }
+    }
+  } finally { T.prefetching = false; }
+}
 
 async function openPicker(r) {
-  T.key = r.key; T.page = 'pick'; P.d = T.bank[r.key] || null; P.sel = '';
+  T.key = r.key; T.page = 'pick'; P.sel = ''; P.c = '';
   const el = $('#view-teacher');
-  el.innerHTML = pickBar(r) + '<main><div class="loading">กำลังโหลดคลังข้อสอบ…</div></main>';
-  $('#pk-back').onclick = () => tShow('home');
-  window.scrollTo(0, 0);
-  if (!P.d) {
-    try { P.d = T.bank[r.key] = await api('bankBrowse', r.room, r.subject); }
-    catch (e) { el.querySelector('main').innerHTML = `<div class="pad"><div class="notice wait" role="alert">${esc(failMsg(e))}</div></div>`; return; }
+  const plan = r.state === 'planned' && r.item && !r.item.missing ? r.item : null;
+  if (!T.bank[r.key] || (plan && !T.bank[r.key].loaded[plan.exam + '|' + plan.subject])) {
+    el.innerHTML = pickBar(r) + '<main><div class="loading">กำลังโหลดคลังข้อสอบ…</div></main>';
+    $('#pk-back').onclick = () => tShow('home');
+    window.scrollTo(0, 0);
   }
+  try { P.d = await bankGet(r, plan ? plan.exam : '', plan ? plan.subject : ''); }
+  catch (e) { el.querySelector('main').innerHTML = `<div class="pad"><div class="notice wait" role="alert">${esc(failMsg(e))}</div></div>`; return; }
   if (T.page !== 'pick' || T.key !== r.key) return;
-  const items = P.d.items;
-  // เปิดที่ประเภทข้อสอบที่มีวิชาของห้องนี้ก่อน (ม.6 มีหลายสนาม วิชาอาจอยู่ใน A-Level/TPAT ไม่ใช่ O-NET)
-  P.exam = P.d.exams.find(x => items.some(i => i.exam === x && i.subject === r.subject))
-    || P.d.exams.find(x => items.some(i => i.exam === x)) || P.d.exams[0];
-  const subs = subjectsOf(P.exam);
-  P.subject = subs.indexOf(r.subject) >= 0 ? r.subject : subs[0] || '';
-  P.topic = '';
-  if (r.state === 'planned' && r.item && !r.item.missing && items.some(i => i.id === r.item.id)) {
-    P.exam = r.item.exam; P.subject = r.item.subject; P.topic = r.item.topic; P.sel = r.item.id;
+  P.exam = P.d.exam; P.subject = P.d.sub; P.topic = '';
+  if (plan && P.d.items.some(i => i.id === plan.id)) {
+    P.exam = plan.exam; P.subject = plan.subject; P.topic = plan.topic; P.sel = plan.id;
   }
+  window.scrollTo(0, 0);
   renderPicker();
+}
+
+// เปลี่ยนประเภท/วิชา: ถ้ายังไม่เคยโหลด ให้โหลดเฉพาะส่วนนั้น
+async function pickGo(exam, sub) {
+  const r = roomOf(T.key);
+  P.exam = exam; P.subject = sub; P.topic = ''; P.sel = '';
+  if (!r || !sub || P.d.loaded[exam + '|' + sub]) return renderPicker();
+  P.loading = true; renderPicker();
+  try { P.d = await bankGet(r, exam, sub); }
+  catch (e) { toast(failMsg(e)); }
+  P.loading = false;
+  if (T.page === 'pick' && P.exam === exam && P.subject === sub) renderPicker();
 }
 
 function pickBar(r) {
@@ -1639,9 +1695,13 @@ function renderPicker() {
   const r = roomOf(T.key), d = P.d, el = $('#view-teacher');
   if (!r || !d) return tShow('home');
   const keepY = window.scrollY;
-  const inSub = d.items.filter(i => i.exam === P.exam && i.subject === P.subject);
+  const loaded = !!d.loaded[P.exam + '|' + P.subject];
+  const inSub = loaded ? d.items.filter(i => i.exam === P.exam && i.subject === P.subject) : [];
+  const byC = i => !P.c || i.c === P.c;
   const topics = [...new Set(inSub.map(i => i.topic))];
-  const list = inSub.filter(i => !P.topic || i.topic === P.topic).sort((a, b) => (a.used ? 1 : 0) - (b.used ? 1 : 0));
+  const inTopic = inSub.filter(i => !P.topic || i.topic === P.topic);
+  const list = inTopic.filter(byC).sort((a, b) => (a.used ? 1 : 0) - (b.used ? 1 : 0));
+  const cs = ['C1', 'C2', 'C3', 'C4', 'C5', 'C6'].filter(c => c === P.c || inSub.some(i => i.c === c));
   const subs = subjectsOf(P.exam);
   const sel = d.items.find(i => i.id === P.sel);
   el.innerHTML = pickBar(r) + `
@@ -1655,13 +1715,19 @@ function renderPicker() {
         ${subs.length ? `<div class="chips scroll" role="radiogroup" aria-labelledby="lab-sub">${subs.map(s => `<button type="button" class="chip" role="radio" data-sub="${esc(s)}" aria-checked="${P.subject === s}">${esc(s)}</button>`).join('')}</div>`
           : '<span class="hint">ไม่มีข้อสอบประเภทนี้สำหรับระดับชั้นนี้</span>'}</div>
       ${inSub.length ? `<div class="fgroup"><label class="lab" for="pk-topic">3 · เรื่อง</label>
-        <div class="selectbox"><span class="v">${esc(P.topic || 'ทุกเรื่อง')}</span><span class="n">${(P.topic ? inSub.filter(i => i.topic === P.topic) : inSub).length} ข้อ</span>
+        <div class="selectbox"><span class="v">${esc(P.topic || 'ทุกเรื่อง')}</span><span class="n">${inTopic.filter(byC).length} ข้อ</span>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
-          <select id="pk-topic"><option value="">ทุกเรื่อง (${inSub.length} ข้อ)</option>${topics.map(t => `<option value="${esc(t)}" ${P.topic === t ? 'selected' : ''}>${esc(t)} (${inSub.filter(i => i.topic === t).length} ข้อ)</option>`).join('')}</select></div></div>` : ''}
+          <select id="pk-topic"><option value="">ทุกเรื่อง (${inSub.filter(byC).length} ข้อ)</option>${topics.map(t => `<option value="${esc(t)}" ${P.topic === t ? 'selected' : ''}>${esc(t)} (${inSub.filter(i => i.topic === t && byC(i)).length} ข้อ)</option>`).join('')}</select></div></div>
+      <div class="fgroup"><span class="lab" id="lab-c">4 · ระดับความคิด</span>
+        <div class="chips cfilter" role="radiogroup" aria-labelledby="lab-c">
+          <button type="button" class="chip" role="radio" data-c="" aria-checked="${!P.c}">ทุกระดับ <span class="n">${inTopic.length}</span></button>
+          ${cs.map(c => `<button type="button" class="chip" role="radio" data-c="${c}" aria-checked="${P.c === c}">${c} ${esc(C_TXT[c] || '')} <span class="n">${inTopic.filter(i => i.c === c).length}</span></button>`).join('')}</div></div>` : ''}
     </div>
     <main class="pad">
-      <span class="sec-label" id="lab-list">4 · เลือกข้อ</span>
-      ${list.length ? `<div class="qlist" role="radiogroup" aria-labelledby="lab-list">${list.map(pickItemHtml).join('')}</div>` : '<div class="card empty">ไม่มีข้อสอบในหมวดนี้</div>'}
+      <span class="sec-label" id="lab-list">${inSub.length ? '5' : '3'} · เลือกข้อ</span>
+      ${!loaded ? '<div class="loading">กำลังโหลดข้อสอบวิชานี้…</div>'
+        : list.length ? `<div class="qlist" role="radiogroup" aria-labelledby="lab-list">${list.map(pickItemHtml).join('')}</div>`
+        : `<div class="card empty">${inTopic.length ? 'ไม่มีข้อระดับ ' + esc(P.c) + ' ในหมวดนี้ ลองเลือก ทุกระดับ' : 'ไม่มีข้อสอบในหมวดนี้'}</div>`}
     </main>
     <div class="dock">
       <button class="btn-p" type="button" id="pk-go" ${sel ? '' : 'disabled'}>ใช้ข้อนี้และเปิดรับคำตอบ</button>
@@ -1670,10 +1736,12 @@ function renderPicker() {
   $('#pk-back').onclick = () => tShow('home');
   $$('[data-exam]', el).forEach(b => b.onclick = () => {
     if (b.getAttribute('aria-disabled') === 'true') return toast(`${d.level} เลือกได้เฉพาะ ${d.exams.join(', ')}`);
-    P.exam = b.dataset.exam; P.subject = subjectsOf(P.exam)[0] || ''; P.topic = ''; P.sel = ''; renderPicker();
+    const ex = b.dataset.exam, ss = subjectsOf(ex);
+    pickGo(ex, ss.indexOf(P.subject) >= 0 ? P.subject : ss.indexOf(r.subject) >= 0 ? r.subject : ss[0] || '');
   });
-  $$('[data-sub]', el).forEach(b => b.onclick = () => { P.subject = b.dataset.sub; P.topic = ''; P.sel = ''; renderPicker(); });
+  $$('[data-sub]', el).forEach(b => b.onclick = () => pickGo(P.exam, b.dataset.sub));
   const tp = $('#pk-topic'); if (tp) tp.onchange = () => { P.topic = tp.value; P.sel = ''; renderPicker(); };
+  $$('[data-c]', el).forEach(b => b.onclick = () => { P.c = b.dataset.c; P.sel = ''; renderPicker(); });
   $$('[data-item]', el).forEach(b => b.onclick = () => { P.sel = P.sel === b.dataset.item ? '' : b.dataset.item; renderPicker(); const x = $(`[data-item="${CSS.escape(b.dataset.item)}"]`); x && x.focus(); });
   $('#pk-go').onclick = e => pickStart(r, P.sel, 'in', '', e.currentTarget);
   $('#pk-more').onclick = () => moreSheet(r, P.sel);
@@ -1696,7 +1764,7 @@ function pickItemHtml(it) {
 async function pickOnly(r, itemId, btn) {
   if (!itemId) return;
   btn.disabled = true; const t0 = btn.textContent; btn.textContent = 'กำลังบันทึก…';
-  try { await api('pickItem', r.room, r.subject, itemId); }
+  try { await apiHome('pickItem', r.room, r.subject, itemId); }
   catch (e) { btn.disabled = false; btn.textContent = t0; ($('#pk-err') || {}).textContent = failMsg(e); if (!$('#pk-err')) toast(failMsg(e)); return; }
   closeSheet(); delete T.bank[r.key];
   toast('บันทึกข้อที่เลือกแล้ว');
@@ -1706,7 +1774,7 @@ async function pickOnly(r, itemId, btn) {
 async function pickStart(r, itemId, mode, dl, btn) {
   if (!itemId) return;
   btn.disabled = true; const t0 = btn.textContent; btn.textContent = 'กำลังเปิดรับ…';
-  try { await api('pickAndStart', r.room, r.subject, itemId, mode, dl); }
+  try { await apiHome('pickAndStart', r.room, r.subject, itemId, mode, dl); }
   catch (e) { btn.disabled = false; btn.textContent = t0; ($('#pk-err') || {}).textContent = failMsg(e); if (!$('#pk-err')) toast(failMsg(e)); return; }
   closeSheet(); delete T.bank[r.key];
   await tLoad(true); tShow('live', r.key);
@@ -1752,7 +1820,7 @@ function renderLive(r) {
     if (!T.arm) { T.arm = true; renderLive(r); clearTimeout(T.armTimer); T.armTimer = setTimeout(() => { if (T.arm && T.page === 'live') { T.arm = false; renderLive(r); } }, 15000); $('#lv-close').focus(); return; }
     clearTimeout(T.armTimer);
     b.disabled = true; b.textContent = 'กำลังปิดรับ…';
-    try { await api('closeRound', r.roundId); }
+    try { await apiHome('closeRound', r.roundId); }
     catch (err) { T.arm = false; $('#lv-err').textContent = failMsg(err); b.disabled = false; b.textContent = 'ปิดรับคำตอบ'; b.classList.remove('arm'); return; }
     T.arm = false;
     await tLoad(true); tShow('result', r.key);
@@ -1826,7 +1894,7 @@ function renderResult(r) {
   if (send) send.onclick = async () => {
     if (!rp.c) { $('#rp-err').textContent = 'กรุณาเลือกระดับที่ใช้สอน'; return; }
     send.disabled = true; send.textContent = 'กำลังส่ง…';
-    try { await api('saveReport', r.roundId, rp.c, [...rp.chips], rp.note.trim()); }
+    try { await apiHome('saveReport', r.roundId, rp.c, [...rp.chips], rp.note.trim()); }
     catch (e) { send.disabled = false; send.textContent = 'ส่งรายงาน'; $('#rp-err').textContent = failMsg(e); return; }
     delete T.rep[r.key];
     toast('ส่งรายงานคาบแล้ว');
