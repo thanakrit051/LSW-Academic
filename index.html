@@ -1283,7 +1283,8 @@ const REPORT_CHIPS = ['เฉลยหน้าห้องแล้ว', 'อ�
 
 const allRooms = () => T.data ? T.data.rooms.concat(T.data.extra || []) : [];
 const roomOf = key => allRooms().find(x => x.key === key) || null;
-const short = (s, n) => { s = String(s || ''); return s.length > n ? s.slice(0, n - 1) + '…' : s; };
+// ข้อความที่มีสมการ ($…$) ห้ามตัดกลางคำสั่ง ไม่งั้นแสดงเป็นโค้ด · ปล่อยเต็มแล้วให้ CSS ตัดด้วย … แทน
+const short = (s, n) => { s = String(s || ''); return s.length > n && s.indexOf('$') < 0 ? s.slice(0, n - 1) + '…' : s; };
 
 async function tInit() {
   T.page = 'home';
