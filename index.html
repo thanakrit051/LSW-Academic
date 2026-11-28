@@ -68,7 +68,7 @@ svg { flex: none; }
 .bar { display: flex; align-items: center; gap: 8px; padding: 14px 16px; background: var(--surface); border-bottom: 1px solid var(--line); padding-top: max(14px, env(safe-area-inset-top)); }
 .bar .t { display: flex; flex-direction: column; line-height: 1.3; min-width: 0; }
 .bar .t b { font-size: 16px; font-weight: 600; }
-.bar .t span { font-size: 12px; color: var(--muted); }
+.bar .t span { font-size: 13px; color: var(--muted); }
 .bar .t span.lg { font-size: 13px; }
 .bar .end { margin-left: auto; white-space: nowrap; }
 .ibtn { width: 40px; height: 40px; margin: -4px 0 -4px -10px; border: 0; background: transparent; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; color: var(--ink); }
@@ -94,20 +94,22 @@ svg { flex: none; }
 button:disabled, .btn-p:disabled { opacity: .5; cursor: not-allowed; }
 .link { background: none; border: 0; padding: 0; color: var(--brand); font-weight: 600; font-size: 14px; text-decoration: none; cursor: pointer; }
 .link.mute { color: var(--muted); font-weight: 500; }
+#stu-fix, #rp-edit, #q-all, #ov-usage { min-height: 44px; min-width: 44px; margin: -12px 0; padding: 0 6px; display: inline-flex; align-items: center; justify-content: center; }
+.hero-top .side #t-menu { min-width: 48px; justify-content: center; }
 .link.warn { color: var(--warn); }
 
 /* ป้ายและสถานะ */
-.ctag { display: inline-flex; align-items: center; font-size: 12px; font-weight: 600; color: var(--brand); border: 1px solid var(--brand-line); background: var(--brand-soft); border-radius: 6px; padding: 0 6px; white-space: nowrap; line-height: 1.6; }
+.ctag { display: inline-flex; align-items: center; font-size: 13px; font-weight: 600; color: var(--brand); border: 1px solid var(--brand-line); background: var(--brand-soft); border-radius: 6px; padding: 0 6px; white-space: nowrap; line-height: 1.6; }
 .ctag.on-white { background: var(--surface); }
 .ctag.solid { color: var(--brand-ink); background: var(--brand); border-color: var(--brand); font-weight: 700; padding: 1px 8px; }
 .ctag.big { font-size: 15px; font-weight: 700; color: var(--brand-ink); background: var(--brand); border-color: var(--brand); border-radius: 8px; padding: 2px 10px; }
-.etag { font-size: 12px; font-weight: 700; color: var(--brand); background: var(--brand-soft); border: 1px solid var(--brand-line); border-radius: 6px; padding: 1px 8px; white-space: nowrap; }
+.etag { font-size: 13px; font-weight: 700; color: var(--brand); background: var(--brand-soft); border: 1px solid var(--brand-line); border-radius: 6px; padding: 1px 8px; white-space: nowrap; }
 .st { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; white-space: nowrap; }
 .st::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; flex: none; }
 .ok { color: var(--good); } .wait { color: var(--warn); } .bad { color: var(--bad); } .info { color: var(--brand); } .mute { color: var(--mute); }
-.diff { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: var(--muted); }
+.diff { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; color: var(--muted); }
 .diff::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--dot, var(--faint)); }
-.now-tag { font-size: 12px; font-weight: 600; color: var(--brand-ink); background: var(--brand); border-radius: 6px; padding: 1px 8px; white-space: nowrap; }
+.now-tag { font-size: 13px; font-weight: 600; color: var(--brand-ink); background: var(--brand); border-radius: 6px; padding: 1px 8px; white-space: nowrap; }
 .now-tag.soft { color: var(--brand); background: var(--brand-soft); }
 .now-tag.warn { color: var(--warn); background: var(--warn-soft); }
 
@@ -130,7 +132,7 @@ button:disabled, .btn-p:disabled { opacity: .5; cursor: not-allowed; }
 .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); background: var(--hero-cell); border-radius: 12px; }
 .stats > div { padding: 10px 12px; display: flex; flex-direction: column; min-width: 0; }
 .stats > div + div { border-left: 1px solid var(--hero-rule); }
-.stats span { font-size: 12px; color: var(--hero-sub); }
+.stats span { font-size: 13px; color: var(--hero-sub); }
 .stats b { font-size: 18px; font-variant-numeric: tabular-nums; }
 
 .card { background: var(--surface); border-radius: 16px; }
@@ -184,7 +186,7 @@ button.row:hover { background: var(--surface-2); }
 .fgroup { display: flex; flex-direction: column; gap: 6px; }
 .fgroup > .lab { font-size: 13px; font-weight: 600; color: var(--ink-2); }
 .fgroup > .lab span { font-weight: 400; color: var(--muted); }
-.fgroup > .hint { font-size: 12px; color: var(--muted); }
+.fgroup > .hint { font-size: 13px; color: var(--muted); }
 .exams { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
 .exams button { height: 44px; border-radius: 10px; font-size: 14px; font-weight: 600; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); padding: 0 4px; }
 .exams button[aria-checked="true"] { border-color: var(--brand); background: var(--brand); color: var(--brand-ink); }
@@ -210,7 +212,7 @@ button.row:hover { background: var(--surface-2); }
 .qi[aria-checked="true"] .radio { border: 2px solid var(--brand); }
 .qi[aria-checked="true"] .radio::after { content: ""; width: 12px; height: 12px; border-radius: 50%; background: var(--brand); }
 .qi .stem { font-family: var(--font-read); font-size: 15px; line-height: 1.55; }
-.qi .foot { font-size: 12px; color: var(--muted); }
+.qi .foot { font-size: 13px; color: var(--muted); }
 .qi .foot .wait { font-weight: 600; }
 .qi img { max-width: 100%; max-height: 180px; object-fit: contain; border-radius: 8px; background: #fff; align-self: flex-start; }
 .ans { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; font-size: 14px; font-variant-numeric: tabular-nums; }
@@ -258,9 +260,11 @@ button.row:hover { background: var(--surface-2); }
 .report { display: flex; flex-direction: column; gap: 12px; }
 .report h2 { font-size: 16px; font-weight: 600; }
 .lv-head { display: flex; justify-content: space-between; font-size: 13px; }
-.lv-head span { color: var(--muted); } .lv-head b { color: var(--brand); }
-.levels { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; }
-.levels button { height: 44px; border-radius: 10px; font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); padding: 0; }
+.lv-head span { color: var(--muted); } .lv-head b { color: var(--ink); } .lv-head b.none { color: var(--muted); font-weight: 500; }
+.levels { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.levels button { min-height: 52px; border-radius: 10px; font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); padding: 4px 2px; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.2; }
+.levels button small { font-size: 13px; font-weight: 500; color: var(--muted); white-space: nowrap; }
+.levels button[aria-checked="true"] small { color: inherit; }
 .levels button[aria-checked="true"] { border-color: var(--brand); background: var(--brand); color: var(--brand-ink); }
 textarea.memo { font-family: var(--font-read); font-size: 15px; line-height: 1.6; color: var(--ink); border: 1px solid var(--line-strong); border-radius: 10px; padding: 10px 12px; resize: none; background: var(--surface); min-height: 46px; width: 100%; }
 .sent-box { display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; border-radius: 12px; background: var(--good-soft); }
@@ -328,13 +332,13 @@ textarea.memo { font-family: var(--font-read); font-size: 15px; line-height: 1.6
 .yn-b button { min-height: 46px; border-radius: 10px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); font-size: 16px; margin: 1px; }
 .yn-b button[aria-checked="true"] { border: 2px solid var(--brand); margin: 0; background: var(--brand-soft); font-weight: 600; }
 .ans .kc { color: var(--good); }
-.qtags { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 12px; }
+.qtags { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 13px; }
 .qtags .sj { color: var(--ink-2); font-weight: 600; }
 .qtags .sep { color: var(--faint); }
 .prog { display: flex; flex-direction: column; gap: 12px; }
 .prog .bar4 { height: 4px; background: var(--line); border-radius: 2px; overflow: hidden; }
 .prog .bar4 span { display: block; height: 100%; background: var(--brand); }
-.prog .r { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
+.prog .r { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); }
 .notice { display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: 12px; font-size: 14px; line-height: 1.55; background: var(--surface); border: 1px solid var(--line); }
 .notice.ok { background: var(--good-soft); border-color: transparent; color: var(--good); }
 .notice.wait { background: var(--warn-soft); border-color: transparent; color: var(--warn-ink); }
@@ -342,6 +346,13 @@ textarea.memo { font-family: var(--font-read); font-size: 15px; line-height: 1.6
 .done-big { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; padding: 18px 0 6px; }
 .done-big .ic { width: 56px; height: 56px; border-radius: 50%; background: var(--good-soft); display: flex; align-items: center; justify-content: center; }
 .done-big b { font-size: 20px; font-weight: 600; }
+.done-big.no .ic { background: var(--bad-soft); } .done-big.warn .ic { background: var(--warn-soft); }
+.done-big.verdict b { font-size: 26px; font-weight: 700; } .done-big.verdict.yes b { color: var(--good); } .done-big.verdict.no b { color: var(--bad); }
+.sent-line { font-size: 14px; color: var(--muted); text-align: center; }
+.rv .lab { font-size: 13px; font-weight: 600; color: var(--muted); }
+.rv .stem { font-size: 16px; line-height: 1.6; }
+.rv .key-line { font-size: 15px; }
+.rv figure { margin: 4px 0; } .rv figure img { max-width: 100%; height: auto; border-radius: 8px; }
 .done-big .score { font-size: 44px; line-height: 1.1; font-weight: 700; font-variant-numeric: tabular-nums; }
 .rv { display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); }
 .rv .h { display: flex; justify-content: space-between; font-weight: 600; font-size: 15px; }
@@ -375,13 +386,13 @@ textarea.memo { font-family: var(--font-read); font-size: 15px; line-height: 1.6
 .brand { display: flex; align-items: center; gap: 10px; padding: 0 6px; }
 .seal { width: 36px; height: 36px; border-radius: 10px; background: var(--brand); color: var(--brand-ink); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; flex: none; }
 .brand .t { display: flex; flex-direction: column; line-height: 1.3; min-width: 0; }
-.brand .t b { font-size: 14px; } .brand .t span { font-size: 12px; color: var(--muted); }
+.brand .t b { font-size: 14px; } .brand .t span { font-size: 13px; color: var(--muted); }
 .nav { display: flex; flex-direction: column; gap: 2px; }
 .nav a, .nav button { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 12px; border-radius: 10px; font-size: 14px; color: var(--ink-2); text-decoration: none; border: 0; background: transparent; text-align: left; width: 100%; }
 .nav a:hover, .nav button:hover { background: var(--surface-2); }
 .nav [aria-current="page"] { background: var(--brand-soft); color: var(--brand); font-weight: 600; }
-.nav .grp { font-size: 12px; color: var(--muted); padding: 14px 12px 4px; }
-.nav .ext::after { content: "↗"; color: var(--faint); font-size: 12px; }
+.nav .grp { font-size: 13px; color: var(--muted); padding: 14px 12px 4px; }
+.nav .ext::after { content: "↗"; color: var(--faint); font-size: 13px; }
 .aside-foot { margin-top: auto; display: flex; flex-direction: column; gap: 2px; }
 .admin > main { flex: 1 1 auto; min-width: 0; padding: 24px 28px 32px; display: flex; flex-direction: column; gap: 20px; }
 .pg-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 12px; }
@@ -405,7 +416,8 @@ textarea.memo { font-family: var(--font-read); font-size: 15px; line-height: 1.6
 .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
 .kpis > div { padding: 16px 20px; display: flex; flex-direction: column; gap: 2px; border-right: 1px solid var(--line-2); }
 .kpis > div:last-child { border-right: 0; }
-.kpis span { font-size: 13px; color: var(--muted); }
+.kpis span { font-size: 13px; }
+.kpis span:not(.ok):not(.wait):not(.bad):not(.info) { color: var(--muted); }
 .kpis b { font-size: 24px; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.35; }
 .kpis.ready b { font-size: 22px; }
 .kpis.ready span.lab { font-size: 14px; }
@@ -436,7 +448,7 @@ table.tb { width: 100%; border-collapse: collapse; font-size: 14px; }
 .issues span { font-size: 13px; color: var(--muted); line-height: 1.45; }
 .roles > div { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 20px; border-top: 1px solid var(--line-2); }
 .roles .t { display: flex; flex-direction: column; line-height: 1.4; }
-.roles .t b { font-size: 14px; font-weight: 600; } .roles .t span { font-size: 12px; color: var(--muted); }
+.roles .t b { font-size: 14px; font-weight: 600; } .roles .t span { font-size: 13px; color: var(--muted); }
 .roles > div > b { font-size: 16px; font-weight: 600; font-variant-numeric: tabular-nums; }
 .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); overflow-x: auto; overflow-y: hidden; scrollbar-width: none; }
 .tabs button { height: 44px; padding: 0 16px; border: 0; background: transparent; font-size: 14px; margin-bottom: -1px; color: var(--muted); font-weight: 500; border-bottom: 2px solid transparent; white-space: nowrap; }
@@ -506,7 +518,19 @@ details.more > summary::-webkit-details-marker { display: none; }
 .fs-code { font-size: clamp(2.2rem, 7vw, 4.6rem); font-weight: 700; letter-spacing: .08em; font-variant-numeric: tabular-nums; color: #173f8a; }
 .fs-count { font-size: clamp(1.1rem, 2.4vw, 1.6rem); }
 .fs .btn { color: #101828; background: #fff; border-color: #d0d5dd; }
-.fs-foot { text-align: center; color: #475467; font-size: .95rem; }
+.fs-foot { text-align: center; color: #475467; font-size: clamp(1rem, 2vw, 1.4rem); }
+.fs-how { font-size: clamp(1.1rem, 2.4vw, 1.75rem); color: #344054; }
+.fs-url { font-size: clamp(1.25rem, 2.8vw, 2.1rem); font-weight: 700; color: #101828; overflow-wrap: break-word; max-width: 24ch; line-height: 1.25; }
+.fs-res { display: grid; gap: clamp(10px, 2vh, 18px); width: min(100%, 980px); margin: 0 auto; align-content: center; }
+.fs-res .pct { font-size: clamp(2.6rem, 8vw, 5.5rem); font-weight: 700; line-height: 1; color: #173f8a; font-variant-numeric: tabular-nums; }
+.fs-res .sum { font-size: clamp(1.1rem, 2.4vw, 1.7rem); color: #344054; }
+.fs-bar { display: grid; grid-template-columns: 1.6em minmax(0, 12em) minmax(0, 1fr) 2.6em; align-items: center; gap: 14px; font-size: clamp(1.1rem, 2.6vw, 1.9rem); }
+.fs-bar .k { font-weight: 700; text-align: center; }
+.fs-bar .tr { position: relative; height: 1.4em; border-radius: 8px; background: #f2f4f7; overflow: hidden; }
+.fs-bar .tr span { position: absolute; inset: 0 auto 0 0; background: #98a2b3; border-radius: 8px; }
+.fs-bar.key .tr span { background: #067647; } .fs-bar.key .k, .fs-bar.key .tx { color: #067647; font-weight: 700; }
+.fs-bar .tx { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #101828; }
+.fs-bar .n { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
 .fs-closed { display: grid; place-items: center; text-align: center; gap: 10px; font-size: 1.3rem; }
 .toast { position: fixed; left: 50%; bottom: 96px; transform: translateX(-50%); z-index: 40; max-width: min(440px, calc(100% - 32px)); padding: 12px 16px; border-radius: 12px; background: var(--ink); color: var(--bg); font-size: 14px; line-height: 1.5; box-shadow: 0 8px 24px rgba(16,24,40,.2); }
 .katex { font-size: 1.08em; }
@@ -518,6 +542,12 @@ details.more > summary::-webkit-details-marker { display: none; }
   #print-area { display: grid !important; place-items: center; text-align: center; gap: 18px; padding: 24px; color: #000; font-family: var(--font); }
   #print-area h1 { font-size: 30pt; } #print-area p { font-size: 15pt; }
   #print-area canvas, #print-area img { width: 9cm; height: 9cm; }
+  #print-area.item { display: block !important; text-align: left; max-width: 18cm; margin: 0 auto; font-family: var(--font-read); }
+  #print-area.item h1 { font-size: 14pt; font-weight: 600; margin-bottom: 10pt; }
+  #print-area.item .q { font-size: 16pt; line-height: 1.6; margin-bottom: 12pt; }
+  #print-area.item img { width: auto; height: auto; max-width: 100%; max-height: 12cm; }
+  #print-area.item ol { list-style: none; padding: 0; margin: 0; display: grid; gap: 8pt; font-size: 15pt; }
+  #print-area.item .ft { margin-top: 18pt; font-size: 11pt; color: #444; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
 </style>
@@ -707,6 +737,8 @@ const IC = {
   close: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
   chev: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color:var(--faint)"><path d="M9 6l6 6-6 6"/></svg>',
   check: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--good)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  cross: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--bad)" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17"/></svg>',
+  alert: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--warn)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 8v5M12 16.5v.5"/><path d="M10.3 4.2L2.9 17.5A2 2 0 0 0 4.6 20.5h14.8a2 2 0 0 0 1.7-3L13.7 4.2a2 2 0 0 0-3.4 0z"/></svg>',
   expand: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>',
   chat: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg>',
   screen: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16v4"/></svg>'
@@ -793,7 +825,7 @@ document.addEventListener('keydown', e => {
 $('#sheet').setAttribute('aria-labelledby', 'sh-title');
 
 /* ===================== เข้าสู่ระบบครู =====================
-   โทเค็นเก็บใน localStorage (ติ๊กจำไว้ เป็นค่าเริ่มต้นในหน้าครู อยู่ได้ 30 วันนับจากใช้ครั้งล่าสุด)
+   โทเค็นเก็บใน localStorage (ติ๊กจำไว้ เป็นค่าเริ่มต้นในหน้าครู อยู่ได้ 1 ปีนับจากใช้ครั้งล่าสุด)
    หรือ sessionStorage (เอาติ๊กออก สำหรับเครื่องใช้ร่วมกัน ปิดแท็บแล้วหลุด) */
 const TK = {
   get() { try { return localStorage.getItem('tk') || sessionStorage.getItem('tk') || ''; } catch (e) { return ''; } },
@@ -823,7 +855,7 @@ function showLogin(note) {
         <div class="field"><label for="lg-pw">รหัสผ่าน</label>
           <div class="pw-wrap"><input id="lg-pw" class="input" type="password" autocomplete="current-password" placeholder="รหัสผ่านที่ผู้ดูแลระบบตั้งให้">
             <button type="button" class="pw-eye" id="lg-eye" aria-pressed="false" aria-controls="lg-pw">แสดง</button></div></div>
-        <label class="remember"><input type="checkbox" id="lg-remember" ${adminLink() ? '' : 'checked'}> <span>จดจำการเข้าสู่ระบบบนอุปกรณ์นี้ 30 วัน<small>ไม่ควรเลือกหากใช้อุปกรณ์ร่วมกับผู้อื่น</small></span></label>
+        <label class="remember"><input type="checkbox" id="lg-remember" ${adminLink() ? '' : 'checked'}> <span>จดจำการเข้าสู่ระบบบนอุปกรณ์นี้<small>ไม่ต้องกรอกรหัสผ่านอีก เว้นแต่ไม่ได้ใช้เกิน 1 ปี · เอาติ๊กออกถ้าเป็นเครื่องที่ใช้ร่วมกัน เช่น คอมพิวเตอร์ห้องเรียน</small></span></label>
         <span class="err" id="lg-err" role="alert">${esc(note || '')}</span>
       </div>
       <p class="note" style="padding:0 4px">หากลืมรหัสผ่าน กรุณาติดต่อผู้ดูแลระบบ</p>
@@ -858,8 +890,12 @@ async function doLogin() {
   } catch (e) { err.textContent = failMsg(e); b.disabled = false; b.textContent = 'เข้าสู่ระบบ'; }
 }
 
-async function doLogout() {
-  if (!confirm('ยืนยันการออกจากระบบ')) return;
+function doLogout() {
+  openSheet(sheetHead('ออกจากระบบ', 'เครื่องนี้จะไม่จำการเข้าสู่ระบบอีก ต้องกรอก ID และรหัสผ่านใหม่') +
+    `<div class="dock" style="position:static;padding:0;border:0;background:none"><div class="two"><button class="btn-s" type="button" data-x>ยกเลิก</button><button class="btn-p" type="button" id="lo-yes">ออกจากระบบ</button></div></div>`,
+    () => { $('#lo-yes').onclick = () => { closeSheet(); logoutNow(); }; $('#lo-yes').focus(); });
+}
+async function logoutNow() {
   const t = TK.get(); TK.clear();
   T.data = null; A.ov = null; A.d = null; DB.d = null;
   try { await run('logout', t); } catch (e) {}
@@ -954,7 +990,7 @@ function stuRender() {
       // เตือนแบบนุ่มถ้ารหัสไม่อยู่ในรายชื่อห้อง (เน็ตช้าหรือตรวจไม่ได้ ข้ามไปทำได้เลย ไม่ให้นักเรียนติด)
       let chk = null;
       try { chk = await Promise.race([run('studentCheck', { r: STU.roundId, studentId: v }), wait(4000).then(() => null)]); } catch (e) { chk = null; }
-      Object.assign(STU, { no: v, err: '', step: chk && chk.inRoom === false ? 'idcheck' : 'quiz' }); stuSave(); stuRender();
+      Object.assign(STU, { no: v, err: '', step: chk && chk.submitted ? 'dupid' : chk && chk.inRoom === false ? 'idcheck' : 'quiz' }); stuSave(); stuRender();
     };
     $('#stu-no').addEventListener('keydown', e => { if (e.key === 'Enter') $('#stu-start').click(); });
     $('#stu-no').focus();
@@ -963,10 +999,21 @@ function stuRender() {
   if (STU.step === 'idcheck') {
     el.innerHTML = stuBar('ห้อง ' + I.room) + `
       <main class="stu"><div class="notice wait" role="alert"><span>ไม่พบรหัส <b>${esc(STU.no)}</b> ในรายชื่อนักเรียนห้อง ${esc(I.room)} กรุณาตรวจสอบรหัสอีกครั้ง</span></div></main>
-      <div class="dock"><div class="two"><button class="btn-s" type="button" id="ic-fix">แก้รหัส</button><button class="btn-p" type="button" id="ic-ok">ยืนยันรหัสนี้</button></div></div>`;
+      <div class="dock"><span class="cap">ถ้ารหัสถูกต้องแล้ว กด ใช้รหัสนี้ เพื่อทำต่อ</span>
+        <div class="two"><button class="btn-s" type="button" id="ic-ok">ใช้รหัสนี้</button><button class="btn-p" type="button" id="ic-fix">แก้รหัส</button></div></div>`;
     $('#ic-fix').onclick = () => { STU.step = 'id'; store.del('draft-' + STU.roundId); stuRender(); };
     $('#ic-ok').onclick = () => { STU.step = 'quiz'; stuSave(); stuRender(); };
     $('#ic-fix').focus();
+    return;
+  }
+  if (STU.step === 'dupid') {
+    el.innerHTML = stuBar('ห้อง ' + I.room) + `
+      <main class="stu"><div class="notice wait" role="alert"><span>รหัส <b>${esc(STU.no)}</b> ส่งคำตอบข้อนี้ไปแล้ว ระบบนับเฉพาะคำตอบแรก ถ้าไม่ใช่รหัสของคุณ กรุณาแก้รหัส</span></div>
+        <p class="note" style="padding:0 4px">ถ้าเป็นรหัสของคุณ ไม่ต้องตอบซ้ำ เฉลยจะแสดงเมื่อครูปิดรับคำตอบ</p></main>
+      <div class="dock"><div class="two"><button class="btn-s" type="button" id="dp-go">ทำต่อ</button><button class="btn-p" type="button" id="dp-fix">แก้รหัส</button></div></div>`;
+    $('#dp-fix').onclick = () => { STU.step = 'id'; store.del('draft-' + STU.roundId); stuRender(); };
+    $('#dp-go').onclick = () => { STU.step = 'quiz'; stuSave(); stuRender(); };
+    $('#dp-fix').focus();
     return;
   }
   if (STU.step === 'quiz' || STU.step === 'confirm') {
@@ -975,6 +1022,7 @@ function stuRender() {
     el.innerHTML = stuBar(`ห้อง ${I.room} · รหัสนักเรียน ${STU.no}`) + `
       <main class="stu">
         <div class="meta"><span>${esc(it.exam)}${it.topic ? ' · ' + esc(it.topic) : ''}</span><button class="link" type="button" id="stu-fix">แก้ไขรหัส</button></div>
+        ${it.c || it.ind ? `<div class="qtags">${cTag(it.c)}${it.ind ? `<span class="sj">ตัวชี้วัด ${esc(it.ind)}</span>` : ''}</div>` : ''}
         ${it.q ? `<h1 id="q-stem">${esc(it.q)}</h1>` : '<h1 id="q-stem" class="sr">โจทย์</h1>'}
         ${it.img ? `<figure><img src="${esc(it.img)}" alt="รูปโจทย์" referrerpolicy="no-referrer"></figure>` : ''}
         ${body}
@@ -1001,8 +1049,9 @@ function stuRender() {
     const r = STU.result || {};
     el.innerHTML = stuBar(`ห้อง ${I.room} · รหัสนักเรียน ${STU.no}`) + `
       <main class="stu">
-        <div class="done-big"><span class="ic">${IC.check}</span><b>ส่งคำตอบแล้ว</b><span class="muted">คำตอบ: ${esc(ansText(it, STU.pick, it.type === 'choice'))}</span></div>
-        ${r.dup ? `<div class="notice wait" role="status">รหัส ${esc(STU.no)} ส่งคำตอบข้อนี้ไปแล้ว ระบบนับเฉพาะครั้งแรก</div>` : ''}
+        <div id="stu-head">${r.dup
+          ? `<div class="done-big warn"><span class="ic">${IC.alert}</span><b>คำตอบนี้ไม่นับ</b><span class="muted">รหัส ${esc(STU.no)} ส่งคำตอบข้อนี้ไปก่อนแล้ว ระบบนับเฉพาะครั้งแรก</span></div>`
+          : `<div class="done-big"><span class="ic">${IC.check}</span><b>ส่งคำตอบแล้ว</b><span class="muted">คำตอบ: ${esc(ansText(it, STU.pick, it.type === 'choice'))}</span></div>`}</div>
         <div id="stu-review"><div class="notice">เฉลยจะแสดงที่หน้านี้เมื่อครูปิดรับคำตอบ</div></div>
         ${I.open ? '<div class="foot-links"><button type="button" id="stu-next">ส่งคำตอบของนักเรียนคนถัดไปด้วยเครื่องนี้</button></div>' : ''}
       </main>`;
@@ -1038,12 +1087,20 @@ async function stuLoadReview() {
   if (!box || STU.step !== 'done') return;
   if (!rv) { STU.reviewTimer = setTimeout(stuLoadReview, 20000); return; }
   const nx = $('#stu-next'); if (nx) nx.parentElement.remove();
-  const x = rv[0], mine = STU.pick;
-  const ok = ansRight(x, mine, x.ans);
-  box.innerHTML = `<div class="rv"><div class="h"><span>เฉลย</span><span class="${ok ? 'yes' : 'no'}">${ok ? 'ถูกต้อง' : 'ไม่ถูกต้อง'}</span></div>
-    <span>คำตอบที่ถูก: <b>${esc(ansText(x, x.ans, x.type === 'choice' || x.type === 'multi'))}</b></span>
-    ${x.why ? `<span class="read muted">${esc(x.why)}</span>` : ''}
-    ${!ok && x.type === 'choice' && x.wrong && x.wrong[mine] ? `<span class="read muted">ตัวเลือกที่ตอบ: ${esc(x.wrong[mine])}</span>` : ''}</div>`;
+  const x = rv[0], mine = STU.pick, r = STU.result || {}, it = (STU.info && STU.info.items[0]) || {};
+  // ส่งซ้ำ: ตัดสินจากคำตอบครั้งแรกที่ระบบนับ (เซิร์ฟเวอร์ส่งคะแนนมา ไม่ส่งตัวคำตอบ)
+  const ok = r.dup && r.firstScore !== undefined ? r.firstScore > 0 : ansRight(x, mine, x.ans);
+  const q = x.q || it.q, img = x.img || it.img;
+  const head = $('#stu-head');
+  if (head) head.innerHTML = `<div class="done-big verdict ${ok ? 'yes' : 'no'}" role="status"><span class="ic">${ok ? IC.check : IC.cross}</span>
+      <b>${ok ? 'ตอบถูก' : 'ยังไม่ถูก'}</b>
+      <span class="muted">${r.dup ? 'ตัดสินจากคำตอบครั้งแรกของรหัสนี้' : 'คำตอบของคุณ: ' + esc(ansText(x, mine, x.type === 'choice'))}</span></div>`;
+  box.innerHTML = `<div class="rv">
+    ${q ? `<span class="lab">โจทย์</span><p class="read stem">${esc(q)}</p>` : ''}${img ? `<figure><img src="${esc(img)}" alt="รูปโจทย์" referrerpolicy="no-referrer"></figure>` : ''}
+    <span class="key-line">คำตอบที่ถูก: <b>${esc(ansText(x, x.ans, x.type === 'choice' || x.type === 'multi'))}</b></span>
+    ${x.why ? `<span class="lab" style="margin-top:4px">คำอธิบาย</span><span class="read">${esc(x.why)}</span>` : ''}
+    ${!ok && !r.dup && x.type === 'choice' && x.wrong && x.wrong[mine] ? `<span class="lab" style="margin-top:4px">ทำไม ${esc(OPT_L[Number(mine) - 1] || mine)} จึงไม่ถูก</span><span class="read">${esc(x.wrong[mine])}</span>` : ''}</div>
+    <p class="sent-line">ส่งคำตอบแล้ว · รหัส ${esc(STU.no)}</p>`;
 }
 
 /* ===================== นักเรียน: แบบประเมินรวม ===================== */
@@ -1163,15 +1220,17 @@ function asRender() {
     const r = AS.result || {};
     const hasScore = r.score !== null && r.score !== undefined;
     el.innerHTML = asHero() + `<main class="pad">
-      <div class="card done-big" style="padding:22px 16px"><span class="ic">${IC.check}</span><b>ส่งแบบประเมินแล้ว</b>
-        ${hasScore ? `<span class="score">${r.score}<span style="font-size:22px;color:var(--muted);font-weight:500"> / ${r.total}</span></span><span class="muted">คะแนน</span>` : ''}
+      <div class="card done-big${r.dup ? ' warn' : ''}" style="padding:22px 16px"><span class="ic">${r.dup ? IC.alert : IC.check}</span><b>${r.dup ? 'ชุดนี้ไม่นับ' : 'ส่งแบบประเมินแล้ว'}</b>
+        ${hasScore ? `<span class="score">${r.score}<span style="font-size:22px;color:var(--muted);font-weight:500"> / ${r.total}</span></span><span class="muted">${r.dup ? 'คะแนนที่นับ (ส่งครั้งแรก)' : 'คะแนน'}</span>` : ''}
         <span class="note">รหัส ${esc(AS.no)}${AS.room ? ' · ห้อง ' + esc(AS.room) : ''}</span></div>
-      ${r.dup ? '<div class="notice wait" role="status">รหัสนี้ส่งแบบประเมินไปแล้ว ระบบนับเฉพาะครั้งแรก</div>' : ''}
-      ${r.review && I && I.items ? `<h2 style="font-size:16px;padding:4px 4px 0">เฉลย</h2>${r.review.map((x, k) => {
-        const mine = AS.answers[k];
-        const ok = ansRight(x, mine, x.ans);
-        return `<div class="rv"><div class="h"><span>ข้อ ${AS.order.indexOf(k) + 1}</span><span class="${ok ? 'yes' : 'no'}">${ok ? 'ถูก' : 'ผิด'}</span></div>
-          <span>คำตอบที่ถูก: ${x.type === 'choice' ? esc(x.opts[Number(x.ans) - 1] ?? '') : esc(ansText(x, x.ans, x.type === 'multi'))}</span>${x.why ? `<span class="read muted">${esc(x.why)}</span>` : ''}</div>`; }).join('')}` : ''}
+      ${r.dup ? '<div class="notice wait" role="status">รหัสนี้ส่งแบบประเมินไปก่อนแล้ว ระบบนับเฉพาะครั้งแรก เฉลยด้านล่างเทียบกับคำตอบชุดที่เพิ่งส่ง</div>' : ''}
+      ${r.review ? `<h2 style="font-size:16px;padding:4px 4px 0">เฉลย</h2>${r.review.map((x, k) => {
+        const mine = AS.answers[k], none = !ansReady(x, mine);
+        const ok = ansRight(x, mine, x.ans), q = x.q || (I && I.items && I.items[k] && I.items[k].q);
+        return `<div class="rv"><div class="h"><span>ข้อ ${AS.order.indexOf(k) + 1}</span><span class="${none ? 'mute' : ok ? 'yes' : 'no'}">${none ? 'ไม่ได้ตอบ' : ok ? 'ถูก' : 'ผิด'}</span></div>
+          ${q ? `<p class="read stem">${esc(q)}</p>` : ''}
+          ${none ? '' : `<span>คำตอบของคุณ: ${esc(ansText(x, mine, x.type === 'choice'))}</span>`}
+          <span class="key-line">คำตอบที่ถูก: <b>${esc(ansText(x, x.ans, x.type === 'choice' || x.type === 'multi'))}</b></span>${x.why ? `<span class="read muted">${esc(x.why)}</span>` : ''}</div>`; }).join('')}` : ''}
       </main>`;
   }
 }
@@ -1266,9 +1325,9 @@ function roomStatus(r) {
 function mainAction(r) {
   if (r.state === 'idle') return { label: `เลือกข้อสอบ ${r.room}`, fn: () => openPicker(r) };
   if (r.state === 'planned') return r.item.missing ? { label: 'เลือกข้อใหม่', fn: () => openPicker(r) } : { label: `เปิดรับคำตอบ ${r.room}`, fn: b => startIn(r, b) };
-  if (r.state === 'open') return { label: 'ดู QR และปิดรับ', fn: () => tShow('live', r.key) };
-  if (!r.report) return { label: 'ดูผลและส่งรายงาน', fn: () => tShow('result', r.key) };
-  return { label: `เลือกข้อสำหรับคาบถัดไป`, fn: () => openPicker(r) };
+  if (r.state === 'open') return { label: `ดู QR และปิดรับ ${r.room}`, fn: () => tShow('live', r.key) };
+  if (!r.report) return { label: `ดูผลและส่งรายงาน ${r.room}`, fn: () => tShow('result', r.key) };
+  return { label: `เลือกข้อคาบถัดไป ${r.room}`, fn: () => openPicker(r) };
 }
 
 function pickFocus(D) {
@@ -1308,14 +1367,14 @@ function weekLine(r) {
 function weekBadge(W) {
   if (!W) return '';
   if (W.n) return W.quota ? `สัปดาห์ที่ ${W.n}` : `สัปดาห์ที่ ${W.n} · ไม่นับ`;
-  if (W.before) return `เริ่มนับ ${W.before}`;
+  if (W.before) return `เริ่มนับการใช้ ${W.before}`;
   return W.after ? 'สิ้นสุดช่วงนับแล้ว' : 'นอกช่วงนับ';
 }
 
 function focusCard(r) {
   const st = roomStatus(r);
   let body = '';
-  if (r.state === 'idle') body = `<div class="mini"><span style="font-size:14px;color:var(--ink-2)">ยังไม่ได้เลือกข้อ</span>
+  if (r.state === 'idle') body = `<div class="mini"><span style="font-size:14px;color:var(--ink-2)">เลือกข้อสอบ 1 ข้อ แล้วเปิดให้นักเรียนตอบในคาบ</span>
       <span class="note">${r.usedCount ? `ห้องนี้ทำแล้ว ${r.usedCount} ข้อ` : 'ห้องนี้ยังไม่เคยทำข้อประจำคาบ'}</span></div>`;
   if (r.state === 'planned') body = miniItem(r.item) + `<div class="links"><button class="link" type="button" data-f="pick">เปลี่ยนข้อ</button><button class="link" type="button" data-f="more">ตัวเลือกอื่น</button></div>`;
   if (r.state === 'open') body = miniItem(r.item) + `<div class="count"><div class="r"><span>ตอบแล้ว</span><span><b class="num">${r.sent || 0}</b> / ${r.size || '?'} คน</span></div>
@@ -1328,7 +1387,7 @@ function focusCard(r) {
       ${r.report ? `<div class="links"><button class="link" type="button" data-f="result">ดูผลและรายงานที่ส่ง</button></div>` : ''}`;
   }
   const when = r.extra ? `รอบ${r.day ? ' ' + r.day : 'ก่อนหน้า'}` : '';
-  return `<section class="card focus" aria-label="ห้องที่ต้องทำต่อ">
+  return `<section class="card focus" id="t-focus" tabindex="-1" aria-label="ห้องที่ต้องทำต่อ ${esc(r.room)} ${esc(r.subject)}">
     <div class="focus-head"><div class="t"><span><b>${esc(r.room)}</b>${r.extra ? '<span class="now-tag warn">ค้างรายงาน</span>' : ''}</span>
       <span class="sub">${esc(r.subject)}${when ? ' · ' + esc(when) : ''}</span></div><span class="st ${st.cls}">${esc(st.text.split(' · ')[0])}</span></div>
     ${body}${r.extra ? '' : weekLine(r)}${stepsHtml(r)}</section>`;
@@ -1374,7 +1433,11 @@ function renderHome() {
     ${act ? `<div class="dock"><button class="btn-p" type="button" id="t-main">${esc(act.label)}</button></div>` : ''}`;
   $('#t-menu').onclick = teacherMenu;
   if (act) $('#t-main').onclick = e => act.fn(e.currentTarget);
-  $$('[data-row]', el).forEach(b => b.onclick = () => { T.focus = b.dataset.row; renderHome(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+  $$('[data-row]', el).forEach(b => b.onclick = () => {
+    T.focus = b.dataset.row; renderHome();
+    const card = $('#t-focus');
+    if (card) { card.focus({ preventScroll: true }); card.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  });
   $$('[data-copy]', el).forEach(b => b.onclick = () => copyText(b.dataset.copy, 'คัดลอกลิงก์แล้ว'));
   $$('[data-f]', el).forEach(b => b.onclick = () => {
     const a = b.dataset.f;
@@ -1425,10 +1488,25 @@ function moreSheet(r, itemId) {
   });
 }
 
+// ตัวเลือกกำหนดปิดนอกคาบ (ตรงกับ nextAt_ ใน Code.gs): ครั้งถัดไปของวันนั้นหลังเวลาปัจจุบัน เรียงตามวันที่ ค่าเริ่มต้นคือวันศุกร์
+const TH_DAY = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'];
+const TH_MON = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+function nextAt(dow, h, m) {
+  const now = new Date();
+  for (let i = 0; i < 8; i++) { const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + i, h, m); if (d.getDay() === dow && d > now) return d; }
+  return new Date(now.getTime() + 7 * 864e5);
+}
+function dlOptions() {
+  const now = new Date();
+  return [['thu', 4, 16, 30], ['fri', 5, 16, 30], ['sun', 0, 20, 0]].map(([v, dow, h, m]) => ({ v, d: nextAt(dow, h, m) }))
+    .sort((a, b) => a.d - b.d)
+    .map(({ v, d }) => `<option value="${v}"${v === 'fri' ? ' selected' : ''}>${d.toDateString() === now.toDateString() ? 'วันนี้' : 'วัน' + TH_DAY[d.getDay()] + 'ที่ ' + d.getDate() + ' ' + TH_MON[d.getMonth()]} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')} น.</option>`).join('');
+}
+
 function outSheet(r, itemId) {
   openSheet(sheetHead('ทำนอกคาบ', `${r.room} · ${r.subject}`) + `
     <div class="field"><label for="dl">ปิดรับอัตโนมัติ</label>
-      <select id="dl" class="input"><option value="fri">วันศุกร์ 16:30 น.</option><option value="thu">วันพฤหัสบดี 16:30 น.</option><option value="sun">วันอาทิตย์ 20:00 น.</option></select></div>
+      <select id="dl" class="input">${dlOptions()}</select></div>
     <span class="err" id="go-err" role="alert"></span>
     <button class="btn-p" type="button" id="go">เปิดรับนอกคาบ</button>`, () => {
     $('#go').onclick = async () => {
@@ -1443,14 +1521,29 @@ function outSheet(r, itemId) {
   });
 }
 
+// พิมพ์ข้อประจำคาบ 1 หน้า (ใช้ตอนไม่มีอินเทอร์เน็ต: ฉายด้วยเครื่องฉายทึบแสงหรือแจกกระดาษ) ไม่มีเฉลย
+function printItem(r) {
+  const it = r.item || {}, pa = $('#print-area');
+  pa.className = 'item';
+  pa.innerHTML = `<h1>${esc(r.subject)} · ห้อง ${esc(r.room)} · ข้อประจำคาบ</h1>
+    ${it.q ? `<p class="q">${esc(it.q)}</p>` : ''}${it.img ? `<img src="${esc(it.img)}" alt="" referrerpolicy="no-referrer">` : ''}
+    ${(it.opts || []).length ? `<ol>${it.opts.map((o, j) => `<li>${OPT_L[j]}. ${esc(o)}</li>`).join('')}</ol>` : ''}
+    <p class="ft">${esc(it.exam || '')}${it.c ? ' · ' + esc(it.c + ' ' + (C_TXT[it.c] || '')) : ''}${it.ind ? ' · ตัวชี้วัด ' + esc(it.ind) : ''}</p>`;
+  const done = () => { pa.className = ''; window.removeEventListener('afterprint', done); };
+  window.addEventListener('afterprint', done);
+  setTimeout(() => window.print(), 300);
+}
+
 function paperSheet(r, itemId) {
   openSheet(sheetHead('บันทึกแบบกระดาษ', `${r.room} · ${r.subject}`) + `
     ${r.state === 'open' ? '<p class="note">ระบบจะปิดรับคำตอบออนไลน์ของรอบนี้ และใช้จำนวนจากกระดาษแทน</p>' : ''}
-    <div class="field"><label for="p-n">จำนวนนักเรียนที่ตอบ</label><input id="p-n" class="input num" inputmode="numeric" placeholder="จาก ${r.size || '?'} คน"></div>
+    ${r.item && !r.item.missing ? '<button class="btn" type="button" id="p-print">พิมพ์ข้อนี้ไว้ฉายหรือแจก</button>' : ''}
+    <div class="field"><label for="p-n">จำนวนนักเรียนที่ตอบ <span class="muted" style="font-weight:400">(ห้องนี้มี ${r.size || '?'} คน)</span></label><input id="p-n" class="input num" inputmode="numeric" placeholder="เช่น ${r.size ? Math.round(r.size * 0.9) : 30}"></div>
     <div class="field"><label for="p-k">จำนวนที่ตอบถูก</label><input id="p-k" class="input num" inputmode="numeric" placeholder="เช่น 21"></div>
     <span class="err" id="p-err" role="alert"></span>
     <p class="note">นับเป็นการใช้เมื่อจำนวนนักเรียนที่ตอบถึงร้อยละ ${esc((T.data && T.data.weekInfo && T.data.weekInfo.useMin) || 50)} ของห้อง</p>
     <button class="btn-p" type="button" id="go">บันทึก</button>`, () => {
+    const pr = $('#p-print'); if (pr) pr.onclick = () => printItem(r);
     $('#go').onclick = async () => {
       const n = +$('#p-n').value, k = +$('#p-k').value;
       if (!Number.isInteger(n) || n < 1 || (r.size && n > r.size)) return $('#p-err').textContent = `จำนวนนักเรียนต้องอยู่ระหว่าง 1–${r.size || 'จำนวนในห้อง'}`;
@@ -1590,6 +1683,14 @@ async function pickStart(r, itemId, mode, dl, btn) {
 }
 
 /* ----- หน้า QR รับคำตอบ ----- */
+// ก่อนยืนยันปิดรับ: เตือนถ้าจำนวนที่ตอบในสัปดาห์นี้ยังไม่ถึงเกณฑ์นับเป็นการใช้ (เตือนเฉยๆ ปิดได้ตามปกติ)
+function closeShort(r) {
+  const w = r.week, W = (T.data && T.data.weekInfo) || {};
+  if (!w || w.counted || !w.need || !r.size) return '';
+  const sent = Math.max(w.sent || 0, r.sent || 0);
+  if (sent >= w.need) return '';
+  return `ตอบแล้ว <b>${sent}/${r.size}</b> คน (${pct(sent, r.size)}%) ยังไม่ถึงเกณฑ์นับเป็นการใช้ ${w.need} คน (ร้อยละ ${esc(W.useMin || 50)}) ถ้าปิดตอนนี้สัปดาห์นี้จะยังไม่นับ`;
+}
 function renderLive(r) {
   const el = $('#view-teacher'), it = r.item || {};
   const msg = `${r.subject} ห้อง ${r.room} · ข้อประจำคาบ\nลิงก์สำหรับตอบ: ${r.link}\nหรือกรอกรหัสห้อง ${fmtCode(r.code)}`;
@@ -1605,18 +1706,20 @@ function renderLive(r) {
       <div class="acts3"><button type="button" id="lv-fs">${IC.expand}ฉายเต็มจอ</button>
         <a href="${esc(lineShare(msg))}" target="_blank" rel="noopener">${IC.chat}ส่งเข้ากลุ่ม LINE</a>
         <a href="${esc(lineShare(scr))}" target="_blank" rel="noopener">${IC.screen}ส่งลิงก์ฉายจอ</a></div>
-      <div class="foot-links"><button type="button" id="lv-paper">บันทึกแบบกระดาษแทน</button></div>
+      <div class="foot-links"><button type="button" id="lv-copy-scr">คัดลอกลิงก์ฉายจอ (เปิดในคอมห้องเรียน)</button><button type="button" id="lv-paper">บันทึกแบบกระดาษแทน</button></div>
     </main>
     <div class="dock"><button class="btn-p${T.arm ? ' arm' : ''}" type="button" id="lv-close">${T.arm ? 'กดอีกครั้งเพื่อยืนยัน' : 'ปิดรับคำตอบ'}</button>
+      ${T.arm && closeShort(r) ? `<div class="notice wait" role="status"><span>${closeShort(r)}</span></div>` : ''}
       <span class="cap" aria-live="polite">${T.arm ? 'เมื่อปิดรับแล้ว นักเรียนจะส่งคำตอบไม่ได้และจะเห็นเฉลย' : `ปิดรับอัตโนมัติ ${esc(r.mode === 'นอกคาบ' ? r.deadline : r.deadlineHm + ' น.')}`}</span>
       <span class="err" id="lv-err" role="alert" style="text-align:center"></span></div>`;
   drawQr($('#lv-qr'), r.link, 600);
   $('#lv-back').onclick = () => tShow('home');
   $('#lv-fs').onclick = () => openFs(r);
   $('#lv-paper').onclick = () => paperSheet(r);
+  $('#lv-copy-scr').onclick = () => copyText(r.screenLink, 'คัดลอกลิงก์ฉายจอแล้ว นำไปเปิดในเบราว์เซอร์ของคอมห้องเรียน');
   $('#lv-close').onclick = async e => {
     const b = e.currentTarget;
-    if (!T.arm) { T.arm = true; renderLive(r); clearTimeout(T.armTimer); T.armTimer = setTimeout(() => { if (T.arm && T.page === 'live') { T.arm = false; renderLive(r); } }, 8000); $('#lv-close').focus(); return; }
+    if (!T.arm) { T.arm = true; renderLive(r); clearTimeout(T.armTimer); T.armTimer = setTimeout(() => { if (T.arm && T.page === 'live') { T.arm = false; renderLive(r); } }, 15000); $('#lv-close').focus(); return; }
     clearTimeout(T.armTimer);
     b.disabled = true; b.textContent = 'กำลังปิดรับ…';
     try { await api('closeRound', r.roundId); }
@@ -1662,9 +1765,9 @@ function renderResult(r) {
     <div class="sent-box"><div class="h"><span class="st ok">ส่งรายงานแล้ว${r.report.at ? ' · ' + esc(r.report.at) : ''}</span><button class="link" type="button" id="rp-edit">แก้ไข</button></div>
       <div class="mini" style="background:none;padding:0;gap:6px"><div class="tags">${cTag(r.report.c, 'on-white')}${r.report.chips ? r.report.chips.split(' · ').map(c => `<span class="note">· ${esc(c)}</span>`).join('') : ''}</div></div>
       ${r.report.note ? `<p>${esc(r.report.note)}</p>` : ''}</div>`
-    : `<div class="lv-head"><span id="lab-lv">ระดับที่ใช้สอน</span><b>${rp.c ? esc(rp.c + ' ' + C_TXT[rp.c]) : 'เลือก 1 ระดับ'}</b></div>
+    : `<div class="lv-head"><span id="lab-lv">ระดับที่ใช้สอน</span>${rp.c ? `<b>${esc(rp.c + ' ' + C_TXT[rp.c])}</b>` : '<b class="none">ยังไม่ได้เลือก</b>'}</div>
       ${it.c && C_TXT[it.c] ? `<p class="note" style="margin:-4px 0 0">ระดับในคลังข้อสอบ: ${esc(it.c)}</p>` : ''}
-      <div class="levels" role="radiogroup" aria-labelledby="lab-lv">${Object.keys(C_TXT).map(c => `<button type="button" role="radio" aria-checked="${rp.c === c}" data-c="${c}" title="${C_TXT[c]}">${c}</button>`).join('')}</div>
+      <div class="levels" role="radiogroup" aria-labelledby="lab-lv">${Object.keys(C_TXT).map(c => `<button type="button" role="radio" aria-checked="${rp.c === c}" data-c="${c}" aria-label="${c} ${C_TXT[c]}">${c}<small>${C_TXT[c]}</small></button>`).join('')}</div>
       <div class="chips" role="group" aria-label="ตัวเลือกด่วน">${REPORT_CHIPS.map(c => `<button type="button" class="chip" aria-pressed="${rp.chips.has(c)}" data-chip="${esc(c)}">${esc(c)}</button>`).join('')}</div>
       <textarea class="memo" id="rp-note" rows="1" maxlength="300" aria-label="บันทึกเพิ่มเติม" placeholder="บันทึกเพิ่มเติม (ถ้ามี)">${esc(rp.note)}</textarea>
       <span class="err" id="rp-err" role="alert"></span>`;
@@ -1722,6 +1825,11 @@ async function tTick() {
 }
 
 /* ----- QR เต็มจอ (ฉายขึ้นจอในห้องเรียน) ----- */
+// ที่อยู่เว็บแบบสั้นสำหรับพิมพ์เอง (ไม่มี https:// และพารามิเตอร์) · เปิดแล้วเจอช่องกรอกรหัสห้อง
+const typeUrl = link => { try { const u = new URL(link); return (u.host + u.pathname).replace(/\/$/, ''); } catch (e) { return ''; } };
+const fsHow = link => { const u = typeUrl(link);
+  return `<span class="fs-how">สแกน QR Code หรือเข้าเว็บ</span>${u ? `<span class="fs-url">${esc(u).replace(/\//g, '/<wbr>')}</span><span class="fs-how">แล้วกรอกรหัสห้อง</span>` : ''}`; };
+
 function openFs(r) {
   const fs = $('#fs');
   closeSheet();
@@ -1730,7 +1838,7 @@ function openFs(r) {
     <div class="fs-top"><h2>${esc(r.subject)} · ข้อประจำคาบ</h2><button class="btn" type="button" id="fs-x">ปิด (Esc)</button></div>
     <div class="fs-main">${r.item && r.item.q ? `<p class="fs-q">${esc(r.item.q)}</p>` : ''}<div class="fs-qr" id="fs-qr"></div>
       <div class="fs-side"><span class="fs-room">ห้อง ${esc(r.room)}</span>
-        <span>สแกน QR Code หรือกรอกรหัสห้อง</span><span class="fs-code">${fmtCode(r.code)}</span>
+        ${fsHow(r.link)}<span class="fs-code">${fmtCode(r.code)}</span>
         <span class="fs-count">ตอบแล้ว <b id="fs-count">${r.sent || 0}</b> จาก ${r.size || '?'} คน</span></div></div>
     <p class="fs-foot">ใช้ได้เฉพาะห้อง ${esc(r.room)}</p>`;
   fs.hidden = false;
@@ -1821,14 +1929,14 @@ function ovRender() {
       <div class="tw"><table class="tb"><thead><tr><th>ระดับชั้น</th><th>ประเภทข้อสอบ</th><th class="r">นักเรียน</th><th>ข้อที่รวมได้</th><th>ยังขาด</th><th>สถานะ</th><th></th></tr></thead>
         <tbody>${o.asm.map(x => `<tr><td class="b">${esc(x.level)}</td><td class="m">${esc(x.types)}</td><td class="r num">${x.students.toLocaleString('en-US')}</td>
           <td>${x.need ? bar(x.have, x.need, x.have < x.need) : '<span class="m">—</span>'}</td><td class="m" style="min-width:140px">${esc(x.gap || (x.need ? 'ครบแล้ว' : '—'))}</td>
-          <td><span class="st ${x.state === 'live' ? 'ok' : x.state === 'scheduled' ? 'info' : x.state === 'draft' && x.have < x.need ? 'wait' : 'mute'}">${esc(x.status)}</span>${x.window ? `<div class="m" style="font-size:12px">${esc(x.window)}</div>` : ''}</td>
+          <td><span class="st ${x.state === 'live' ? 'ok' : x.state === 'scheduled' ? 'info' : x.state === 'draft' && x.have < x.need ? 'wait' : 'mute'}">${esc(x.status)}</span>${x.window ? `<div class="m" style="font-size:13px">${esc(x.window)}</div>` : ''}</td>
           <td class="r"><button class="btn sm" type="button" data-lv="${esc(x.level)}">กำกับแบบประเมิน</button></td></tr>`).join('') || '<tr><td colspan="7" class="m">ยังไม่มีระดับชั้นในชีตห้องเรียน</td></tr>'}</tbody></table></div></section>
 
     <div class="cols">
       <section class="sec wide" aria-labelledby="h-bank"><div class="sec-h"><div class="t"><h2 id="h-bank">คลังข้อสอบรายวิชา</h2>
           <span class="s">เป้า ${o.target} ข้อต่อวิชาต่อระดับ · รวม ${o.bankTotal.toLocaleString('en-US')} ข้อ</span></div></div>
         <div class="tw"><table class="tb"><thead><tr><th>วิชา</th><th>ระดับ</th><th>ผู้รับผิดชอบ</th><th class="r">ใช้ในคาบแล้ว</th><th>ข้อในคลัง</th><th>สถานะ</th></tr></thead>
-          <tbody>${o.bank.length ? o.bank.map(x => `<tr><td class="b">${esc(x.subject)}${x.taught ? '' : ' <span class="m" style="font-weight:400;font-size:12px">(ยังไม่มีครูผู้สอน)</span>'}</td><td class="nw">${esc(x.level)}</td><td class="m nw">${esc(x.owner || '—')}</td>
+          <tbody>${o.bank.length ? o.bank.map(x => `<tr><td class="b">${esc(x.subject)}${x.taught ? '' : ' <span class="m" style="font-weight:400;font-size:13px">(ยังไม่มีครูผู้สอน)</span>'}</td><td class="nw">${esc(x.level)}</td><td class="m nw">${esc(x.owner || '—')}</td>
             <td class="r num">${x.used}</td><td>${bar(x.items, o.target, x.state === 'bad')}</td><td><span class="st ${x.state}">${esc(x.status)}</span></td></tr>`).join('')
             : '<tr><td colspan="6" class="m">คลังข้อสอบยังว่าง</td></tr>'}</tbody></table></div></section>
       <div class="narrow">
@@ -1873,7 +1981,7 @@ function asmRender() {
   const phase = d.exists ? s.phase : 'none';
   const draftView = !d.exists || phase === 'draft';
   const keepY = window.scrollY;
-  const tabs = `<div class="tabs" role="tablist" aria-label="ระดับชั้น">${d.levels.map(x => `<button type="button" role="tab" data-tab="${esc(x.level)}" aria-selected="${x.level === d.level}">${esc(x.level)}${x.phase ? ` <span style="font-size:12px;font-weight:400">· ${esc((PHASE[x.phase] || PHASE.none)[1].split(' · ')[0])}</span>` : ''}</button>`).join('')}</div>`;
+  const tabs = `<div class="tabs" role="tablist" aria-label="ระดับชั้น">${d.levels.map(x => `<button type="button" role="tab" data-tab="${esc(x.level)}" aria-selected="${x.level === d.level}">${esc(x.level)}${x.phase ? ` <span style="font-size:13px;font-weight:400">· ${esc((PHASE[x.phase] || PHASE.none)[1].split(' · ')[0])}</span>` : ''}</button>`).join('')}</div>`;
   const head = `<button class="back" type="button" id="as-back">← ภาพรวมข้อมูล</button>
     <div class="pg-head"><div class="t"><div><h1>${esc(c.title || 'แบบประเมินรวม ' + d.level)}</h1>${phaseSt(phase)}</div>
         <p>${esc(d.level)} · นักเรียน ${d.students.toLocaleString('en-US')} คน ${d.roomCount} ห้อง · ครูประจำชั้นที่ส่งลิงก์ต่อได้ ${d.homeroomCount} จาก ${d.roomCount} ห้อง</p></div>
@@ -1925,7 +2033,7 @@ function asmDraft(d, c, edit) {
         <div class="sec-pad" style="flex-direction:row;flex-wrap:wrap;justify-content:space-between;align-items:center;border-top:1px solid var(--line-2)">
           ${!lock && addable.length ? `<div class="addrow"><select id="add-exam" aria-label="ประเภทข้อสอบ">${addable.map(x => `<option>${esc(x.e)}</option>`).join('')}</select>
             <select id="add-sub" aria-label="วิชา"></select><button class="btn sm" type="button" id="add-go">+ เพิ่มวิชา</button></div>` : '<span></span>'}
-          <b class="num">รวม ${total} ข้อ · ประมาณ ${Math.max(10, Math.round(total * 1.75))} นาที</b></div></section>
+          <b class="num">${total ? `รวม ${total} ข้อ · ประมาณ ${Math.max(10, Math.round(total * 1.75))} นาที` : 'ยังไม่ได้กำหนดจำนวนข้อ'}</b></div></section>
       <section class="sec" aria-labelledby="h-it"><div class="sec-h line"><div class="t"><h2 id="h-it">รายการข้อ${d.exists ? ` (${items.length} / ${d.summary.need} ข้อ)` : ''}</h2>
           <span class="s">ข้อที่ไม่ล็อกอาจถูกเปลี่ยนเมื่อสุ่มใหม่</span></div>
           ${edit && d.exists ? `<button class="btn pri sm" type="button" data-a="fill"${A.dirty ? ' disabled title="บันทึกร่างก่อน"' : ''}>สุ่มเติมให้ครบ ${d.summary.need} ข้อ</button>` : ''}</div>
@@ -2051,7 +2159,8 @@ async function asmAct(a, btn) {
       <p class="note">หลังประกาศจะแก้ไขข้อและสัดส่วนไม่ได้</p>
       ${s.have < s.need ? `<div class="notice wait">มีข้อ ${s.have} จาก ${s.need} ข้อ ยังไม่ครบตามสัดส่วน</div>` : ''}
       ${(d.uncovered || []).length ? `<div class="notice wait"><span><b>${d.uncovered.map(x => esc(x.room)).join(', ')}</b> ไม่มีครูประจำชั้นที่ส่งลิงก์ต่อได้</span></div>` : ''}
-      <span class="err" id="go-err" role="alert"></span><button class="btn-p" type="button" id="go">ประกาศ</button>`, () => {
+      ${!s.have ? '<div class="notice wait" role="alert">ยังไม่มีข้อในแบบประเมิน กดสุ่มเติมข้อก่อนจึงประกาศได้</div>' : ''}
+      <span class="err" id="go-err" role="alert"></span><button class="btn-p" type="button" id="go"${s.have ? '' : ' disabled'}>${!s.have ? 'ประกาศไม่ได้' : s.have < s.need ? `ประกาศทั้งที่มี ${s.have} จาก ${s.need} ข้อ` : 'ประกาศ'}</button>`, () => {
       $('#go').onclick = async () => {
         $('#go').disabled = true;
         try { await api('adminAssessStatus', lv, 'เปิด'); } catch (e) { $('#go-err').textContent = failMsg(e); $('#go').disabled = false; return; }
@@ -2199,7 +2308,15 @@ async function screenInit(token) {
     let d;
     try { d = await run('screenData', token); } catch (e) { return; }
     if (d.closed) {
-      fs.innerHTML = `<div></div><div class="fs-closed"><b class="fs-room">${d.room ? 'ห้อง ' + esc(d.room) : ''}</b><span>ปิดรับคำตอบแล้ว</span></div><div></div>`;
+      const res = d.result, it = d.item;
+      if (res && it && res.n) {
+        const bars = res.dist ? it.opts.map((o, j) => { const n = res.dist[j] || 0, key = isKey(it, j);
+          return `<div class="fs-bar${key ? ' key' : ''}"><span class="k">${OPT_L[j]}</span><span class="tx" title="${esc(o)}">${esc(o)}${key ? ' ✓' : ''}</span><span class="tr"><span style="width:${pct(n, res.n)}%"></span></span><span class="n">${n}</span></div>`; }).join('') : '';
+        fs.innerHTML = `<div class="fs-top"><h2>${esc(d.subject || '')} · ห้อง ${esc(d.room)} · ปิดรับคำตอบแล้ว</h2></div>
+          <div class="fs-res">${it.q ? `<p class="fs-q" style="max-width:none">${esc(it.q)}</p>` : ''}
+            <div><span class="pct">${res.pct}%</span> <span class="sum">ตอบถูก ${res.ok} จาก ${res.n} คน</span></div>${bars}</div>
+          <p class="fs-foot">${res.dist ? 'แถบสีเขียวคือคำตอบที่ถูก ตัวเลขคือจำนวนนักเรียนที่เลือก' : ''}</p>`;
+      } else fs.innerHTML = `<div></div><div class="fs-closed"><b class="fs-room">${d.room ? 'ห้อง ' + esc(d.room) : ''}</b><span>ปิดรับคำตอบแล้ว</span></div><div></div>`;
       return true;
     }
     if (!drawn) {
@@ -2207,7 +2324,7 @@ async function screenInit(token) {
         <div class="fs-top"><h2>${esc(d.subject)} · ข้อประจำคาบ</h2><span>ปิดรับอัตโนมัติ ${esc(d.deadline)}</span></div>
         <div class="fs-main">${d.q ? `<p class="fs-q">${esc(d.q)}</p>` : ''}<div class="fs-qr" id="fs-qr"></div>
           <div class="fs-side"><span class="fs-room">ห้อง ${esc(d.room)}</span>
-            <span>สแกน QR Code หรือกรอกรหัสห้อง</span><span class="fs-code">${fmtCode(d.code)}</span>
+            ${fsHow(d.link)}<span class="fs-code">${fmtCode(d.code)}</span>
             <span class="fs-count">ตอบแล้ว <b id="fs-count">${d.sent}</b> จาก ${d.size || '?'} คน</span></div></div>
         <p class="fs-foot">ใช้ได้เฉพาะห้อง ${esc(d.room)}</p>`;
       drawQr($('#fs-qr'), d.link); drawn = true;
