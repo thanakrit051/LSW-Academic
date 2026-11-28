@@ -2091,7 +2091,7 @@ function sysRender() {
     ${o.canAdmin ? `<section class="sec" aria-labelledby="h-tool"><div class="sec-h line"><div class="t"><h2 id="h-tool">เครื่องมือแก้ปัญหา</h2>
         <span class="s">ใช้เมื่อครูเข้าระบบไม่ได้ หรือสงสัยว่ามีคนใช้บัญชีแทน</span></div></div>
       <div class="tools">
-        <div><span class="t"><b>ครูกรอกรหัสผิดเกิน 5 ครั้ง</b><span>ระบบล็อก 15 นาที เลือกครูแล้วกดปลดล็อกได้ทันที</span></span>
+        <div><span class="t"><b>ครูกรอกรหัสผิดเกิน 15 ครั้ง</b><span>ระบบล็อก 5 นาที เลือกครูแล้วกดปลดล็อกได้ทันที</span></span>
           <div class="tact"><select class="box" id="ul-t" aria-label="ครูที่ต้องการปลดล็อก"><option value="">เลือกครู</option>${(T2 || []).map(t => `<option value="${esc(t.tid)}">${esc(t.tid)} · ${esc(t.name)}${t.hasLogin ? '' : ' (ยังไม่ตั้งรหัสผ่าน)'}</option>`).join('')}</select>
           <button class="btn sm" type="button" id="ul-go">ปลดล็อก</button></div></div>
         <div><span class="t"><b>ออกจากระบบครูทุกเครื่อง</b><span>ทุกคนรวมถึงคุณต้องเข้าสู่ระบบใหม่ ใช้เมื่อเปลี่ยนรหัสผ่านหรือสงสัยว่ามีคนใช้บัญชีแทน</span></span>
